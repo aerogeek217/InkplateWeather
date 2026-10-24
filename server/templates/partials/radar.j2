@@ -1,0 +1,52 @@
+{% set r = ctx.radar %}
+      <div style="position: relative; width: 600px; height: 627px; flex-shrink: 0">
+        <svg width="600" height="627" viewBox="-240 -250.8 480 501.6" role="img" aria-label="{{ r.aria_label }}" style="display: block; outline: 1px solid #000000">
+{% if r.svg_layers %}
+{{ r.svg_layers | safe }}
+{% else %}
+          <rect x="-240" y="-250.8" width="480" height="501.6" fill="#FFFFFF"></rect>
+{% endif %}
+        </svg>
+{% if r.message %}
+        <div style="position: absolute; left: 60px; right: 60px; top: 280px; text-align: center; font-size: 17px; font-weight: 600; color: #494949">{{ r.message }}</div>
+{% endif %}
+{% if r.site_time %}
+        <div style="position: absolute; left: 10px; top: 10px; background: #FFFFFF; border: 1px solid #000000; padding: 6px 10px; display: flex; gap: 10px; align-items: center; font-size: 12px">
+          <span style="font-weight: 700">Radar · {{ r.site_time }}</span>
+{% if r.legend == "types" %}
+          <span style="display: flex; gap: 4px; align-items: center; color: #494949">
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect width="14" height="14" fill="#B6B6B6" stroke="#000000"></rect></svg>Rain
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" style="margin-left: 4px"><defs><pattern id="wLgMix" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="4" stroke="#000000" stroke-width="1.4"></line></pattern></defs><rect width="14" height="14" fill="url(#wLgMix)" stroke="#000000"></rect></svg>Ice/sleet
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" style="margin-left: 4px"><defs><pattern id="wLgSnow" width="4.6" height="4.6" patternUnits="userSpaceOnUse"><circle cx="2.3" cy="2.3" r="1.1" fill="#000000"></circle></pattern></defs><rect width="14" height="14" fill="url(#wLgSnow)" stroke="#000000"></rect></svg>Snow
+          </span>
+{% else %}
+          <span style="display: flex; gap: 3px; align-items: center; color: #494949">
+            Light
+            <span style="width: 12px; height: 12px; background: #DBDBDB"></span><span style="width: 12px; height: 12px; background: #929292"></span><span style="width: 12px; height: 12px; background: #494949"></span><span style="width: 12px; height: 12px; background: #000000"></span>
+            Heavy
+          </span>
+{% endif %}
+{% if r.lightning_legend %}
+          <span style="display: flex; gap: 4px; align-items: center; color: #494949">{{ icon_svg("markers/lightning-recent", 9, 12) }}Lightning · 30 min</span>
+{% endif %}
+        </div>
+{% endif %}
+{% if r.callout or r.next_chip %}
+        <div style="position: absolute; right: 12px; bottom: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px">
+{% if r.callout %}
+          <div style="background: #000000; color: #FFFFFF; padding: 10px 14px; display: flex; gap: 12px; align-items: center">
+{% if r.callout.kind in callout_icons %}{% set ci = callout_icons[r.callout.kind] %}
+            {{ icon_svg(ci[0], ci[1], ci[2]) }}
+{% endif %}
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 26px; font-weight: 800; line-height: 1; letter-spacing: -0.02em">{{ r.callout.headline }}</span>
+              <span style="font-size: 12.5px; color: #DBDBDB">{{ r.callout.detail }}</span>
+            </div>
+          </div>
+{% endif %}
+{% if r.next_chip %}
+          <div style="background: #FFFFFF; border: 1px solid #000000; padding: 4px 10px; font-size: 12.5px; font-weight: 600">{{ r.next_chip }}</div>
+{% endif %}
+        </div>
+{% endif %}
+      </div>

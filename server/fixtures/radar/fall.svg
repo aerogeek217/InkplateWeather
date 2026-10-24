@@ -1,0 +1,54 @@
+<!-- Phase-1 radar artwork for the fall fixture: the hand-drawn layers of design/source/dashboard.html (base map, echoes, overlays). Phase 3 replaces this with generated layers. -->
+<rect x="-240" y="-250.8" width="480" height="501.6" fill="#FFFFFF"></rect>
+<path d="M-62,-280 L-62,70 M95,-280 L95,280 M-140,-132 L-140,280 M-40,70 L-40,280 M-280,-132 L213,-132 M-280,70 L213,70 M-140,150 L213,150 M-62,-230 L213,-230" fill="none" stroke="#DBDBDB" stroke-width="1"></path>
+<path d="M213,-280 L213,280" fill="none" stroke="#929292" stroke-width="1.2" stroke-dasharray="8 4"></path>
+<text x="228" y="-130" transform="rotate(-90 228 -130)" text-anchor="middle" font-family="Inter Tight, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="4" fill="#929292">INDIANA</text>
+<path d="M25,-280 L11,-146 L2,-100 L-8,-25 L-6,50 L0,123 L-34,235 L-50,280 M-280,-240 L-207,-185 L-120,-90 L-20,-25 L60,-20 L185,-10 L280,0 M-8,-25 L-100,-22 L-235,73 L-280,100" fill="none" stroke="#B6B6B6" stroke-width="3.5" stroke-linejoin="round"></path>
+<g fill="#929292">
+  <path d="M-232,-48 C-222,-56 -206,-50 -200,-42 C-194,-34 -204,-26 -214,-30 C-222,-34 -236,-38 -232,-48 Z"></path>
+  <path d="M176,-56 C182,-52 184,-44 182,-36 C180,-30 176,-32 175,-40 C174,-48 172,-54 176,-56 Z"></path>
+  <path d="M-176,190 C-168,200 -162,220 -164,240 C-166,262 -158,275 -168,280 C-176,268 -180,250 -178,232 C-176,214 -184,200 -176,190 Z"></path>
+</g>
+<path d="M-262,280 C-275,200 -240,130 -222,70 C-205,10 -195,-70 -168,-140 C-148,-195 -128,-245 -108,-280 L-28,-280 C-48,-232 -66,-182 -80,-125 C-95,-62 -104,-2 -118,58 C-132,118 -142,198 -132,280 Z" fill="#DBDBDB"></path>
+<circle cx="-52" cy="62" r="13" fill="#DBDBDB"></circle>
+<circle cx="-34" cy="-118" r="9" fill="#DBDBDB"></circle>
+<path d="M-222,280 C-232,205 -208,140 -194,80 C-180,18 -168,-55 -146,-120 C-130,-168 -114,-215 -98,-262 C-86,-262 -82,-246 -88,-222 C-102,-165 -116,-105 -128,-40 C-140,22 -150,86 -158,150 C-165,205 -166,245 -170,280 Z" fill="#929292"></path>
+<g fill="#494949">
+  <ellipse cx="-176" cy="108" rx="16" ry="32" transform="rotate(18 -176 108)"></ellipse>
+  <ellipse cx="-150" cy="-42" rx="13" ry="26" transform="rotate(18 -150 -42)"></ellipse>
+  <ellipse cx="-118" cy="-150" rx="10" ry="20" transform="rotate(18 -118 -150)"></ellipse>
+  <ellipse cx="-195" cy="230" rx="12" ry="22" transform="rotate(18 -195 230)"></ellipse>
+</g>
+<g fill="#000000">
+  <ellipse cx="-178" cy="104" rx="6" ry="12" transform="rotate(18 -178 104)"></ellipse>
+  <ellipse cx="-151" cy="-46" rx="5" ry="10" transform="rotate(18 -151 -46)"></ellipse>
+</g>
+<g fill="none" stroke="#000000" stroke-width="1.3" stroke-dasharray="6 4">
+  <path d="M-34.9,-250.8 L-139,250.8"></path>
+  <path d="M36.5,-250.8 L-67.6,250.8"></path>
+  <path d="M106.8,-250.8 L2.7,250.8"></path>
+</g>
+<g font-family="Inter Tight, Arial, sans-serif" font-size="10" font-weight="800" text-anchor="middle">
+  <g transform="translate(-44.4,-205)"><rect x="-18" y="-8" width="36" height="14" fill="#000000"></rect><text y="3" fill="#FFFFFF">3 PM</text></g>
+  <g transform="translate(27,-205)"><rect x="-18" y="-8" width="36" height="14" fill="#000000"></rect><text y="3" fill="#FFFFFF">4 PM</text></g>
+  <g transform="translate(97.3,-205)"><rect x="-18" y="-8" width="36" height="14" fill="#000000"></rect><text y="3" fill="#FFFFFF">5 PM</text></g>
+</g>
+<circle cx="0" cy="0" r="140" fill="none" stroke="#6D6D6D" stroke-width="1"></circle>
+<path d="M-128,128 L-62,101" fill="none" stroke="#000000" stroke-width="3.2" stroke-linecap="round"></path>
+<path d="M-51,96 L-65,91 L-60,106 Z" fill="#000000"></path>
+<g font-family="Inter Tight, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#000000" stroke="#FFFFFF" stroke-width="4" paint-order="stroke">
+  <text x="-126" y="106">15 mph</text>
+  <circle cx="2" cy="-100" r="3.2"></circle><text x="8" y="-96">Rantoul</text>
+  <circle cx="11" cy="-146" r="3.2"></circle><text x="17" y="-142">Paxton</text>
+  <circle cx="185" cy="-10" r="3.6"></circle><text x="179" y="-17" text-anchor="end">Danville</text>
+  <circle cx="-235" cy="73" r="3.6"></circle><text x="-229" y="92">Decatur</text>
+  <circle cx="-100" cy="-22" r="3.2"></circle><text x="-100" y="-30" text-anchor="middle">Monticello</text>
+  <circle cx="-210" cy="-34" r="3.2"></circle><text x="-205" y="-60">Clinton</text>
+  <circle cx="-207" cy="-185" r="3.6"></circle><text x="-200" y="-181">Bloomington</text>
+  <circle cx="0" cy="123" r="3.2"></circle><text x="7" y="127">Tuscola</text>
+  <circle cx="-34" cy="235" r="3.6"></circle><text x="-27" y="239">Mattoon</text>
+  <text x="9" y="-28">Champaign</text>
+  <text x="102" y="-100" font-weight="400" fill="#494949">25 mi</text>
+</g>
+<rect x="-6" y="-6" width="12" height="12" fill="#000000"></rect>
+<text x="12" y="15" font-family="Inter Tight, Arial, sans-serif" font-size="11.5" font-weight="800" fill="#000000" stroke="#FFFFFF" stroke-width="4" paint-order="stroke">SAVOY</text>

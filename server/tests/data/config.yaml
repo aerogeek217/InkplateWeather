@@ -1,0 +1,41 @@
+# Test config: fixture mode, every field from the fixture provider (mirrors config/config.example.yaml).
+location: {name: "Savoy, IL", lat: 40.0617, lon: -88.2517, tz: America/Chicago}
+server:
+  refresh_minutes: 30
+  fixture: fall
+providers:
+  fixture: {type: fixture, name: fall}
+fields:
+  outdoor.temperature: [{from: fixture}]
+  outdoor.humidity: [{from: fixture}]
+  outdoor.feels_like: [{from: fixture}]
+  outdoor.temperature_history: [{from: fixture}]
+  wind.speed: [{from: fixture}]
+  wind.gust: [{from: fixture}]
+  wind.direction: [{from: fixture}]
+  uv.index: [{from: fixture}]
+  indoor.temperature: [{from: fixture}]
+  indoor.humidity: [{from: fixture}]
+  garage.temperature: [{from: fixture}]
+  garage.humidity: [{from: fixture}]
+  pressure.sea_level: [{from: fixture}]
+  pressure.trend_3h: [{from: fixture}]
+  rain.today: [{from: fixture}]
+  rain.week: [{from: fixture}]
+  rain.month: [{from: fixture}]
+  rain.year: [{from: fixture}]
+  air.aqi: [{from: fixture}]
+  snow.depth: [{from: fixture}]
+  snow.season: [{from: fixture}]
+  normals.high: [{from: fixture}]
+  normals.low: [{from: fixture}]
+  conditions.current: [{from: fixture}]
+  forecast.hourly: [{from: fixture}]
+  forecast.daily: [{from: fixture}]
+  alerts.active: [{from: fixture}]
+  astro.sun: [{from: fixture}]
+  astro.moon: [{from: fixture}]
+  radar.frame: [{from: fixture}]
+  radar.callout: [{from: fixture}]
+  summary.day_line: [{from: fixture}]
+  summary.next_hazard: [{from: fixture}]

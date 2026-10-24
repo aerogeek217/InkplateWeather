@@ -1,0 +1,18 @@
+{% set cols = "display: grid; grid-template-columns: 60px 30px minmax(0, 1fr) 62px 50px 64px 42px; column-gap: 8px; align-items: center; flex: 1; min-height: 24px" %}
+      <div aria-label="Seven-day forecast" style="display: flex; flex-direction: column; border-top: 3px solid #000000; flex: 1; min-height: 0">
+{% for row in ctx.forecast %}
+        <div style="{{ cols }}{% if not loop.first %}; border-top: 1px solid #B6B6B6{% endif %}">
+{% if row.is_today %}
+          <span style="justify-self: start; background: #000000; color: #FFFFFF; padding: 1px 6px; font-size: 13px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase">{{ row.day }}</span>
+{% else %}
+          <span style="font-size: 14.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase">{{ row.day }}</span>
+{% endif %}
+          {{ icon_svg(row.icon.name, 28) }}
+          <span style="font-size: 14.5px">{{ row.text }}</span>
+          <span style="display: flex; gap: 4px; align-items: center; font-size: 14.5px{% if row.wind.bold %}; font-weight: 700{% endif %}">{% if row.wind.dir_text %}{{ icon_svg(wind_arrow(row.wind.dir_text), 12, label="from the " ~ wind_names[row.wind.dir_text]) }}{% endif %}{{ row.wind.dir_text }} {{ row.wind.speed }}</span>
+{% set pm = precip_markers[row.precip_kind] %}
+          <span style="display: flex; gap: 3px; align-items: center; justify-content: flex-end; font-size: 14.5px; font-weight: 700">{{ icon_svg(pm[0], pm[1], pm[2]) }}{{ row.precip_text }}</span>
+          <span style="font-size: 23px; font-weight: 800; line-height: 1; padding-left: 16px">{{ row.high }}</span><span style="font-size: 23px; font-weight: 300; color: #6D6D6D; line-height: 1">{{ row.low }}</span>
+        </div>
+{% endfor %}
+      </div>
