@@ -45,20 +45,20 @@ async def test_fall_header_and_current():
 
 async def test_fall_trend_geometry_matches_board():
     t = (await build("fall"))[0].trend
-    assert [g for g in t.gridlines] == [(12.25, "60°"), (32.88, "50°"), (53.5, "40°")]
+    assert [g for g in t.gridlines] == [(10.5, "60°"), (28.18, "50°"), (45.86, "40°")]
     assert close(t.midnights, [91.5, 265.1, 438.7])
     assert t.day_labels == [(34.0, "FRI"), (96.0, "SAT"), (270.0, "SUN"), (443.0, "MON")]
-    assert close(t.now, (196.4, 15.55))
-    assert len(t.past) == 24 and close(t.past[0], (30, 6.06)) and close(t.past[12], (116.8, 49.38))
-    board_future = [(196.4, 15.55), (200, 12.25), (207.3, 24.62), (221.7, 32.88), (243.4, 43.19), (265.1, 51.44),
-                    (286.8, 55.56), (308.5, 57.62), (330.2, 49.38), (351.9, 34.94), (373.6, 28.75), (395.3, 39.06),
-                    (417, 51.44), (438.7, 59.69), (460.4, 63.81), (482.1, 65.88), (503.8, 51.44), (525.5, 30.81),
-                    (540, 24.62)]
+    assert close(t.now, (196.4, 13.33))
+    assert len(t.past) == 24 and close(t.past[0], (30, 5.19)) and close(t.past[12], (116.8, 42.33))
+    board_future = [(196.4, 13.33), (200, 10.5), (207.3, 21.1), (221.7, 28.18), (243.4, 37.02), (265.1, 44.09),
+                    (286.8, 47.62), (308.5, 49.39), (330.2, 42.33), (351.9, 29.95), (373.6, 24.64), (395.3, 33.48),
+                    (417, 44.09), (438.7, 51.16), (460.4, 54.69), (482.1, 56.47), (503.8, 44.09), (525.5, 26.41),
+                    (540, 21.1)]
     assert len(t.future) == len(board_future)
     assert all(close(a, b) for a, b in zip(t.future, board_future, strict=True))
-    board_points = [(120.4, 49.38, 120.4, 43.75, "42°"), (308.5, 57.62, 308.5, 52, "38°"),
-                    (373.6, 28.75, 373.6, 23.5, "52°"), (482.1, 65.88, 482.1, 59.5, "34°"),
-                    (540, 24.62, 532, 19, "54°")]
+    board_points = [(120.4, 42.33, 120.4, 37.5, "42°"), (308.5, 49.39, 308.5, 44.57, "38°"),
+                    (373.6, 24.64, 373.6, 20.14, "52°"), (482.1, 56.47, 482.1, 51, "34°"),
+                    (540, 21.1, 532, 16.29, "54°")]
     assert [p[4] for p in t.points] == [p[4] for p in board_points]
     for p, b in zip(t.points, board_points, strict=True):
         assert close(p[:4], b[:4], tol=0.9)
@@ -69,8 +69,8 @@ async def test_fall_trend_geometry_matches_board():
 async def test_winter_trend_labels_below_lows_when_room():
     t = (await build("winter"))[0].trend
     assert [g[1] for g in t.gridlines] == ["30°", "20°", "10°"]
-    board = [(109.6, 32.58, 42.25, "25°"), (330.2, 45.78, 55.75, "19°"), (373.6, 41.42, 36.25, "21°"),
-             (482.1, 63.4, 58, "11°"), (540, 41.42, 35.5, "21°")]
+    board = [(109.6, 27.93, 36.21, "25°"), (330.2, 39.24, 47.79, "19°"), (373.6, 35.5, 31.07, "21°"),
+             (482.1, 54.34, 49.71, "11°"), (540, 35.5, 30.43, "21°")]
     for p, b in zip(t.points, board, strict=True):
         assert p[4] == b[3]
         assert close((p[0], p[1], p[3]), b[:3], tol=0.9)
@@ -79,10 +79,11 @@ async def test_winter_trend_labels_below_lows_when_room():
 async def test_fall_precip_rain_bars():
     p = (await build("fall"))[0].precip
     assert (p.title, p.right_text, p.right_bold, p.patterned, p.key, p.height) == (
-        "Chance of rain", "next 12 h", False, False, [], 74)
+        "Chance of rain", "next 12 h", False, False, [], 66)
+    assert p.axis_y == 48 and p.hour_y == 62
     assert [(b.y, b.height, b.fill) for b in p.bars[:6]] == [
-        (36, 20, "#494949"), (16, 40, "#000000"), (16, 40, "#000000"), (26, 30, "#494949"), (36, 20, "#494949"),
-        (46, 10, "#929292")]
+        (30.86, 17.14, "#494949"), (13.71, 34.29, "#000000"), (13.71, 34.29, "#000000"), (22.29, 25.71, "#494949"),
+        (30.86, 17.14, "#494949"), (39.43, 8.57, "#929292")]
     assert [b.label for b in p.bars] == ["40", "80", "80", "60", "40", "20"] + [None] * 6
     assert p.hour_labels == [(3, "3 PM", "start"), (87.5, "6 PM", "middle"), (162.5, "9 PM", "middle"),
                              (237.5, "12 AM", "middle")]
@@ -91,9 +92,10 @@ async def test_fall_precip_rain_bars():
 async def test_winter_precip_patterned_with_key_and_amounts():
     p = (await build("winter"))[0].precip
     assert (p.title, p.right_text, p.right_bold, p.patterned, p.key, p.height) == (
-        "Chance of snow", "3–5 in · ice 0.05 in", True, True, ["ice", "snow"], 64)
+        "Chance of snow", "3–5 in · ice 0.05 in", True, True, ["ice", "snow"], 56)
+    assert p.axis_y == 42 and p.hour_y == 54
     assert [b.fill for b in p.bars[:3]] == ["url(#wBarMix)", "url(#wBarMix)", "url(#wBarSnow)"]
-    assert (p.bars[0].y, p.bars[0].height, p.bars[3].y, p.bars[0].label_y) == (17.6, 32.4, 14, 14.6)
+    assert (p.bars[0].y, p.bars[0].height, p.bars[3].y, p.bars[0].label_y) == (14.78, 27.22, 11.76, 12.26)
 
 
 async def test_gauge_switches_in_winter():
@@ -102,9 +104,9 @@ async def test_gauge_switches_in_winter():
     assert (fall.title, fall.note) == ("Rain gauge", "inches")
     assert [(c.value.text, c.label) for c in fall.cells] == [
         ("0.00", "Today"), ("0.42", "This week"), ("1.86", "October"), ("31.07", "2026")]
-    assert (winter.title, winter.note, winter.note_size) == ("Gauge", "liquid in · snow via NWS", 11)
+    assert (winter.title, winter.note, winter.note_size) == ("Gauge", "in · snow via NWS", 13)
     assert [(c.value.text, c.label) for c in winter.cells] == [
-        ("0.21", "Today"), ("1.12", "January"), ("4 in", "Snow depth · NWS"), ("11.8 in", "Season snow · NWS")]
+        ("0.21", "Today"), ("1.12", "January"), ("4 in", "Snow depth"), ("11.8 in", "Season snow")]
 
 
 async def test_winter_alert_replaces_day_line():
@@ -162,6 +164,8 @@ async def test_forecast_rows():
 def test_icon_rules():
     assert icons.header_modifiers("conditions/clear-night", 5, 33, False) == ["frost"]
     assert icons.header_modifiers("conditions/thunderstorm", 25, 70, True) == ["wind", "alert"]
+    assert icons.header_modifiers("conditions/sunny", 8, 70, False, windy=True) == ["wind"]
+    assert icons.header_modifiers("conditions/clear-night", 5, 35, False) == []
     assert icons.resolve(Icon(name="conditions/thunderstorm", modifiers=["alert"])) == "modifiers/storm-nws-alert"
     assert icons.resolve(Icon(name="conditions/rain", modifiers=["wind"])) == "conditions/rain"
     assert icons.condition("no-such-thing") == "conditions/cloudy"

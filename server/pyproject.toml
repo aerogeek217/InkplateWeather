@@ -14,6 +14,7 @@ dependencies = [
     "pillow>=10.4",
     "playwright>=1.47",
     "tzdata>=2024.1",  # zoneinfo data on Windows and slim images
+    "astral>=3.2",  # sun and moon rise/set (pure Python, no runtime downloads)
 ]
 
 [project.optional-dependencies]

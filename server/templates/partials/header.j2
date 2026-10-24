@@ -8,7 +8,7 @@
     <div style="display: flex; gap: {{ 18 if h.alert else 22 }}px; align-items: center">
 {% if h.alert %}
       <span style="display: flex; gap: 10px; align-items: center">
-        <span style="display: flex; gap: 6px; align-items: center; background: #000000; color: #FFFFFF; padding: 3px 8px; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase">
+        <span style="display: flex; gap: 6px; align-items: center; background: #000000; color: #FFFFFF; padding: 3px 8px; font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase">
           {{ icon_svg("markers/alert-triangle-inverse", 12, 11) }}
           {{ h.alert.event }}
         </span>
@@ -20,13 +20,13 @@
       <span style="font-size: 17px; font-weight: 600">{{ h.day_line }}</span>
 {% endif %}
       <span style="width: 1px; height: 20px; background: #000000"></span>
-{% if h.next_update %}
-      <span style="font-size: 14px; color: #494949">Next update {{ h.next_update }}</span>
-{% endif %}
 {% if h.battery_pct is not none %}
       <span style="display: flex; gap: 6px; align-items: center; font-size: 16px; font-weight: 700">
         <svg width="30" height="14" viewBox="0 0 30 14" aria-hidden="true"><rect x="1" y="1" width="25" height="12" rx="2" fill="none" stroke="#000000" stroke-width="2"></rect><rect x="27" y="4.5" width="2.5" height="5" fill="#000000"></rect><rect x="3.5" y="3.5" width="{{ h.battery_fill }}" height="7" fill="#000000"></rect></svg>
         {{ h.battery_pct }}%
+{% if h.battery_text %}
+        <span style="margin-left: 4px; font-weight: 600">{{ h.battery_text }}</span>
+{% endif %}
       </span>
 {% endif %}
       <span style="font-size: 22px; font-weight: 700">{{ h.time_text }}</span>

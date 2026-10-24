@@ -1,4 +1,9 @@
-"""Run providers concurrently within a time budget, then resolve every configured field."""
+"""Run providers concurrently within a time budget, then resolve every configured field.
+
+With a `ProviderCache` (live mode), each provider's result is reused while younger than its TTL and the last good
+result stands in when a fetch fails or runs over the budget (see app/cache.py). With a `HistoryStore`, the winning
+station values are recorded after the resolve (see app/history.py).
+"""
 from __future__ import annotations
 
 import asyncio
@@ -7,7 +12,9 @@ from collections.abc import Mapping
 from datetime import datetime
 
 from . import fields as field_registry
+from .cache import ProviderCache
 from .config import AppConfig, ProviderCfg, SourceCfg
+from .history import HistoryStore
 from .providers import base
 from .providers.base import Provider, RequestContext
 from .providers.fixture import FixtureProvider
@@ -33,9 +40,24 @@ def _import_providers() -> None:
                 log.exception("could not import provider module %s", m.name)
 
 
-def build_providers(cfg: AppConfig) -> dict[str, Provider]:
+def build_providers(cfg: AppConfig, errors: dict[str, str] | None = None) -> dict[str, Provider]:
+    """Instantiate every configured provider.
+
+    Without `errors`, the first provider that can't be built raises. With it, broken providers are left out and
+    their error text is stored there (fields using them resolve as `not_fetched`), so one bad provider can't take
+    the whole screen down.
+    """
     _import_providers()
-    return {name: base.build(name, pcfg, cfg) for name, pcfg in cfg.providers.items()}
+    out: dict[str, Provider] = {}
+    for name, pcfg in cfg.providers.items():
+        try:
+            out[name] = base.build(name, pcfg, cfg)
+        except Exception as e:
+            if errors is None:
+                raise
+            log.error("provider %s could not be built: %s", name, e)
+            errors[name] = f"{type(e).__name__}: {e}"
+    return out
 
 
 async def _fetch(p: Provider, ctx: RequestContext, budget: float) -> ProviderResult:
@@ -47,11 +69,21 @@ async def _fetch(p: Provider, ctx: RequestContext, budget: float) -> ProviderRes
 
 
 async def collect(providers: Mapping[str, Provider], fields_cfg: Mapping[str, list[SourceCfg]],
-                  ctx: RequestContext, budget: float = BUDGET_S) -> dict[str, Resolved]:
+                  ctx: RequestContext, budget: float = BUDGET_S, *, cache: ProviderCache | None = None,
+                  history: HistoryStore | None = None) -> dict[str, Resolved]:
     used = {s.from_ for sources in fields_cfg.values() for s in sources}
     names = [n for n in providers if n in used]
-    results = await asyncio.gather(*(_fetch(providers[n], ctx, budget) for n in names))
-    return resolve(fields_cfg, dict(zip(names, results, strict=True)), ctx.now)
+    if cache is not None:
+        results = await asyncio.gather(*(cache.get(providers[n], ctx, budget) for n in names))
+    else:
+        results = await asyncio.gather(*(_fetch(providers[n], ctx, budget) for n in names))
+    resolved = resolve(fields_cfg, dict(zip(names, results, strict=True)), ctx.now)
+    if history is not None:
+        try:
+            history.record(resolved, ctx.now)
+        except Exception:  # history is a nice-to-have; never fail the render over it
+            log.exception("could not record history")
+    return resolved
 
 
 def fixture_fields(source: str = "fixture") -> dict[str, list[SourceCfg]]:

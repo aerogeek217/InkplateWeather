@@ -1,0 +1,62 @@
+{
+ "id": "https://api.weather.gov/points/40.0617,-88.2517",
+ "type": "Feature",
+ "properties": {
+  "@id": "https://api.weather.gov/points/40.0617,-88.2517",
+  "@type": "wx:Point",
+  "cwa": "ILX",
+  "type": "land",
+  "forecastOffice": "https://api.weather.gov/offices/ILX",
+  "gridId": "ILX",
+  "gridX": 95,
+  "gridY": 70,
+  "forecast": "https://api.weather.gov/gridpoints/ILX/95,70/forecast",
+  "forecastHourly": "https://api.weather.gov/gridpoints/ILX/95,70/forecast/hourly",
+  "forecastGridData": "https://api.weather.gov/gridpoints/ILX/95,70",
+  "observationStations": "https://api.weather.gov/gridpoints/ILX/95,70/stations",
+  "relativeLocation": {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -88.2544972,
+     40.0591346
+    ]
+   },
+   "properties": {
+    "city": "Savoy",
+    "state": "IL",
+    "distance": {
+     "unitCode": "wmoUnit:m",
+     "value": 0
+    },
+    "bearing": {
+     "unitCode": "wmoUnit:degree_(angle)",
+     "value": 0
+    }
+   }
+  },
+  "forecastZone": "https://api.weather.gov/zones/forecast/ILZ045",
+  "county": "https://api.weather.gov/zones/county/ILC019",
+  "fireWeatherZone": "https://api.weather.gov/zones/fire/ILZ045",
+  "timeZone": "America/Chicago",
+  "radarStation": "KILX",
+  "astronomicalData": {
+   "sunrise": "2026-10-24T07:13:31-05:00",
+   "sunset": "2026-10-24T18:00:48-05:00",
+   "transit": "2026-10-24T12:37:10-05:00",
+   "civilTwilightBegin": "2026-10-24T06:45:55-05:00",
+   "civilTwilightEnd": "2026-10-24T18:28:24-05:00",
+   "nauticalTwilightBegin": "2026-10-24T06:14:14-05:00",
+   "nauticalTwilightEnd": "2026-10-24T19:00:05-05:00",
+   "astronomicalTwilightBegin": "2026-10-24T05:42:49-05:00",
+   "astronomicalTwilightEnd": "2026-10-24T19:31:30-05:00"
+  },
+  "nwr": {
+   "transmitter": "WXJ76",
+   "sameCode": "017019",
+   "areaBroadcast": "https://api.weather.gov/radio/WXJ76/broadcast",
+   "pointBroadcast": "https://api.weather.gov/points/40.0617,-88.2517/radio"
+  }
+ }
+}

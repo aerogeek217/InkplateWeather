@@ -1,0 +1,159 @@
+[
+  {
+    "entity_id": "sensor.pms5003_aqi",
+    "state": "42",
+    "attributes": {"state_class": "measurement", "device_class": "aqi", "friendly_name": "PMS5003 AQI"},
+    "last_changed": "2026-10-24T19:05:12.481203+00:00",
+    "last_reported": "2026-10-24T19:28:43.120911+00:00",
+    "last_updated": "2026-10-24T19:05:12.481203+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PA", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sensor.pms5003_pm2_5",
+    "state": "8.6",
+    "attributes": {"state_class": "measurement", "unit_of_measurement": "µg/m³", "device_class": "pm25",
+                   "friendly_name": "PMS5003 PM2.5"},
+    "last_changed": "2026-10-24T19:28:43.120911+00:00",
+    "last_reported": "2026-10-24T19:28:43.120911+00:00",
+    "last_updated": "2026-10-24T19:28:43.120911+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PB", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sensor.pms5003_pm10",
+    "state": "unavailable",
+    "attributes": {"unit_of_measurement": "µg/m³", "device_class": "pm10", "friendly_name": "PMS5003 PM10"},
+    "last_changed": "2026-10-24T18:12:00.000000+00:00",
+    "last_reported": "2026-10-24T18:12:00.000000+00:00",
+    "last_updated": "2026-10-24T18:12:00.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PC", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sensor.porch_temperature",
+    "state": "12.5",
+    "attributes": {"state_class": "measurement", "unit_of_measurement": "°C", "device_class": "temperature",
+                   "friendly_name": "Porch temperature"},
+    "last_changed": "2026-10-24T19:25:00.000000+00:00",
+    "last_reported": "2026-10-24T19:29:00.000000+00:00",
+    "last_updated": "2026-10-24T19:25:00.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PD", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sensor.attic_temperature",
+    "state": "88.2",
+    "attributes": {"state_class": "measurement", "unit_of_measurement": "°F", "device_class": "temperature",
+                   "friendly_name": "Attic temperature"},
+    "last_changed": "2026-10-24T19:20:00+00:00",
+    "last_updated": "2026-10-24T19:20:00+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PE", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sensor.outdoor_humidity",
+    "state": "48.3",
+    "attributes": {"state_class": "measurement", "unit_of_measurement": "%", "device_class": "humidity",
+                   "friendly_name": "Outdoor humidity"},
+    "last_changed": "2026-10-24T19:29:30.000000+00:00",
+    "last_reported": "2026-10-24T19:29:30.000000+00:00",
+    "last_updated": "2026-10-24T19:29:30.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PF", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sensor.barometer",
+    "state": "1013.2",
+    "attributes": {"state_class": "measurement", "unit_of_measurement": "hPa", "device_class": "atmospheric_pressure",
+                   "friendly_name": "Barometer"},
+    "last_changed": "2026-10-24T19:29:30.000000+00:00",
+    "last_reported": "2026-10-24T19:29:30.000000+00:00",
+    "last_updated": "2026-10-24T19:29:30.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PG", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sensor.wind_speed",
+    "state": "16.09",
+    "attributes": {"state_class": "measurement", "unit_of_measurement": "km/h", "device_class": "wind_speed",
+                   "friendly_name": "Wind speed"},
+    "last_changed": "2026-10-24T19:29:30.000000+00:00",
+    "last_reported": "2026-10-24T19:29:30.000000+00:00",
+    "last_updated": "2026-10-24T19:29:30.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PH", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sensor.wind_gust",
+    "state": "4.47",
+    "attributes": {"state_class": "measurement", "unit_of_measurement": "m/s", "device_class": "wind_speed",
+                   "friendly_name": "Wind gust"},
+    "last_changed": "2026-10-24T19:29:30.000000+00:00",
+    "last_reported": "2026-10-24T19:29:30.000000+00:00",
+    "last_updated": "2026-10-24T19:29:30.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PI", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sensor.rain_today",
+    "state": "12.7",
+    "attributes": {"state_class": "total_increasing", "unit_of_measurement": "mm", "device_class": "precipitation",
+                   "friendly_name": "Rain today"},
+    "last_changed": "2026-10-24T19:00:00.000000+00:00",
+    "last_reported": "2026-10-24T19:29:30.000000+00:00",
+    "last_updated": "2026-10-24T19:00:00.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PJ", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sensor.rain_rate",
+    "state": "2.54",
+    "attributes": {"state_class": "measurement", "unit_of_measurement": "mm/h",
+                   "device_class": "precipitation_intensity", "friendly_name": "Rain rate"},
+    "last_changed": "2026-10-24T19:29:30.000000+00:00",
+    "last_reported": "2026-10-24T19:29:30.000000+00:00",
+    "last_updated": "2026-10-24T19:29:30.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PK", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sensor.yard_illuminance",
+    "state": "5300",
+    "attributes": {"state_class": "measurement", "unit_of_measurement": "lx", "device_class": "illuminance",
+                   "friendly_name": "Yard illuminance"},
+    "last_changed": "2026-10-24T19:29:30.000000+00:00",
+    "last_reported": "2026-10-24T19:29:30.000000+00:00",
+    "last_updated": "2026-10-24T19:29:30.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PL", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sensor.mystery",
+    "state": "unknown",
+    "attributes": {"friendly_name": "Mystery sensor"},
+    "last_changed": "2026-10-24T17:00:00.000000+00:00",
+    "last_reported": "2026-10-24T17:00:00.000000+00:00",
+    "last_updated": "2026-10-24T17:00:00.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PM", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "binary_sensor.garage_door",
+    "state": "off",
+    "attributes": {"device_class": "garage_door", "friendly_name": "Garage door"},
+    "last_changed": "2026-10-24T15:41:07.000000+00:00",
+    "last_reported": "2026-10-24T15:41:07.000000+00:00",
+    "last_updated": "2026-10-24T15:41:07.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PN", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "weather.forecast_home",
+    "state": "partlycloudy",
+    "attributes": {"temperature": 58, "temperature_unit": "°F", "humidity": 61, "pressure": 29.9,
+                   "pressure_unit": "inHg", "wind_bearing": 225.0, "wind_speed": 6.2, "wind_speed_unit": "mph",
+                   "attribution": "Weather forecast from met.no", "friendly_name": "Forecast Home",
+                   "supported_features": 3},
+    "last_changed": "2026-10-24T18:30:00.000000+00:00",
+    "last_reported": "2026-10-24T19:00:00.000000+00:00",
+    "last_updated": "2026-10-24T19:00:00.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PO", "parent_id": null, "user_id": null}
+  },
+  {
+    "entity_id": "sun.sun",
+    "state": "above_horizon",
+    "attributes": {"next_dawn": "2026-10-25T11:43:20.000000+00:00", "elevation": 30.1, "azimuth": 210.5,
+                   "rising": false, "friendly_name": "Sun"},
+    "last_changed": "2026-10-24T12:13:00.000000+00:00",
+    "last_reported": "2026-10-24T19:28:00.000000+00:00",
+    "last_updated": "2026-10-24T19:28:00.000000+00:00",
+    "context": {"id": "01JB2Z8Q6W2T4X9Y7KD3M5N1PP", "parent_id": null, "user_id": null}
+  }
+]

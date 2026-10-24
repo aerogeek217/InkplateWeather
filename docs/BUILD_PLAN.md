@@ -1,7 +1,7 @@
 # Build plan
 
-Status: **Phase 1 complete, milestone reached; awaiting review** on branch `phase-1` (2026-10-24). The Inkplate
-shows the fall board served from the OMV Pi. PR approved and merged by the user's instruction; icon set v1.1 approved.
+Status: **Phase 1 merged (2026-10-24). Phase 2 built, approved and deployed** (OMV Pi; first 2396c38 at 12:58 CDT,
+then the readability pass 2c22f9c at 13:30 CDT, 2026-10-24); now running on live data for a few days before the `phase-2` PR.
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 
@@ -148,15 +148,25 @@ Phase 1 notes (2026-10-24):
 
 | # | WS | Task | Depends | Done when |
 |---|---|---|---|---|
-| 2.1 | B | `ecowitt_local`: parse `get_livedata_info` (strings with units; hex IDs; `wh25`, `rain`, `lightning`, `ch_aisle`), map via config | 1.2 | parses the saved sample exactly; tolerant to missing blocks; unit tests |
-| 2.2 | B | `nws_observations` (KCMI), `nws_forecast` (points → hourly/daily/grid incl. snow & ice amounts, weather type), `nws_alerts` (zone/county from points) with User-Agent from config/env and grid cache | 1.2 | recorded-response tests (respx); handles 429/5xx → error Reading |
-| 2.3 | B | `open_meteo` (us_aqi, uv_index, fallback hourly/daily), `acis` (normals, season snow, snow depth), `astro` (sunrise/set, day length delta, moon phase %, rise/set, next 4 principal phases) | 1.2 | tests against recorded responses; astro verified against a known date |
-| 2.4 | B | `home_assistant` generic entity provider (token via env) and `device` provider | 1.2 | tests with recorded HA state JSON |
-| 2.5 | A | `viewmodel.py` real logic: icon mapping + modifiers (SPEC table), dominant precip type, snow amounts, day line (template-based sentence from forecast; NWS short forecast fallback), alert takeover, gauge winter swap, wind bold ≥ 20 mph, frost modifier, chart series + label placement without collisions | 2.1–2.3 | fixture-driven tests for each conditional behavior in SPEC |
-| 2.6 | A | Error states per ARCHITECTURE *Error handling*: stale styling + "as of", missing-slot sentences, header summary when ≥ 2 sections missing, battery low notice; `fixtures/outage.json` | 2.5 | outage fixture renders readable plain-language messages; reviewed by user |
-| 2.7 | A | `/status` page (per-field winner, ages, attempts) and `/admin/reload` | 1.2 | shows provenance for all fields |
+| 2.1 ✅ | B | `ecowitt_local`: parse `get_livedata_info` (strings with units; hex IDs; `wh25`, `rain`, `lightning`, `ch_aisle`), map via config | 1.2 | parses the saved sample exactly; tolerant to missing blocks; unit tests |
+| 2.2 ✅ | B | `nws_observations` (KCMI), `nws_forecast` (points → hourly/daily/grid incl. snow & ice amounts, weather type), `nws_alerts` (zone/county from points) with User-Agent from config/env and grid cache | 1.2 | recorded-response tests (respx); handles 429/5xx → error Reading |
+| 2.3 ✅ | B | `open_meteo` (us_aqi, uv_index, fallback hourly/daily), `acis` (normals, season snow, snow depth), `astro` (sunrise/set, day length delta, moon phase %, rise/set, next 4 principal phases) | 1.2 | tests against recorded responses; astro verified against a known date |
+| 2.4 ✅ | B | `home_assistant` generic entity provider (token via env) and `device` provider | 1.2 | tests with recorded HA state JSON |
+| 2.5 ✅ | A | `viewmodel.py` real logic: icon mapping + modifiers (SPEC table), dominant precip type, snow amounts, day line (template-based sentence from forecast; NWS short forecast fallback), alert takeover, gauge winter swap, wind bold ≥ 20 mph, frost modifier, chart series + label placement without collisions | 2.1–2.3 | fixture-driven tests for each conditional behavior in SPEC |
+| 2.6 ✅ | A | Error states per ARCHITECTURE *Error handling*: stale styling + "as of", missing-slot sentences, header summary when ≥ 2 sections missing, battery low notice; `fixtures/outage.json` | 2.5 | outage fixture renders readable plain-language messages; reviewed by user |
+| 2.7 ✅ | A | `/status` page (per-field winner, ages, attempts) and `/admin/reload` | 1.2 | shows provenance for all fields |
 
 Milestone: the live screen runs on real data for a few days; the user reviews error wording.
+
+Phase 2 contracts (frozen 2026-10-24, commit 77dfe6f): `app/shapes.py` (structured values), `app/conditions.py`
+(NWS/WMO codes → icon set), live `config/config.example.yaml` (sources per field, provider key names). Added to the
+plan: a `history` provider that records station readings in the cache (24 h temperature chart, 3 h pressure trend),
+with NWS observations as the fallback.
+
+Layout reflow (approved 2026-10-24): 6 mm more margin, no font changes, "Next update" removed; references
+regenerated (fall 0.052 %, winter 0.051 % in the container). First live render on the dev PC (2026-10-24): 33/35
+fields ok; gaps for 2.5: generated day line / callout / next chip, trend scale ignores the forecast range (labels
+clipped), "gusts" shown when equal to the wind speed.
 
 ### Phase 3: radar
 

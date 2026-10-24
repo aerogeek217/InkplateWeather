@@ -1,0 +1,233 @@
+{
+ "_note": "Crafted for tests (not recorded): winter storm like design/reference/dashboard-winter.png, same shape as the real api.weather.gov responses.",
+ "type": "Feature",
+ "properties": {
+  "@id": "https://api.weather.gov/gridpoints/ILX/95,70",
+  "@type": "wx:Gridpoint",
+  "updateTime": "2027-01-19T20:40:00+00:00",
+  "validTimes": "2027-01-19T15:00:00+00:00/P7DT10H",
+  "gridId": "ILX",
+  "gridX": 95,
+  "gridY": 70,
+  "temperature": {
+   "uom": "wmoUnit:degC",
+   "values": [
+    {
+     "validTime": "2027-01-19T18:00:00+00:00/PT3H",
+     "value": -0.6
+    },
+    {
+     "validTime": "2027-01-19T21:00:00+00:00/PT3H",
+     "value": -1.1
+    },
+    {
+     "validTime": "2027-01-20T00:00:00+00:00/PT10H",
+     "value": -3.3
+    },
+    {
+     "validTime": "2027-01-20T10:00:00+00:00/PT8H",
+     "value": -6.1
+    },
+    {
+     "validTime": "2027-01-20T18:00:00+00:00/P6D",
+     "value": -8.0
+    }
+   ]
+  },
+  "probabilityOfPrecipitation": {
+   "uom": "wmoUnit:percent",
+   "values": [
+    {
+     "validTime": "2027-01-19T18:00:00+00:00/PT6H",
+     "value": 90
+    },
+    {
+     "validTime": "2027-01-20T00:00:00+00:00/PT6H",
+     "value": 100
+    },
+    {
+     "validTime": "2027-01-20T06:00:00+00:00/PT4H",
+     "value": 70
+    },
+    {
+     "validTime": "2027-01-20T10:00:00+00:00/PT6H",
+     "value": 40
+    },
+    {
+     "validTime": "2027-01-20T16:00:00+00:00/P6DT6H",
+     "value": 5
+    }
+   ]
+  },
+  "quantitativePrecipitation": {
+   "uom": "wmoUnit:mm",
+   "values": [
+    {
+     "validTime": "2027-01-19T18:00:00+00:00/PT6H",
+     "value": 3.81
+    },
+    {
+     "validTime": "2027-01-20T00:00:00+00:00/PT6H",
+     "value": 10.16
+    },
+    {
+     "validTime": "2027-01-20T06:00:00+00:00/PT6H",
+     "value": 3.05
+    },
+    {
+     "validTime": "2027-01-20T12:00:00+00:00/PT6H",
+     "value": 0.25
+    },
+    {
+     "validTime": "2027-01-20T18:00:00+00:00/P6D",
+     "value": 0
+    }
+   ]
+  },
+  "snowfallAmount": {
+   "uom": "wmoUnit:mm",
+   "values": [
+    {
+     "validTime": "2027-01-19T18:00:00+00:00/PT6H",
+     "value": 0
+    },
+    {
+     "validTime": "2027-01-20T00:00:00+00:00/PT6H",
+     "value": 101.6
+    },
+    {
+     "validTime": "2027-01-20T06:00:00+00:00/PT6H",
+     "value": 25.4
+    },
+    {
+     "validTime": "2027-01-20T12:00:00+00:00/PT6H",
+     "value": 5.08
+    },
+    {
+     "validTime": "2027-01-20T18:00:00+00:00/P6D",
+     "value": 0
+    }
+   ]
+  },
+  "iceAccumulation": {
+   "uom": "wmoUnit:mm",
+   "values": [
+    {
+     "validTime": "2027-01-19T18:00:00+00:00/PT6H",
+     "value": 1.27
+    },
+    {
+     "validTime": "2027-01-20T00:00:00+00:00/P6DT18H",
+     "value": 0
+    }
+   ]
+  },
+  "windGust": {
+   "uom": "wmoUnit:km_h-1",
+   "values": [
+    {
+     "validTime": "2027-01-19T18:00:00+00:00/PT6H",
+     "value": 40.7
+    },
+    {
+     "validTime": "2027-01-20T00:00:00+00:00/PT12H",
+     "value": 51.9
+    },
+    {
+     "validTime": "2027-01-20T12:00:00+00:00/PT12H",
+     "value": 46.3
+    },
+    {
+     "validTime": "2027-01-21T00:00:00+00:00/P5DT18H",
+     "value": 22.2
+    }
+   ]
+  },
+  "weather": {
+   "values": [
+    {
+     "validTime": "2027-01-19T18:00:00+00:00/PT6H",
+     "value": [
+      {
+       "coverage": "likely",
+       "weather": "sleet",
+       "intensity": "light",
+       "visibility": {
+        "unitCode": "wmoUnit:km",
+        "value": null
+       },
+       "attributes": []
+      },
+      {
+       "coverage": "chance",
+       "weather": "snow",
+       "intensity": "light",
+       "visibility": {
+        "unitCode": "wmoUnit:km",
+        "value": null
+       },
+       "attributes": []
+      }
+     ]
+    },
+    {
+     "validTime": "2027-01-20T00:00:00+00:00/PT10H",
+     "value": [
+      {
+       "coverage": "definite",
+       "weather": "snow",
+       "intensity": "moderate",
+       "visibility": {
+        "unitCode": "wmoUnit:km",
+        "value": null
+       },
+       "attributes": [
+        "heavy_snow"
+       ]
+      }
+     ]
+    },
+    {
+     "validTime": "2027-01-20T10:00:00+00:00/PT6H",
+     "value": [
+      {
+       "coverage": "chance",
+       "weather": "snow",
+       "intensity": "light",
+       "visibility": {
+        "unitCode": "wmoUnit:km",
+        "value": null
+       },
+       "attributes": []
+      },
+      {
+       "coverage": "areas",
+       "weather": "blowing_snow",
+       "intensity": null,
+       "visibility": {
+        "unitCode": "wmoUnit:km",
+        "value": null
+       },
+       "attributes": []
+      }
+     ]
+    },
+    {
+     "validTime": "2027-01-20T16:00:00+00:00/P6DT2H",
+     "value": [
+      {
+       "coverage": null,
+       "weather": null,
+       "intensity": null,
+       "visibility": {
+        "unitCode": "wmoUnit:km",
+        "value": null
+       },
+       "attributes": []
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

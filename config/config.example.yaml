@@ -3,6 +3,8 @@
 #
 # Durations: 30s, 10m, 2h, 1d. Each field lists its sources in priority order; the first reading
 # younger than max_age wins, an older one is shown grayed out ("as of …") only if nothing fresher exists.
+# `key` is the provider's own name for the value; it defaults to the field name. Only the Ecowitt gateway uses
+# native keys (its hex IDs, plus wh25.* and ch<N>.* for the indoor and channel sensors).
 
 location: {name: "Savoy, IL", lat: 40.0617, lon: -88.2517, tz: America/Chicago}
 
@@ -12,63 +14,63 @@ nws:
 
 server:
   refresh_minutes: 30
-  # Phase 1: /display.png renders this fixture (server/fixtures/<name>.json). Remove for live data.
-  fixture: fall
   cache_dir: cache
+  history_sample_minutes: 10   # record station temperature/pressure for the charts; 0 disables
+  # Render a saved test board instead of live data (server/fixtures/<name>.json):
+  # fixture: fall
 
 providers:
-  fixture: {type: fixture, name: fall}
-  # Phase 2 (live data):
-  # ecowitt: {type: ecowitt_local, host: 192.168.1.135, ttl: 0s}
-  # nws_obs: {type: nws_observations, ttl: 10m}
-  # nws_fc:  {type: nws_forecast, ttl: 30m}
-  # nws_alerts: {type: nws_alerts, ttl: 5m}
-  # om:      {type: open_meteo, ttl: 30m}
-  # acis:    {type: acis, ttl: 12h}
-  # astro:   {type: astro}
-  # device:  {type: device}
-  # ha:      {type: home_assistant, url: "http://homeassistant.local:8123", token_env: HA_TOKEN, ttl: 60s}
+  ecowitt:    {type: ecowitt_local, host: 192.168.1.135, ttl: 30s}
+  nws_obs:    {type: nws_observations, ttl: 10m}        # station from nws.station
+  nws_fc:     {type: nws_forecast, ttl: 30m}            # points → hourly, daily, gridpoint amounts
+  nws_alerts: {type: nws_alerts, ttl: 5m}               # zone + county from points
+  om:         {type: open_meteo, ttl: 30m}              # air quality, UV, fallback forecast
+  acis:       {type: acis, ttl: 12h, station: "USC00118740"}   # Urbana, IL co-op: normals, snow
+  astro:      {type: astro, ttl: 1h}                    # computed locally
+  history:    {type: history, ttl: 0s}                  # recorded station readings (cache/history)
+  device:     {type: device}                            # battery etc. from the Inkplate's request
+  # Home Assistant, e.g. for the PMS5003 later:
+  # ha:       {type: home_assistant, url: "http://homeassistant.local:8123", token_env: HA_TOKEN, ttl: 60s}
 
-# Phase 1 resolves every field from the fixture provider (key defaults to the field name).
-# Phase 2 example lines are shown commented underneath.
 fields:
-  outdoor.temperature:  [{from: fixture}]
-  # outdoor.temperature: [{from: ecowitt, key: "0x02", max_age: 10m}, {from: nws_obs, max_age: 90m}]
-  outdoor.humidity:     [{from: fixture}]
-  outdoor.feels_like:   [{from: fixture}]
-  outdoor.temperature_history: [{from: fixture}]
-  wind.speed:           [{from: fixture}]
-  # wind.speed:         [{from: ecowitt, key: "0x0B", max_age: 10m}, {from: nws_obs, max_age: 90m}]
-  wind.gust:            [{from: fixture}]
-  wind.direction:       [{from: fixture}]
-  uv.index:             [{from: fixture}]
-  # uv.index:           [{from: ecowitt, key: "0x17", max_age: 15m}, {from: om, key: uv_index}]
-  indoor.temperature:   [{from: fixture}]
-  indoor.humidity:      [{from: fixture}]
-  garage.temperature:   [{from: fixture}]
-  # garage.temperature: [{from: ecowitt, key: ch1.temp, max_age: 15m}]
-  garage.humidity:      [{from: fixture}]
-  pressure.sea_level:   [{from: fixture}]
-  pressure.trend_3h:    [{from: fixture}]
-  rain.today:           [{from: fixture}]
-  rain.week:            [{from: fixture}]
-  rain.month:           [{from: fixture}]
-  rain.year:            [{from: fixture}]
-  air.aqi:              [{from: fixture}]
-  # air.aqi:            [{from: om, key: us_aqi}]
+  # Station first, public data as fallback.
+  outdoor.temperature:  [{from: ecowitt, key: "0x02", max_age: 10m}, {from: nws_obs, max_age: 90m}, {from: om, max_age: 90m}]
+  outdoor.humidity:     [{from: ecowitt, key: "0x07", max_age: 10m}, {from: nws_obs, max_age: 90m}]
+  outdoor.dew_point:    [{from: ecowitt, key: "0x03", max_age: 10m}, {from: nws_obs, max_age: 90m}]
+  outdoor.feels_like:   [{from: ecowitt, key: "3", max_age: 10m}, {from: nws_obs, max_age: 90m}]
+  outdoor.temperature_history: [{from: history, max_age: 40m}, {from: nws_obs, max_age: 3h}]
+  wind.speed:           [{from: ecowitt, key: "0x0B", max_age: 10m}, {from: nws_obs, max_age: 90m}]
+  wind.gust:            [{from: ecowitt, key: "0x0C", max_age: 10m}, {from: nws_obs, max_age: 90m}]
+  wind.direction:       [{from: ecowitt, key: "0x0A", max_age: 10m}, {from: nws_obs, max_age: 90m}]
+  uv.index:             [{from: ecowitt, key: "0x17", max_age: 15m}, {from: om, max_age: 90m}]
+  solar.radiation:      [{from: ecowitt, key: "0x15", max_age: 15m}]
+  indoor.temperature:   [{from: ecowitt, key: wh25.intemp, max_age: 15m}]
+  indoor.humidity:      [{from: ecowitt, key: wh25.inhumi, max_age: 15m}]
+  garage.temperature:   [{from: ecowitt, key: ch1.temp, max_age: 15m}]
+  garage.humidity:      [{from: ecowitt, key: ch1.humidity, max_age: 15m}]
+  pressure.sea_level:   [{from: ecowitt, key: wh25.rel, max_age: 15m}, {from: nws_obs, max_age: 90m}]
+  pressure.trend_3h:    [{from: history, max_age: 40m}, {from: nws_obs, max_age: 3h}]
+  rain.today:           [{from: ecowitt, key: "0x10", max_age: 15m}]
+  rain.week:            [{from: ecowitt, key: "0x11", max_age: 15m}]
+  rain.month:           [{from: ecowitt, key: "0x12", max_age: 15m}]
+  rain.year:            [{from: ecowitt, key: "0x13", max_age: 15m}]
+  rain.rate:            [{from: ecowitt, key: "0x0E", max_age: 15m}]
+  # Public data.
+  air.aqi:              [{from: om, max_age: 3h}]
   # later, when the PMS5003 works (e.g. via ESPHome → Home Assistant):
-  # air.aqi:            [{from: ha, entity: sensor.pms5003_aqi, max_age: 20m}, {from: om, key: us_aqi}]
-  snow.depth:           [{from: fixture}]
-  snow.season:          [{from: fixture}]
-  normals.high:         [{from: fixture}]
-  normals.low:          [{from: fixture}]
-  conditions.current:   [{from: fixture}]
-  forecast.hourly:      [{from: fixture}]
-  forecast.daily:       [{from: fixture}]
-  alerts.active:        [{from: fixture}]
-  astro.sun:            [{from: fixture}]
-  astro.moon:           [{from: fixture}]
-  radar.frame:          [{from: fixture}]
-  radar.callout:        [{from: fixture}]
-  summary.day_line:     [{from: fixture}]
-  summary.next_hazard:  [{from: fixture}]
+  # air.aqi:            [{from: ha, entity: sensor.pms5003_aqi, max_age: 20m}, {from: om, max_age: 3h}]
+  snow.depth:           [{from: acis, max_age: 48h}]   # ACIS posts the 8 AM report late in the day
+  snow.season:          [{from: acis, max_age: 48h}]
+  normals.high:         [{from: acis}]
+  normals.low:          [{from: acis}]
+  conditions.current:   [{from: nws_obs, max_age: 90m}, {from: om, max_age: 90m}]
+  forecast.hourly:      [{from: nws_fc, max_age: 3h}, {from: om, max_age: 3h}]
+  forecast.daily:       [{from: nws_fc, max_age: 6h}, {from: om, max_age: 6h}]
+  alerts.active:        [{from: nws_alerts, max_age: 30m}]
+  astro.sun:            [{from: astro}]
+  astro.moon:           [{from: astro}]
+  device.battery_pct:   [{from: device}]
+  device.voltage_mv:    [{from: device}]
+  device.wake_reason:   [{from: device}]
+  # Radar arrives in phase 3; until then the radar panel shows a plain-language note.
+  # The day line, radar callout and "Next:" chip are generated by the view model from the forecast.

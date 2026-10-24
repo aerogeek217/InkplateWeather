@@ -40,16 +40,18 @@ class Header(BaseModel):
     date_text: str  # "Saturday 24 October"
     day_line: str | None = None  # replaced by `alert` when one is active
     alert: Alert | None = None
-    next_update: str | None = None  # "3:00"; hidden while an alert is shown
+    next_update: str | None = None  # "3:00"; not rendered since the 2026-10-24 reflow (kept for the model)
     battery_pct: int | None = None
     battery_low: bool = False
     battery_fill: float = 0  # width of the battery icon's fill bar (0–20 px)
     time_text: str  # "2:30 PM"
     notice: str | None = None  # header summary sentence when ≥ 2 sections are missing (phase 2.6)
+    battery_text: str | None = None  # "Battery low: charge soon" (≤ 15 %), beside the battery icon
+    battery_strip: str | None = None  # reminder strip across the top of the radar panel (≤ 5 %)
 
 
 class Callout(BaseModel):
-    kind: str  # storm | snow | rain → callout icon
+    kind: str  # storm | snow → callout icon; rain | ice | alert have none
     headline: str  # "Storms ~4 PM"
     detail: str  # "22 mi west · ENE 15 mph · ~0.5 in"
 
@@ -75,8 +77,9 @@ class Wind(BaseModel):
     dir_text: str  # "S"
     from_deg: float | None  # arrow rotation source; None = calm/unknown
     speed: str  # "14"
-    gust: str | None = None  # "26"
-    bold: bool = False  # gusts ≥ 20 mph (forecast list rule)
+    gust: str | None = None  # "26"; only when gusts are at least 5 mph above the speed
+    bold: bool = False  # sustained wind ≥ 20 mph (forecast list rule)
+    calm: bool = False  # < 1 mph: shown as "Calm" without an arrow
 
 
 class Current(BaseModel):
@@ -86,10 +89,17 @@ class Current(BaseModel):
     feels: str | None  # "Feels 58° · Humidity 64%"
     wind: Wind | None
     normals: str | None  # "Average 63° / 42°"
+    # Stale parts are drawn in gray; `as_of` ("as of 1:12 PM") is one small line under the detail block for the
+    # station values (temperature, feels/humidity, wind). A stale forecast (H/L) is noted in ctx.notices instead.
+    high_low_stale: bool = False
+    feels_stale: bool = False
+    wind_stale: bool = False
+    normals_stale: bool = False
+    as_of: str | None = None
 
 
 class TrendChart(BaseModel):
-    """Geometry in the 544 × 92 viewBox of the design. Coordinates computed by the view model."""
+    """Geometry in the 544 × 81 viewBox of the design. Coordinates computed by the view model."""
 
     aria_label: str = ""
     gridlines: list[tuple[float, str]] = []  # (y, "60°")
@@ -100,6 +110,12 @@ class TrendChart(BaseModel):
     nights: list[tuple[float, float]] = []  # (x, width) black bars under the axis
     now: tuple[float, float] | None = None
     points: list[tuple[float, float, float, float, str]] = []  # (dot x, dot y, label x, label y, "42°")
+    axis_y: float = 60  # x axis (bottom of the plot area)
+    grid_label_dy: float = 2.57  # gridline label baseline below its line
+    night_y: float = 62  # top of the night bars
+    day_label_y: float = 78  # baseline of the day names and NOW
+    message: str | None = None  # nothing to draw: one centred line instead of the chart
+    past_message: str | None = None  # no history yet: small note in the past half (the forecast is still drawn)
 
 
 class PrecipBar(BaseModel):
@@ -116,26 +132,27 @@ class PrecipChart(BaseModel):
     right_text: str  # "next 12 h" or "3–5 in · ice 0.05 in"
     right_bold: bool = False
     patterned: bool = False  # winter style (outlined, patterned bars)
-    height: int = 74
+    height: int = 66
     bars: list[PrecipBar] = []
     hour_labels: list[tuple[float, str, str]] = []  # (x, "6 PM", text-anchor)
     key: list[str] = []  # precip types shown in the key (only when > 1 type)
     aria_label: str = ""
-    axis_y: float = 56  # baseline of the bars (56 normally, 50 when the key needs room)
-    label_size: float = 10.5  # percent-label font size
-    hour_y: float = 70  # baseline of the hour labels
+    axis_y: float = 48  # baseline of the bars (48 normally, 42 when the key needs room)
+    label_size: float = 12  # percent-label font size
+    hour_y: float = 62  # baseline of the hour labels
+    empty_text: str | None = None  # every hour < 10 %: one centred sentence instead of the bars
 
 
 class GaugeCell(BaseModel):
     value: Slot
-    label: str  # "Today", "Snow depth · NWS"
+    label: str  # "Today", "Snow depth"
 
 
 class Gauge(BaseModel):
     title: str  # "Rain gauge" | "Gauge"
-    note: str  # "inches" | "liquid in · snow via NWS"
+    note: str  # "inches" | "in · snow via NWS"
     cells: list[GaugeCell]
-    note_size: int = 12  # the winter note is longer and set at 11 px
+    note_size: int = 13
 
 
 class Sun(BaseModel):
@@ -145,6 +162,7 @@ class Sun(BaseModel):
     delta: str  # "−2 m/day"
     arc_end: tuple[float, float] | None  # sun position on the arc (None at night)
     aria_label: str = ""
+    message: str | None = None  # sun times unavailable: shown instead of the arc
 
 
 class MoonPhase(BaseModel):
@@ -162,6 +180,7 @@ class Moon(BaseModel):
     next: list[MoonPhase]
     aria_label: str = ""
     shadow_path: str = ""  # dark part of the 36 px phase drawing (viewBox -28 -28 56 56, r 25)
+    message: str | None = None  # moon data unavailable: shown instead of the phase
 
 
 class ForecastRow(BaseModel):
@@ -191,4 +210,8 @@ class DashboardContext(BaseModel):
     sun: Sun
     moon: Moon
     forecast: list[ForecastRow]  # 7 rows, today first
-    notices: list[str] = []  # extra plain-language notes (fallback used, battery strip …)
+    # Notes box (radar panel, under the legend): fallback used, stale/missing readings in full sentences,
+    # sections without a slot of their own (alerts). Phase 2.6.
+    notices: list[str] = []
+    # 2.6 addition (additive, optional): sentence shown in place of the 7-day list when the forecast is missing.
+    forecast_message: str | None = None

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inkplate weather status</title>
+<style>
+  :root { color-scheme: light dark; --muted: #6d6d6d; --line: #dbdbdb; --ok: #1b7f3b; --stale: #9a6700; --bad: #b42318; }
+  @media (prefers-color-scheme: dark) { :root { --muted: #a0a0a0; --line: #3a3a3a; --ok: #4ac26b; --stale: #d4a72c; --bad: #f47067; } }
+  body { font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; margin: 1.5rem auto; max-width: 78rem; padding: 0 1rem; }
+  h1 { font-size: 1.4rem; margin: 0 0 .25rem; }
+  h2 { font-size: 1.1rem; margin: 2rem 0 .5rem; }
+  .meta { color: var(--muted); }
+  .meta span { margin-right: 1.25rem; }
+  .meta code { overflow-wrap: anywhere; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; vertical-align: top; padding: .35rem .5rem; border-bottom: 1px solid var(--line); }
+  th { font-weight: 600; white-space: nowrap; }
+  td.num { white-space: nowrap; }
+  code, .mono { font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; }
+  .ok { color: var(--ok); } .stale { color: var(--stale); } .missing, .error { color: var(--bad); }
+  .status { font-weight: 600; }
+  .muted { color: var(--muted); }
+  .attempts { margin: 0; padding: 0; list-style: none; }
+  .attempts li { white-space: nowrap; }
+  .wrap { overflow-x: auto; }
+  .banner { padding: .5rem .75rem; border: 1px solid var(--line); border-radius: 6px; margin: 1rem 0; }
+</style>
+</head>
+<body>
+<h1>Inkplate weather status</h1>
+<p class="meta">
+  <span>{{ s.location }} ({{ s.timezone }})</span>
+  <span>Mode: <b>{{ s.mode }}</b>{% if s.fixture %} (fixture “{{ s.fixture }}”){% endif %}</span>
+  <span>Deployed commit: <code>{{ s.deployed_commit }}</code></span>
+  <span>Generated {{ s.generated_at }}</span>
+</p>
+<p class="meta">
+  <span>Config: <code>{{ s.config.path or "?" }}</code>{% if s.config.is_example %} <b>(example config)</b>{% endif %}, loaded {{ s.config.loaded_at or "?" }}</span>
+  <span>Cache: <code>{{ s.cache_dir or "?" }}</code></span>
+  <span>History sampler: {{ "running" if s.history_sampler else "off" }}</span>
+</p>
+<p class="meta">
+  {% if s.last_display_request %}
+  <span>Last display request: {{ s.last_display_request.age }} ago
+    (battery {{ s.last_display_request.battery_pct if s.last_display_request.battery_pct is not none else "?" }} %,
+    {{ s.last_display_request.voltage_mv if s.last_display_request.voltage_mv is not none else "?" }} mV,
+    {{ s.last_display_request.wake_reason or "no reason given" }})</span>
+  {% else %}
+  <span>No display request since the server started.</span>
+  {% endif %}
+  <span>Fields: {% for k, n in s.counts|dictsort %}<span class="{{ k }}">{{ n }} {{ k }}</span>{% if not loop.last %}, {% endif %}{% endfor %}</span>
+</p>
+<p class="meta"><a href="/status.json">JSON</a> · <a href="/preview">Preview</a> · <a href="/admin/reload">Reload config</a></p>
+{% if s.mode == "fixture" %}
+<p class="banner">Fixture mode: values come from <code>server/fixtures/{{ s.fixture }}.json</code> at its pinned time ({{ s.resolved_at }}), not from live sources.</p>
+{% endif %}
+
+<h2>Fields</h2>
+<div class="wrap">
+<table>
+  <thead><tr><th>Field</th><th>Status</th><th>Value</th><th>Source</th><th>Age</th><th>Message</th><th>Sources tried</th></tr></thead>
+  <tbody>
+  {% for f in s.fields %}
+  <tr>
+    <td><b>{{ f.label }}</b><br><code class="muted">{{ f.field }}</code></td>
+    <td class="status {{ f.status }}">{{ f.status }}{% if f.fallback_used %}<br><span class="muted">fallback</span>{% endif %}</td>
+    <td class="num">{{ f.display }}</td>
+    <td>{{ f.source or "" }}{% if f.source_type %} <span class="muted">({{ f.source_type }})</span>{% endif %}</td>
+    <td class="num">{{ f.age }}</td>
+    <td>{{ f.message or f.as_of or "" }}{% if f.note and f.status != "ok" %}<br><code class="muted">{{ f.note }}</code>{% endif %}</td>
+    <td><ul class="attempts">
+      {% for a in f.attempts %}
+      <li><code>{{ a.source }}:{{ a.key }}</code> <span class="{{ a.outcome }}">{{ a.outcome }}</span>{% if a.note %} <span class="muted">{{ a.note }}</span>{% endif %}{% if a.age %} <span class="muted">· {{ a.age }} old</span>{% endif %}</li>
+      {% endfor %}
+    </ul></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<h2>Providers</h2>
+<div class="wrap">
+<table>
+  <thead><tr><th>Provider</th><th>TTL</th><th>Last request</th><th>Last fetch</th><th>Last success</th><th>Last error</th><th>Cached result</th><th>Options</th><th>Used by</th></tr></thead>
+  <tbody>
+  {% for p in s.providers %}
+  <tr>
+    <td><b>{{ p.name }}</b><br><span class="muted">{{ p.type }}</span></td>
+    <td class="num">{{ p.ttl }}</td>
+    <td>{% if p.build_error %}<span class="error">not built</span>{% elif p.served %}<span class="{{ {'live': 'ok', 'cache': 'ok', 'fallback': 'stale', 'error': 'error'}[p.served] }}">{{ p.served }}</span>{% if p.fetching %} <span class="muted">(fetching)</span>{% endif %}{% else %}<span class="muted">{{ "not cached" if s.mode == "fixture" else "not used yet" }}</span>{% endif %}</td>
+    <td class="num">{% if p.last_fetch_age %}{{ p.last_fetch_age }} ago{% if p.last_duration_s is not none %}<br><span class="muted">took {{ p.last_duration_s }} s</span>{% endif %}{% endif %}</td>
+    <td class="num">{% if p.last_success_age %}{{ p.last_success_age }} ago{% endif %}</td>
+    <td>{% if p.build_error %}<span class="error">{{ p.build_error }}</span>{% elif p.last_error %}<span class="error">{{ p.last_error }}</span><br><span class="muted">{{ p.last_error_age }} ago</span>{% endif %}</td>
+    <td class="num">{% if p.cache_age %}{{ p.cache_age }} old{% endif %}</td>
+    <td><code>{% for k, v in p.options|dictsort %}{{ k }}={{ v }}{% if not loop.last %}, {% endif %}{% endfor %}</code></td>
+    <td><span class="muted">{{ p.used_by|join(", ") }}</span></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<h2>Station history</h2>
+<p class="meta">
+  <span>File: <code>{{ s.history.file or "(memory only)" }}</code></span>
+  {% if s.history.chart %}<span>24 h chart: {% if s.history.chart.ok %}<span class="ok">ready</span> ({{ s.history.chart.points }} points){% else %}<span class="stale">not yet</span> <span class="muted">({{ s.history.chart.note }}; needs ≥ 20 h with no gap over 2 h)</span>{% endif %}</span>{% endif %}
+  {% if s.history.trend %}<span>3 h pressure trend: {% if s.history.trend.ok %}<span class="ok">{{ "%+.3f"|format(s.history.trend.value) }} inHg</span>{% else %}<span class="stale">not yet</span> <span class="muted">({{ s.history.trend.note }})</span>{% endif %}</span>{% endif %}
+</p>
+<table>
+  <thead><tr><th>Series</th><th>Points</th><th>Oldest</th><th>Newest</th><th>Last value</th></tr></thead>
+  <tbody>
+  {% for name, h in s.history.series|dictsort %}
+  <tr><td><code>{{ name }}</code></td><td class="num">{{ h.points }}</td><td class="mono">{{ h.first or "" }}</td>
+      <td class="mono">{{ h.last or "" }}{% if h.last_age %} <span class="muted">({{ h.last_age }} ago)</span>{% endif %}</td>
+      <td class="num">{{ h.last_value if h.last_value is not none else "" }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</body>
+</html>

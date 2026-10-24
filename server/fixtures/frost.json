@@ -1,0 +1,683 @@
+{
+ "now": "2026-10-25T21:30:00-05:00",
+ "device": {
+  "battery_pct": 78,
+  "voltage_mv": 3980,
+  "wake_reason": "timer"
+ },
+ "readings": {
+  "outdoor.temperature": 33.8,
+  "outdoor.humidity": 78,
+  "outdoor.dew_point": 30,
+  "outdoor.feels_like": 33.8,
+  "outdoor.temperature_history": [
+   {
+    "t": "2026-10-25T11:30:00-05:00",
+    "v": 50
+   },
+   {
+    "t": "2026-10-25T12:30:00-05:00",
+    "v": 52
+   },
+   {
+    "t": "2026-10-25T13:30:00-05:00",
+    "v": 52
+   },
+   {
+    "t": "2026-10-25T14:30:00-05:00",
+    "v": 51
+   },
+   {
+    "t": "2026-10-25T15:30:00-05:00",
+    "v": 49
+   },
+   {
+    "t": "2026-10-25T16:30:00-05:00",
+    "v": 46
+   },
+   {
+    "t": "2026-10-25T17:30:00-05:00",
+    "v": 43
+   },
+   {
+    "t": "2026-10-25T18:30:00-05:00",
+    "v": 40
+   },
+   {
+    "t": "2026-10-25T19:30:00-05:00",
+    "v": 37
+   },
+   {
+    "t": "2026-10-25T20:30:00-05:00",
+    "v": 35.5
+   },
+   {
+    "t": "2026-10-25T21:30:00-05:00",
+    "v": 33.8
+   }
+  ],
+  "wind.speed": 0.4,
+  "wind.gust": 1.1,
+  "wind.direction": 315,
+  "uv.index": 0,
+  "solar.radiation": 0,
+  "indoor.temperature": 70.2,
+  "indoor.humidity": 41,
+  "garage.temperature": 52.8,
+  "garage.humidity": 58,
+  "pressure.sea_level": 29.94,
+  "pressure.trend_3h": 0.03,
+  "rain.today": 0.0,
+  "rain.week": 0.42,
+  "rain.month": 1.86,
+  "rain.year": 31.07,
+  "rain.rate": 0.0,
+  "air.aqi": 34,
+  "snow.depth": 0,
+  "snow.season": 0,
+  "normals.high": 63,
+  "normals.low": 42,
+  "conditions.current": "clear-night",
+  "forecast.hourly": [
+   {
+    "t": "2026-10-25T22:00:00-05:00",
+    "temp": 33.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 3,
+    "wind_gust": 6,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-25T23:00:00-05:00",
+    "temp": 32.8,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 3,
+    "wind_gust": 6,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T00:00:00-05:00",
+    "temp": 32.5,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 3,
+    "wind_gust": 6,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T01:00:00-05:00",
+    "temp": 32.2,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 3,
+    "wind_gust": 6,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T02:00:00-05:00",
+    "temp": 32.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 3,
+    "wind_gust": 6,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T03:00:00-05:00",
+    "temp": 31.8,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 3,
+    "wind_gust": 6,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T04:00:00-05:00",
+    "temp": 31.5,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 3,
+    "wind_gust": 6,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T05:00:00-05:00",
+    "temp": 31.2,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 3,
+    "wind_gust": 6,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T06:00:00-05:00",
+    "temp": 31.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 3,
+    "wind_gust": 6,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T07:00:00-05:00",
+    "temp": 31.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 3,
+    "wind_gust": 6,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-26T08:00:00-05:00",
+    "temp": 34.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-26T09:00:00-05:00",
+    "temp": 37.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-26T10:00:00-05:00",
+    "temp": 40.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-26T11:00:00-05:00",
+    "temp": 43.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-26T12:00:00-05:00",
+    "temp": 46.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-26T13:00:00-05:00",
+    "temp": 49.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-26T14:00:00-05:00",
+    "temp": 52.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-26T15:00:00-05:00",
+    "temp": 55.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-26T16:00:00-05:00",
+    "temp": 55.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-26T17:00:00-05:00",
+    "temp": 53.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-26T18:00:00-05:00",
+    "temp": 51.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T19:00:00-05:00",
+    "temp": 49.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T20:00:00-05:00",
+    "temp": 47.5,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T21:00:00-05:00",
+    "temp": 46.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T22:00:00-05:00",
+    "temp": 44.5,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-26T23:00:00-05:00",
+    "temp": 43.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-27T00:00:00-05:00",
+    "temp": 41.5,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-27T01:00:00-05:00",
+    "temp": 40.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-27T02:00:00-05:00",
+    "temp": 39.3,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-27T03:00:00-05:00",
+    "temp": 38.7,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-27T04:00:00-05:00",
+    "temp": 38.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-27T05:00:00-05:00",
+    "temp": 37.3,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-27T06:00:00-05:00",
+    "temp": 36.7,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-27T07:00:00-05:00",
+    "temp": 36.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-27T08:00:00-05:00",
+    "temp": 38.2,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-27T09:00:00-05:00",
+    "temp": 40.4,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-27T10:00:00-05:00",
+    "temp": 42.6,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-27T11:00:00-05:00",
+    "temp": 44.8,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-27T12:00:00-05:00",
+    "temp": 47.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-27T13:00:00-05:00",
+    "temp": 50.2,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-27T14:00:00-05:00",
+    "temp": 53.5,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-27T15:00:00-05:00",
+    "temp": 56.8,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-27T16:00:00-05:00",
+    "temp": 60.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-27T17:00:00-05:00",
+    "temp": 59.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "sunny"
+   },
+   {
+    "t": "2026-10-27T18:00:00-05:00",
+    "temp": 58.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-27T19:00:00-05:00",
+    "temp": 57.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-27T20:00:00-05:00",
+    "temp": 56.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   },
+   {
+    "t": "2026-10-27T21:00:00-05:00",
+    "temp": 55.0,
+    "pop": 2,
+    "precip_type": "rain",
+    "wind_speed": 8,
+    "wind_gust": 14,
+    "wind_dir": 315,
+    "icon": "clear-night"
+   }
+  ],
+  "forecast.daily": [
+   {
+    "date": "2026-10-25",
+    "icon": "clear-night",
+    "text": "Clear",
+    "high": null,
+    "low": 31,
+    "wind_dir": 315,
+    "wind_speed": 3,
+    "pop": 0,
+    "precip_type": "rain",
+    "snow_in": 0,
+    "detail": "Clear, with a low around 31."
+   },
+   {
+    "date": "2026-10-26",
+    "icon": "sunny",
+    "text": "Sunny",
+    "high": 55,
+    "low": 36,
+    "wind_dir": 315,
+    "wind_speed": 8,
+    "pop": 0,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2026-10-27",
+    "icon": "partly-cloudy",
+    "text": "Partly cloudy",
+    "high": 61,
+    "low": 43,
+    "wind_dir": 180,
+    "wind_speed": 10,
+    "pop": 10,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2026-10-28",
+    "icon": "cloudy",
+    "text": "Cloudy",
+    "high": 64,
+    "low": 48,
+    "wind_dir": 180,
+    "wind_speed": 14,
+    "pop": 30,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2026-10-29",
+    "icon": "rain",
+    "text": "Rain",
+    "high": 57,
+    "low": 41,
+    "wind_dir": 90,
+    "wind_speed": 12,
+    "pop": 60,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2026-10-30",
+    "icon": "partly-cloudy",
+    "text": "Some sun",
+    "high": 54,
+    "low": 37,
+    "wind_dir": 315,
+    "wind_speed": 10,
+    "pop": 20,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2026-10-31",
+    "icon": "sunny",
+    "text": "Sunny",
+    "high": 58,
+    "low": 39,
+    "wind_dir": 225,
+    "wind_speed": 9,
+    "pop": 0,
+    "precip_type": "rain",
+    "snow_in": 0
+   }
+  ],
+  "alerts.active": [],
+  "astro.sun": {
+   "sunrise": "2026-10-25T07:18:00-05:00",
+   "sunset": "2026-10-25T18:07:00-05:00",
+   "day_length_min": 649,
+   "delta_min_per_day": -2
+  },
+  "astro.moon": {
+   "phase_name": "waxing gibbous",
+   "illumination": 99,
+   "waxing": true,
+   "rise": "2026-10-25T17:45:00-05:00",
+   "set": "2026-10-26T07:10:00-05:00",
+   "next": [
+    {
+     "kind": "full",
+     "date": "2026-10-26"
+    },
+    {
+     "kind": "last",
+     "date": "2026-11-02"
+    },
+    {
+     "kind": "new",
+     "date": "2026-11-09"
+    },
+    {
+     "kind": "first",
+     "date": "2026-11-17"
+    }
+   ]
+  }
+ }
+}

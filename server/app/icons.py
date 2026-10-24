@@ -109,16 +109,31 @@ def resolve(icon: Icon) -> str:
     return icon.name
 
 
-def header_modifiers(code: str, gust_mph: float | None, temp_f: float | None, alert_active: bool) -> list[str]:
-    """Phase-1 modifier rules (SPEC conditional behavior); phase 2.5 refines them."""
+def header_modifiers(code: str, gust_mph: float | None, temp_f: float | None, alert_active: bool,
+                     windy: bool = False) -> list[str]:
+    """Header icon modifiers (SPEC conditional behavior):
+
+    - wind: gusts ≥ 20 mph, or the source itself called it windy/breezy (`Condition.windy`);
+    - frost: clear night at ≤ 34 °F;
+    - alert: thunderstorm while an NWS alert is active.
+
+    `resolve` turns them into composite artwork where it exists (the alert badge wins over wind on a storm).
+    """
     mods = []
-    if gust_mph is not None and gust_mph >= WIND_GUST_MODIFIER_MPH:
+    if windy or (gust_mph is not None and gust_mph >= WIND_GUST_MODIFIER_MPH):
         mods.append("wind")
     if code.endswith("clear-night") and temp_f is not None and temp_f <= FROST_MAX_F:
         mods.append("frost")
     if alert_active and code.endswith("thunderstorm"):
         mods.append("alert")
     return mods
+
+
+def forecast_modifiers(name: str, wind_mph: float | None) -> list[str]:
+    """Forecast-row icon: the wind composite on days with wind ≥ 20 mph, only where that artwork exists
+    (e.g. sunny-wind); `resolve` falls back to the base icon otherwise."""
+    windy = wind_mph is not None and wind_mph >= WIND_GUST_MODIFIER_MPH
+    return ["wind"] if windy and resolve(Icon(name=name, modifiers=["wind"])) != name else []
 
 
 WIND_DIRS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]

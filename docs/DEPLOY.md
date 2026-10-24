@@ -53,7 +53,8 @@ git archive --format=tar phase-1 docker-compose.yml server config docs/DEPLOY.md
 ssh pi@192.168.1.254 "cd ~/inkplate-weather && cp -n config/config.example.yaml config/config.yaml &&   mkdir -p cache && sudo docker compose build && sudo docker compose up -d"
 ```
 
-`cp -n` keeps an existing `config.yaml`. Measured on a Pi 4: build 284 s (cold), image 940 MB.
+`cp -n` keeps an existing `config.yaml`. To have `/status` show the deployed commit, copy `DEPLOYED_COMMIT` into `server/` before
+`docker compose build` (it is baked into the image). Measured on a Pi 4: build 284 s (cold), image 940 MB.
 
 ### B. Cross-build on a PC with buildx, then copy the image
 

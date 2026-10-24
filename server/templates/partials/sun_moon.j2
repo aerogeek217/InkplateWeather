@@ -1,7 +1,10 @@
 {% set s = ctx.sun %}
 {% set m = ctx.moon %}
-      <div style="display: grid; grid-template-columns: 236px minmax(0, 1fr); column-gap: 0; border-top: 2px solid #000000; padding-top: 10px">
+      <div style="display: grid; grid-template-columns: 236px minmax(0, 1fr); column-gap: 0; border-top: 2px solid #000000; padding-top: 8px">
         <div style="display: flex; flex-direction: column; gap: 2px; padding-right: 14px">
+{% if s.message %}
+          <div style="height: 72px; display: flex; align-items: center; font-size: 15px; font-weight: 600; color: #494949">{{ s.message }}</div>
+{% else %}
           <svg width="222" height="52" viewBox="0 0 230 54" role="img" aria-label="{{ s.aria_label }}">
             <defs>
               <pattern id="htGround" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#929292" stroke-width="1.2"></line></pattern>
@@ -13,7 +16,7 @@
             <path d="M14,46 A101,36 0 0 1 {{ s.arc_end[0] }},{{ s.arc_end[1] }}" fill="none" stroke="#000000" stroke-width="2.5"></path>
 {% endif %}
             <path d="M14,40 V52 M216,40 V52" stroke="#000000" stroke-width="2"></path>
-            <text x="115" y="41" text-anchor="middle" font-family="Inter Tight, Arial, sans-serif" font-size="11" font-weight="600" fill="#494949">{{ s.day_length }}</text>
+            <text x="115" y="41" text-anchor="middle" font-family="Inter Tight, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#494949">{{ s.day_length }}</text>
 {% if s.arc_end %}
             <g transform="translate({{ s.arc_end[0] }},{{ s.arc_end[1] }})">
               <circle cx="0" cy="0" r="13" fill="#FFFFFF"></circle>
@@ -22,10 +25,14 @@
 {% endif %}
           </svg>
           <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; font-weight: 700">
-            <span>↑ {{ s.rise }}</span><span style="font-size: 11px; font-weight: 400; color: #494949">{{ s.delta }}</span><span>↓ {{ s.set }}</span>
+            <span>↑ {{ s.rise }}</span><span style="font-size: 13px; font-weight: 400; color: #494949">{{ s.delta }}</span><span>↓ {{ s.set }}</span>
           </div>
+{% endif %}
         </div>
-        <div style="display: flex; flex-direction: column; gap: 6px; padding-left: 14px; border-left: 1px solid #B6B6B6">
+        <div style="display: flex; flex-direction: column; gap: 3px; padding-left: 14px; border-left: 1px solid #B6B6B6">
+{% if m.message %}
+          <div style="height: 72px; display: flex; align-items: center; font-size: 15px; font-weight: 600; color: #494949">{{ m.message }}</div>
+{% else %}
           <div style="display: flex; gap: 10px; align-items: center">
             <svg width="36" height="36" viewBox="-28 -28 56 56" role="img" aria-label="{{ m.aria_label }}">
               <circle cx="0" cy="0" r="25" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"></circle>
@@ -36,13 +43,14 @@
             </svg>
             <div style="display: flex; flex-direction: column; gap: 1px">
               <span style="font-size: 15px; font-weight: 700">{{ m.illumination }} · {{ m.phase_name }}</span>
-              <span style="font-size: 12px; color: #494949">{{ m.rise_set }}</span>
+              <span style="font-size: 13px; color: #494949">{{ m.rise_set }}</span>
             </div>
           </div>
-          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; font-size: 11px">
+          <div style="display: grid; grid-template-columns: repeat(2, max-content); gap: 0 16px; font-size: 13px">
 {% for ph in m.next %}{% set mi = moon_small[ph.kind] %}
             <span style="display: flex; gap: 4px; align-items: center">{{ icon_svg(mi[0], 13, label=mi[1]) }}<span><span style="font-weight: 700">{{ ph.label }}</span> {{ ph.date }}</span></span>
 {% endfor %}
           </div>
+{% endif %}
         </div>
       </div>
