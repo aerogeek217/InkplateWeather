@@ -24,6 +24,9 @@ dev = [
     "respx>=0.21",
     "ruff>=0.6",
 ]
+basemap = [
+    "pyshp>=2.3",  # tools/build_basemap.py only (the base map is committed)
+]
 
 [build-system]
 requires = ["setuptools>=69"]
