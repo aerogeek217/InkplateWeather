@@ -44,7 +44,7 @@ BOLD_WIND_MPH = 20
 BATTERY_LOW_PCT = 15  # header note
 BATTERY_STRIP_PCT = 5  # reminder strip
 MIN_SECTIONS_FOR_NOTICE = 2  # the day line becomes "Some data is unavailable: …"
-MAX_NOTICES = 5  # lines in the notes box
+MAX_NOTICES = 6  # sentences in the notes box
 
 # ------------------------------------------------------------------ small formatting helpers
 
@@ -1015,7 +1015,7 @@ def missing_sections(d: _Data, readings: list[ReadingCell], gauge: Gauge, sun: S
         out.append("radar")
     if d.missing("forecast.daily") or (d.resolved.get("forecast.daily") is not None and not forecast):
         out.append("forecast")
-    if d.missing("forecast.hourly"):
+    elif d.missing("forecast.hourly"):  # both gone reads as just "forecast"
         out.append("hourly")
     if d.missing("outdoor.temperature"):
         out.append("current")

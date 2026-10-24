@@ -214,10 +214,25 @@ def label_of(field: str) -> str:
     return f.label if f else field
 
 
+RAIN_GAUGE_FIELDS = ("rain.today", "rain.week", "rain.month", "rain.year")
+RAIN_GAUGE_LABEL = "Rain gauge"  # stands for two or more of its cells in one sentence
+
+
+def _lower(s: str) -> str:
+    return s if s[1:2].isupper() else s[:1].lower() + s[1:]  # "UV index" keeps its capitals
+
+
 def labels_text(field_names: list[str]) -> str:
     """'Inside sensor, garage sensor and pressure' (first capitalised, the rest lower-case)."""
-    labels = [label_of(f) for f in field_names]
-    return cap(join_and([labels[0], *(lb[:1].lower() + lb[1:] for lb in labels[1:])]))
+    rain = [f for f in field_names if f in RAIN_GAUGE_FIELDS]
+    labels = []
+    for f in field_names:
+        if f in rain and len(rain) > 1:
+            if f == rain[0]:
+                labels.append(RAIN_GAUGE_LABEL)
+            continue
+        labels.append(label_of(f))
+    return cap(join_and([labels[0], *(_lower(lb) for lb in labels[1:])]))
 
 
 def source_type(source: str, source_types: Mapping[str, str] | None) -> str:

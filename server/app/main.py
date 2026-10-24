@@ -22,7 +22,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Res
 from fastapi.staticfiles import StaticFiles
 from pydantic import ValidationError
 
-from . import collector, config, history, status, viewmodel
+from . import collector, config, history, messages, status, viewmodel
 from .cache import ProviderCache
 from .cache import cache_dir as cache_dir
 from .config import AppConfig
@@ -32,7 +32,7 @@ from .providers.base import DeviceInfo, RequestContext
 from .providers.fixture import FixtureError, fixture_device, fixture_now
 from .render import environment, render_html
 from .render.browser import Renderer
-from .render.quantize import quantize_png
+from .render.quantize import quantize, quantize_png
 from .resolver import Resolved
 
 log = logging.getLogger("inkplate")
@@ -252,6 +252,90 @@ def _last_good(cfg: AppConfig) -> bytes | None:
         return None
 
 
+def _last_good_time(cfg: AppConfig) -> datetime | None:
+    try:
+        mtime = (cache_dir(cfg) / "last-good.png").stat().st_mtime
+    except OSError:
+        return None
+    return datetime.fromtimestamp(mtime, ZoneInfo(cfg.location.tz))
+
+
+# ------------------------------------------------------------------ error strip (render failed)
+
+STRIP_Y0, STRIP_Y1 = 57, 117  # black band over the header (header 69–113): inside the frame, clearly visible
+STRIP_X = 71  # text starts at the content's left edge
+STRIP_FONT_PX, STRIP_FONT_WEIGHT = 17, 600  # the header day line's size and weight
+
+
+def render_failure_reason(e: BaseException) -> str:
+    """Short plain-language reason for a failed render (never an exception name)."""
+    name = type(e).__name__
+    if isinstance(e, TimeoutError) or "Timeout" in name:
+        return messages.RENDER_REASON_TIMEOUT
+    if type(e).__module__.split(".")[0] == "playwright":
+        return messages.RENDER_REASON_BROWSER
+    return messages.RENDER_REASON_OTHER
+
+
+def _strip_font():
+    """Bundled Inter Tight (Pillow/FreeType reads the woff2), else Pillow's own scalable font, else its bitmap."""
+    from PIL import ImageFont
+
+    try:
+        f = ImageFont.truetype(str(ASSETS_DIR / "fonts" / "InterTight-latin.woff2"), STRIP_FONT_PX)
+        with suppress(Exception):
+            f.set_variation_by_axes([STRIP_FONT_WEIGHT])
+        return f
+    except Exception:
+        try:
+            return ImageFont.load_default(size=STRIP_FONT_PX)
+        except Exception:
+            return ImageFont.load_default()
+
+
+def _wrap(text: str, font, width: float) -> list[str]:
+    lines: list[str] = []
+    for word in text.split():
+        if lines and font.getlength(lines[-1] + " " + word) <= width:
+            lines[-1] += " " + word
+        else:
+            lines.append(word)
+    return lines
+
+
+def burn_error_strip(png: bytes, text: str) -> bytes:
+    """The last good image with a black band and white `text` over the header, still in the 8 gray levels."""
+    import io
+
+    from PIL import Image, ImageDraw
+
+    with Image.open(io.BytesIO(png)) as src:
+        img = src.convert("L")
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((0, STRIP_Y0, img.width - 1, STRIP_Y1 - 1), fill=0)
+    font = _strip_font()
+    lines = _wrap(text, font, img.width - 2 * STRIP_X)[:2]
+    line_h = round(STRIP_FONT_PX * 1.3)
+    y = (STRIP_Y0 + STRIP_Y1) / 2 - line_h * len(lines) / 2
+    for line in lines:
+        draw.text((STRIP_X, y + line_h / 2), line, fill=255, font=font, anchor="lm")
+        y += line_h
+    buf = io.BytesIO()
+    quantize(img).save(buf, format="PNG", optimize=True)
+    return buf.getvalue()
+
+
+def error_strip_text(cfg: AppConfig, at: datetime, e: BaseException) -> str:
+    shown = _last_good_time(cfg)
+    tz = cfg.location.tz
+    shown_text = None
+    if shown is not None:
+        shown_text = messages.clock(shown, tz)
+        if shown.astimezone(ZoneInfo(tz)).date() != at.astimezone(ZoneInfo(tz)).date():
+            shown_text = f"{shown.astimezone(ZoneInfo(tz)):%a} {shown_text}"  # "Fri 2:30 PM"
+    return messages.render_failed(messages.clock(at, tz), render_failure_reason(e), shown_text)
+
+
 @app.get("/health")
 async def health() -> JSONResponse:
     return JSONResponse({"status": "ok"})
@@ -271,12 +355,15 @@ async def display(request: Request, batt: str | None = Query(None), mv: str | No
         dctx = await build_context(cfg, cfg.server.fixture, device, request.app.state)
         png = await render_png(request.app.state.renderer, dctx)
         _save_last_good(cfg, png)
-    except Exception:
+    except Exception as e:
         log.exception("render failed")
         png = _last_good(cfg)
         if png is None:
             raise HTTPException(status_code=503, detail="render failed and no last good image") from None
-        # TODO(2.6): burn an error strip into the last good image.
+        try:
+            png = burn_error_strip(png, error_strip_text(cfg, real_now, e))
+        except Exception:  # the plain last good image is still better than an error
+            log.exception("could not draw the error strip")
     return Response(content=png, media_type="image/png", headers=headers)
 
 
