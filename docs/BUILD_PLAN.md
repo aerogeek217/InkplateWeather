@@ -1,7 +1,7 @@
 # Build plan
 
-Status: **Phase 1 built, awaiting review** on branch `phase-1` (2026-10-24). Open items: first arm64 render on the Pi,
-flashing the Inkplate, approval of icon set v1.1.
+Status: **Phase 1 built and deployed, awaiting review** on branch `phase-1` (2026-10-24). Open items: confirm the
+Inkplate shows the board, approval of icon set v1.1.
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 
@@ -137,8 +137,10 @@ Phase 1 notes (2026-10-24):
 - In the Linux container against the old Edge references: fall 3.86 %, winter 4.04 % (text anti-aliasing only).
   With the user's approval the references were regenerated inside the container (canonical) plus a Windows
   baseline in `design/reference/windows/`; both platforms now measure fall 0.050 %, winter 0.095 %.
-- 1.6: arm64 image builds (buildx) but Chromium can't run under QEMU emulation, so the first arm64 render happens on the Pi.
-- 1.7: compiles for both Inkplate 10 variants (default Soldered `Inkplate10V2`); not flashed (user step).
+- 1.6: arm64 image builds (buildx) but Chromium can't run under QEMU emulation. Deployed on the OMV Pi 4
+  (192.168.1.254, `~/inkplate-weather`, commit 7e83cbc, built natively in 284 s): healthy; fixtures on the Pi match
+  the canonical references (fall 0.050 %, winter 0.095 %); `/display.png` 3.6 s cold, ~1.0 s warm.
+- 1.7: compiles for both Inkplate 10 variants; flashed to the user's Soldered Inkplate 10 (COM3) with the user's approval.
 - `/display.png` also returns `X-Sleep-Seconds` (seconds to the next :00/:30) so the firmware can align its sleep.
 
 ### Phase 2: live data, fallbacks, error text

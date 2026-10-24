@@ -42,6 +42,19 @@ cd inkplate-weather
 docker compose build          # native arm64 build, several minutes on a Pi 4
 ```
 
+### A2. Push the source from the dev PC over SSH, build on the Pi (used for this deployment)
+
+Use this when the Pi has no `git`. It copies exactly one commit, then builds natively. In this deployment the user
+`pi` isn't in the `docker` group but has passwordless `sudo`, so Docker runs through `sudo`.
+
+```sh
+# on the dev PC, from the repo root (Git Bash)
+git archive --format=tar phase-1 docker-compose.yml server config docs/DEPLOY.md   | ssh pi@192.168.1.254 "mkdir -p ~/inkplate-weather && tar -x -C ~/inkplate-weather &&       echo $(git rev-parse --short phase-1) > ~/inkplate-weather/DEPLOYED_COMMIT"
+ssh pi@192.168.1.254 "cd ~/inkplate-weather && cp -n config/config.example.yaml config/config.yaml &&   mkdir -p cache && sudo docker compose build && sudo docker compose up -d"
+```
+
+`cp -n` keeps an existing `config.yaml`. Measured on a Pi 4: build 284 s (cold), image 940 MB.
+
 ### B. Cross-build on a PC with buildx, then copy the image
 
 ```sh
@@ -98,6 +111,7 @@ Open `http://<pi-ip>:8080/preview` in a browser to see the live HTML.
 
 ```sh
 git pull && docker compose up -d --build       # option A
+# option A2: rerun its two commands (the second can be `sudo docker compose up -d --build`)
 # option B: repeat the build/save/load steps, then: docker compose up -d
 docker image prune -f                          # remove the old untagged image
 ```
