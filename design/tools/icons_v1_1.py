@@ -1,7 +1,7 @@
-"""Build source/icons-proposed.html: icon-set additions and fixes awaiting approval.
+"""Build source/icons-v1.1.html: icon set v1.1 additions and fixes (approved 2026-10-24).
 
 Each entry is shown large and at the size it is drawn on the screen, on its intended background.
-Usage: python design/tools/icons_proposed.py
+Usage: python design/tools/icons_v1_1.py
 """
 import pathlib
 import re
@@ -55,15 +55,15 @@ def main():
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Icon set additions (proposed)</title>
+<title>Icon set v1.1 additions</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet">
 <style>body{{margin:0}}</style>
 </head>
 <body>
 <div style="width: 1200px; box-sizing: border-box; padding: 36px 40px; background: #FFFFFF; color: #000000; font-family: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; gap: 18px">
   <header style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 3px solid #000000; padding-bottom: 10px">
-    <span style="font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Icon set · v1.1 (proposed)</span>
-    <span style="font-size: 13px; color: #494949">Additions and fixes awaiting approval · large and at screen size</span>
+    <span style="font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Icon set · v1.1 additions</span>
+    <span style="font-size: 13px; color: #494949">Approved 2026-10-24 · large and at screen size · base set on icons.html</span>
   </header>
   <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; row-gap: 18px">{cells}
   </div>
@@ -71,7 +71,7 @@ def main():
 </body>
 </html>
 '''
-    out = ROOT / "source" / "icons-proposed.html"
+    out = ROOT / "source" / "icons-v1.1.html"
     out.write_text(html, encoding="utf-8", newline="\n")
     print(f"wrote {out}")
 

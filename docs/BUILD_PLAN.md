@@ -1,7 +1,7 @@
 # Build plan
 
 Status: **Phase 1 complete, milestone reached; awaiting review** on branch `phase-1` (2026-10-24). The Inkplate
-shows the fall board served from the OMV Pi. Open items: PR review and merge, approval of icon set v1.1.
+shows the fall board served from the OMV Pi. PR approved and merged by the user's instruction; icon set v1.1 approved.
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 

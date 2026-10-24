@@ -1,6 +1,6 @@
 # Inkplate weather display — design spec
 
-Status: **approved 2026-10-24** ("B3b · Tall radar", winter state, icon set v1).
+Status: **approved 2026-10-24** ("B3b · Tall radar", winter state, icon set v1.1, approved the same day).
 Design canvas (visual history and comments): https://claude.ai/artifact/L59NG2bMU2NXkNgvtAjB3W
 
 All numbers on the reference boards are mock data. This document describes what each
@@ -150,9 +150,9 @@ Inside temp + RH · Garage temp + RH · Pressure + trend arrow · Air quality (U
 
 ## Icons
 
-`icons/` contains 59 SVGs: `conditions/` (20), `modifiers/` (4 composite examples),
+`icons/` contains 63 SVGs: `conditions/` (20), `modifiers/` (5 composites),
 `moon/` (8 phases), `wind/` (8 arrows named by the direction the wind comes **from**),
-`markers/` (precip type, pressure trend, sun marker, map symbols, alert triangle, map lightning bolts) and
+`markers/` (precip type, pressure trend, sun marker, map symbols, alert triangles, map lightning bolts, callout glyphs) and
 `fills/` (radar / precip-bar fills). The renderer should map forecast weather codes
 (NWS icon codes or WMO codes) onto `conditions/` and add modifiers by rule (table above).
 
@@ -160,9 +160,10 @@ The icon set is canonical: where a board drew an icon slightly differently from 
 storm, partly cloudy; freezing drizzle; wintry mix; small moon phases), the renderer uses the set's icon
 (user decision 2026-10-24).
 
-**v1.1 additions, proposed 2026-10-24 and awaiting approval** (drawn on the approved boards but missing from v1;
-sheet: `source/icons-proposed.html`): `modifiers/sunny-wind`, `markers/callout-storm`, `markers/callout-snow`,
-`markers/alert-triangle-inverse`.
+**Icon set v1.1, approved 2026-10-24**: four additions that the boards needed but v1 lacked, `modifiers/sunny-wind`,
+`markers/callout-storm`, `markers/callout-snow` and `markers/alert-triangle-inverse`, plus a fix to `markers/alert-triangle`
+(the exclamation gained its dot, pixel-snapped for 12 px). Sheet: `source/icons-v1.1.html` (built by
+`tools/icons_v1_1.py`); `source/icons.html` shows the fixed triangle. `source/Icons.dc.html` is the original v1 export.
 
 ## Reference renders
 

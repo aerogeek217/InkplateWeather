@@ -3,8 +3,8 @@
 Icons are inlined (never fetched) so the renderer needs no file access for them. Names are paths under
 assets/icons without ".svg", e.g. "conditions/thunderstorm".
 
-`assets/icons` is a copy of the icon set in `design/icons`, which is canonical. Icons the boards needed but the
-set lacked were added to the set as proposals (see design/SPEC.md, Icons): modifiers/sunny-wind,
+`assets/icons` is a copy of the icon set in `design/icons`, which is canonical. Icons the boards needed but v1
+lacked are part of icon set v1.1 (approved; see design/SPEC.md, Icons): modifiers/sunny-wind,
 markers/callout-storm, markers/callout-snow, markers/alert-triangle-inverse.
 """
 from __future__ import annotations
