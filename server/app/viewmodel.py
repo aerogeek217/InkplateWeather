@@ -451,13 +451,15 @@ def _runs(vals: list[float]) -> list[tuple[int, int, float]]:
     return runs
 
 
-TREND_LABEL_SIZE = 12  # trend.j2 point labels: 12 px / 700, text-anchor middle
+TREND_LABEL_SIZE = 13.5  # trend.j2 point labels: 13.5 units / 700, text-anchor middle
 LABEL_ASCENT = 0.73 * TREND_LABEL_SIZE  # digit/degree height above the baseline
 LABEL_TOP_MIN = 0.5  # label tops stay inside the svg
+LABEL_EDGE = 0.5  # min space between a label and the svg's left/right edge (the board's 54° at 13.5 units)
 TREND_VIEW_W = 544.0
 EXTREME_MIN_DEG = 2  # an upcoming low/high must differ from its neighbours by this much to be labelled
 LABEL_SHIFTS = (0.0, -10.0, 10.0, -18.0, 18.0)
 DAY_LABEL_GAP = 12  # min space between NOW and a day name under the axis
+DAY_LABEL_SIZE = 13  # trend.j2 day names (700) and NOW (800)
 Span = tuple[float, float]
 
 
@@ -522,7 +524,7 @@ def _place_label(px: float, py: float, low: bool, text: str, gridline_ys: list[f
     cands.sort(key=lambda c: (abs(c[1]) > 0, sides.index(c[0]), abs(c[1])))  # both sides unshifted first
 
     def ok(side: str, dx: float, strict: bool) -> tuple[float, float] | None:
-        lx = min(max(base_x + dx, w / 2 + 1), TREND_VIEW_W - w / 2 - 1)
+        lx = min(max(base_x + dx, w / 2 + LABEL_EDGE), TREND_VIEW_W - w / 2 - LABEL_EDGE)
         if side == "below":
             ly = py + LABEL_BELOW
             if ly > LABEL_BOTTOM_MAX or any(ly - LABEL_CAP <= g <= ly for g in gridline_ys):
@@ -613,10 +615,10 @@ def _trend(d: _Data, now: datetime, tz: ZoneInfo, sun: dict | None) -> TrendChar
         day_labels.insert(0, (TREND_X0 + 4, f"{start:%a}".upper()))
     # Keep day names clear of the NOW label: one just after NOW (late evening) moves right, one running into it
     # from the left is left out.
-    now_half = measure("NOW", 11.5, 800) / 2 + DAY_LABEL_GAP
+    now_half = measure("NOW", DAY_LABEL_SIZE, 800) / 2 + DAY_LABEL_GAP
     clear = []
     for lx, s in day_labels:
-        if lx + measure(s, 11.5, 700) < NOW_X - now_half or lx > NOW_X + now_half:
+        if lx + measure(s, DAY_LABEL_SIZE, 700) < NOW_X - now_half or lx > NOW_X + now_half:
             clear.append((lx, s))
         elif lx > NOW_X:
             clear.append((float(_round(NOW_X + now_half)), s))
@@ -678,8 +680,9 @@ def _trend(d: _Data, now: datetime, tz: ZoneInfo, sun: dict | None) -> TrendChar
 PRECIP_HOURS = 12
 # (axis y, px per %, label size, label dy, hour-label y, svg height). The 2026-10-24 reflow raised the baseline
 # 8 px and scaled the bars to fit (48/56 normal, 42/50 with the key); labels below the baseline moved up 8.
-PRECIP_NORMAL = (48.0, 0.5 * 48 / 56, 10.5, -4.0 * 48 / 56, 62.0, 66)
-PRECIP_COMPACT = (42.0, 0.36 * 42 / 50, 9.5, -3.0 * 42 / 50, 54.0, 56)
+# The readability pass (2026-10-24) raised the percent labels 10.5 → 12 (compact 9.5 → 11.5) in place.
+PRECIP_NORMAL = (48.0, 0.5 * 48 / 56, 12.0, -4.0 * 48 / 56, 62.0, 66)
+PRECIP_COMPACT = (42.0, 0.36 * 42 / 50, 11.5, -3.0 * 42 / 50, 54.0, 56)
 BAR_PITCH, BAR_W = 25.0, 15.0
 PRECIP_NAMES = {"rain": "rain", "snow": "snow", "ice": "ice"}
 KEY_ORDER = ["ice", "snow", "rain"]
@@ -821,11 +824,11 @@ def _gauge(d: _Data, now: datetime) -> Gauge:
         return GaugeCell(value=d.slot(field, text, narrow=True), label=label)
 
     if winter:
-        return Gauge(title="Gauge", note="liquid in · snow via NWS", note_size=11, cells=[
+        return Gauge(title="Gauge", note="in · snow via NWS", cells=[
             cell("rain.today", _amount(d.num("rain.today")), "Today"),
             cell("rain.month", _amount(d.num("rain.month")), month),
-            cell("snow.depth", _snow_in(depth), "Snow depth · NWS"),
-            cell("snow.season", _snow_in(season), "Season snow · NWS"),
+            cell("snow.depth", _snow_in(depth), "Snow depth"),
+            cell("snow.season", _snow_in(season), "Season snow"),
         ])
     return Gauge(title="Rain gauge", note="inches", cells=[
         cell("rain.today", _amount(d.num("rain.today")), "Today"),

@@ -138,21 +138,21 @@ class PrecipChart(BaseModel):
     key: list[str] = []  # precip types shown in the key (only when > 1 type)
     aria_label: str = ""
     axis_y: float = 48  # baseline of the bars (48 normally, 42 when the key needs room)
-    label_size: float = 10.5  # percent-label font size
+    label_size: float = 12  # percent-label font size
     hour_y: float = 62  # baseline of the hour labels
     empty_text: str | None = None  # every hour < 10 %: one centred sentence instead of the bars
 
 
 class GaugeCell(BaseModel):
     value: Slot
-    label: str  # "Today", "Snow depth · NWS"
+    label: str  # "Today", "Snow depth"
 
 
 class Gauge(BaseModel):
     title: str  # "Rain gauge" | "Gauge"
-    note: str  # "inches" | "liquid in · snow via NWS"
+    note: str  # "inches" | "in · snow via NWS"
     cells: list[GaugeCell]
-    note_size: int = 12  # the winter note is longer and set at 11 px
+    note_size: int = 13
 
 
 class Sun(BaseModel):

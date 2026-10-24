@@ -4,7 +4,7 @@
   <pattern id="wSnowHeavy" width="3.6" height="3.6" patternUnits="userSpaceOnUse"><rect width="3.6" height="3.6" fill="#B6B6B6"></rect><circle cx="1.8" cy="1.8" r="1.2" fill="#000000"></circle></pattern>
   <pattern id="wMix" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#000000" stroke-width="1.6"></line></pattern>
 </defs>
-<rect x="-212" y="-226.8" width="424" height="453.6" fill="#FFFFFF"></rect>
+<rect x="-214.4" y="-228" width="428.8" height="456" fill="#FFFFFF"></rect>
 <path d="M-62,-280 L-62,70 M95,-280 L95,280 M-140,-132 L-140,280 M-40,70 L-40,280 M-280,-132 L213,-132 M-280,70 L213,70 M-140,150 L213,150 M-62,-230 L213,-230" fill="none" stroke="#DBDBDB" stroke-width="1"></path>
 <path d="M213,-280 L213,280" fill="none" stroke="#929292" stroke-width="1.2" stroke-dasharray="8 4"></path>
 <path d="M-240,-250.8 H240 V-70 C160,-40 80,-60 0,-30 C-80,0 -160,-10 -240,10 Z" fill="url(#wSnow)"></path>

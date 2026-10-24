@@ -104,9 +104,9 @@ async def test_gauge_switches_in_winter():
     assert (fall.title, fall.note) == ("Rain gauge", "inches")
     assert [(c.value.text, c.label) for c in fall.cells] == [
         ("0.00", "Today"), ("0.42", "This week"), ("1.86", "October"), ("31.07", "2026")]
-    assert (winter.title, winter.note, winter.note_size) == ("Gauge", "liquid in · snow via NWS", 11)
+    assert (winter.title, winter.note, winter.note_size) == ("Gauge", "in · snow via NWS", 13)
     assert [(c.value.text, c.label) for c in winter.cells] == [
-        ("0.21", "Today"), ("1.12", "January"), ("4 in", "Snow depth · NWS"), ("11.8 in", "Season snow · NWS")]
+        ("0.21", "Today"), ("1.12", "January"), ("4 in", "Snow depth"), ("11.8 in", "Season snow")]
 
 
 async def test_winter_alert_replaces_day_line():

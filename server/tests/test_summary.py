@@ -79,8 +79,8 @@ def test_day_line_falls_back_to_nws_wording():
 
 
 def test_header_budget_matches_the_board():
-    # header 1058 px − left group (~352) − right group without the day line (~220) − 24 px breathing room
-    assert budget("fall") == pytest.approx(462, abs=1)
+    # header 1064 px − left group (~352) − right group without the day line (~220) − 24 px breathing room
+    assert budget("fall") == pytest.approx(468, abs=1)
     assert summary.header_budget("Savoy, IL", "Wednesday 30 September", None, "12:30 PM") < budget("fall") + 30
 
 

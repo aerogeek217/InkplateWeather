@@ -43,9 +43,10 @@ EVENING_HOUR = 15  # from 3 PM the day line talks about tonight and tomorrow
 
 # header geometry (header.j2): left group = icon 34 (−4 margin) + 14 + city + 14 + date;
 # right group = [day line] 22 divider(1) 22 battery(30 + 6 + "78%") 22 time
-HEADER_WIDTH = 1200 - 2 * 71
+HEADER_WIDTH = 1200 - 2 * 68
 HEADER_MIN_GAP = 24  # keep at least this much white between the left and right groups
 DAY_LINE_SIZE, DAY_LINE_WEIGHT = 17, 600
+ALERT_TAG_SIZE = 13  # header.j2 alert tag: 13 px / 800, 0.08em, uppercase
 
 STORM_ICONS = {"thunderstorm", "hail"}
 KIND_WORD = {"storm": "storms", "rain": "rain", "snow": "snow", "ice": "sleet"}
@@ -484,7 +485,7 @@ def header_budget(city: str, date_text: str, battery_pct: int | None, time_text:
 
 def alert_width(event: str, detail: str) -> float:
     """Width of the header's alert group (tag + detail), header.j2."""
-    tag = 8 + 12 + 6 + measure(event, 12, 800, 0.08, uppercase=True) + 8
+    tag = 8 + 12 + 6 + measure(event, ALERT_TAG_SIZE, 800, 0.08, uppercase=True) + 8
     return tag + (10 + measure(detail, 15, 600) if detail else 0)
 
 

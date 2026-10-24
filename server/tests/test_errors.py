@@ -221,7 +221,7 @@ async def test_battery_low_day_line_yields():
     assert h.day_line == "Storms around 4 PM." and summary.fits(h.day_line, budget)
     html = render_html(await ctx_for("battery-low", device=DeviceInfo(battery_pct=4)))
     assert messages.BATTERY_LOW in html and 'role="alert"' in html
-    assert measure(messages.BATTERY_STRIP.format(pct=100), 15, 600) <= 530 - 24  # one line in the strip
+    assert measure(messages.BATTERY_STRIP.format(pct=100), 15, 600) <= 536 - 24  # one line in the strip
 
 
 # ------------------------------------------------------------------ sections
@@ -314,7 +314,8 @@ async def test_alert_never_overflows():
     budget = summary.header_budget(h.city, h.date_text, h.battery_pct, h.time_text, gap=18) - (
         viewmodel.BATTERY_TEXT_GAP + measure(messages.BATTERY_LOW, 16, 600))
     assert summary.alert_width(a.event, a.detail) <= budget
-    assert a.event == "Svr T-storm Warning" and a.detail == "until 3:15 PM"
+    # With the 13 px tag (readability pass) "until 3:15 PM" misses this tightest header by ~4 px: the tag stands alone.
+    assert a.event == "Svr T-storm Warning" and a.detail == ""
 
 
 # ------------------------------------------------------------------ error strip

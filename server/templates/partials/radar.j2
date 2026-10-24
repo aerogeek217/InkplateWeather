@@ -1,7 +1,7 @@
 {% set r = ctx.radar %}
 {% set strip = ctx.header.battery_strip %}
 {% macro legend(position) %}
-        <div style="{{ position }}background: #FFFFFF; border: 1px solid #000000; padding: 6px 10px; display: flex; gap: 10px; align-items: center; font-size: 12px">
+        <div style="{{ position }}background: #FFFFFF; border: 1px solid #000000; padding: 6px 10px; display: flex; gap: 10px; align-items: center; font-size: 13px">
           <span style="font-weight: 700">Radar · {{ r.site_time }}</span>
 {% if r.legend == "types" %}
           <span style="display: flex; gap: 4px; align-items: center; color: #494949">
@@ -21,28 +21,28 @@
 {% endif %}
         </div>
 {% endmacro %}
-      <div style="position: relative; width: 530px; height: 567px; flex-shrink: 0">
-        <svg width="530" height="567" viewBox="-212 -226.8 424 453.6" role="img" aria-label="{{ r.aria_label }}" style="display: block; outline: 1px solid #000000">
+      <div style="position: relative; width: 536px; height: 570px; flex-shrink: 0">
+        <svg width="536" height="570" viewBox="-214.4 -228 428.8 456" role="img" aria-label="{{ r.aria_label }}" style="display: block; outline: 1px solid #000000">
 {% if r.svg_layers %}
 {{ r.svg_layers | safe }}
 {% else %}
-          <rect x="-212" y="-226.8" width="424" height="453.6" fill="#FFFFFF"></rect>
+          <rect x="-214.4" y="-228" width="428.8" height="456" fill="#FFFFFF"></rect>
 {% endif %}
         </svg>
 {% if r.message %}
         <div style="position: absolute; left: 60px; right: 60px; top: 250px; text-align: center; font-size: 17px; font-weight: 600; color: #494949">{{ r.message }}</div>
 {% endif %}
 {% if strip %}
-        <div role="alert" style="position: absolute; left: 0; top: 0; width: 530px; box-sizing: border-box; padding: 8px 12px; background: #000000; color: #FFFFFF; font-size: 15px; font-weight: 600">{{ strip }}</div>
+        <div role="alert" style="position: absolute; left: 0; top: 0; width: 536px; box-sizing: border-box; padding: 8px 12px; background: #000000; color: #FFFFFF; font-size: 15px; font-weight: 600">{{ strip }}</div>
 {% endif %}
 {% if ctx.notices or strip %}
 {% if r.site_time or ctx.notices %}
-        <div style="position: absolute; left: 10px; top: {{ 44 if strip else 10 }}px; max-width: 510px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px">
+        <div style="position: absolute; left: 10px; top: {{ 44 if strip else 10 }}px; max-width: 516px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px">
 {% if r.site_time and not strip %}{# the ≤ 5 % battery strip covers the legend's place; keep the map overlays clear #}
 {{ legend("") }}
 {% endif %}
 {% if ctx.notices %}
-          <div aria-label="Notes" style="background: #FFFFFF; border: 1px solid #000000; padding: 5px 10px; display: flex; flex-direction: column; gap: 2px; font-size: 12px; line-height: 1.3">
+          <div aria-label="Notes" style="background: #FFFFFF; border: 1px solid #000000; padding: 5px 10px; display: flex; flex-direction: column; gap: 2px; font-size: 13px; line-height: 1.3">
 {% for n in ctx.notices %}
             <span>{{ n }}</span>
 {% endfor %}
@@ -62,12 +62,12 @@
 {% endif %}
             <div style="display: flex; flex-direction: column; gap: 3px">
               <span style="font-size: 26px; font-weight: 800; line-height: 1; letter-spacing: -0.02em">{{ r.callout.headline }}</span>
-              <span style="font-size: 12.5px; color: #DBDBDB">{{ r.callout.detail }}</span>
+              <span style="font-size: 13.5px; color: #DBDBDB">{{ r.callout.detail }}</span>
             </div>
           </div>
 {% endif %}
 {% if r.next_chip %}
-          <div style="background: #FFFFFF; border: 1px solid #000000; padding: 4px 10px; font-size: 12.5px; font-weight: 600">{{ r.next_chip }}</div>
+          <div style="background: #FFFFFF; border: 1px solid #000000; padding: 4px 10px; font-size: 13.5px; font-weight: 600">{{ r.next_chip }}</div>
 {% endif %}
         </div>
 {% endif %}

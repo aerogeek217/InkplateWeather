@@ -8,7 +8,7 @@
 {% if t.midnights %}
           <path d="{% for x in t.midnights %}{% if not loop.first %} {% endif %}M{{ x }},0 V{{ t.axis_y | round(2) }}{% endfor %}" stroke="#929292" stroke-width="1" stroke-dasharray="2 3"></path>
 {% endif %}
-          <g font-family="{{ font }}" font-size="11" fill="#494949" text-anchor="end">
+          <g font-family="{{ font }}" font-size="13" fill="#494949" text-anchor="end">
             {% for y, label in t.gridlines %}<text x="24" y="{{ (y + t.grid_label_dy) | round(2) }}">{{ label }}</text>{% endfor %}
 
           </g>
@@ -31,19 +31,19 @@
             {% for p in t.points %}<circle cx="{{ p[0] }}" cy="{{ p[1] }}" r="3"></circle>{% endfor %}
 
           </g>
-          <g font-family="{{ font }}" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">
+          <g font-family="{{ font }}" font-size="13.5" font-weight="700" fill="#000000" text-anchor="middle">
             {% for p in t.points %}<text x="{{ p[2] }}" y="{{ p[3] }}">{{ p[4] }}</text>{% endfor %}
 
           </g>
-          <g font-family="{{ font }}" font-size="11.5" font-weight="700" fill="#494949">
+          <g font-family="{{ font }}" font-size="13" font-weight="700" fill="#494949">
             {% for x, label in t.day_labels %}<text x="{{ x }}" y="{{ t.day_label_y | round(2) }}">{{ label }}</text>{% endfor %}
 
           </g>
 {% if t.now %}
-          <text x="{{ t.now[0] }}" y="{{ t.day_label_y | round(2) }}" text-anchor="middle" font-family="{{ font }}" font-size="11.5" font-weight="800" fill="#000000">NOW</text>
+          <text x="{{ t.now[0] }}" y="{{ t.day_label_y | round(2) }}" text-anchor="middle" font-family="{{ font }}" font-size="13" font-weight="800" fill="#000000">NOW</text>
 {% endif %}
 {% if t.past_message and t.now %}
-          <text x="{{ ((30 + t.now[0]) / 2) | round(2) }}" y="{{ (t.axis_y / 2) | round(2) }}" dominant-baseline="central" text-anchor="middle" font-family="{{ font }}" font-size="11" fill="#494949">{{ t.past_message }}</text>
+          <text x="{{ ((30 + t.now[0]) / 2) | round(2) }}" y="{{ (t.axis_y / 2) | round(2) }}" dominant-baseline="central" text-anchor="middle" font-family="{{ font }}" font-size="13" fill="#494949">{{ t.past_message }}</text>
 {% endif %}
 {% if t.message %}
           <text x="285" y="{{ (t.axis_y / 2) | round(2) }}" dominant-baseline="central" text-anchor="middle" font-family="{{ font }}" font-size="15" font-weight="600" fill="#494949">{{ t.message }}</text>

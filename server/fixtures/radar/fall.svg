@@ -1,5 +1,5 @@
 <!-- Phase-1 radar artwork for the fall fixture: the hand-drawn layers of design/source/dashboard.html (base map, echoes, overlays). Phase 3 replaces this with generated layers. -->
-<rect x="-212" y="-226.8" width="424" height="453.6" fill="#FFFFFF"></rect>
+<rect x="-214.4" y="-228" width="428.8" height="456" fill="#FFFFFF"></rect>
 <path d="M-62,-280 L-62,70 M95,-280 L95,280 M-140,-132 L-140,280 M-40,70 L-40,280 M-280,-132 L213,-132 M-280,70 L213,70 M-140,150 L213,150 M-62,-230 L213,-230" fill="none" stroke="#DBDBDB" stroke-width="1"></path>
 <path d="M213,-280 L213,280" fill="none" stroke="#929292" stroke-width="1.2" stroke-dasharray="8 4"></path>
 <text x="228" y="-130" transform="rotate(-90 228 -130)" text-anchor="middle" font-family="Inter Tight, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="4" fill="#929292">INDIANA</text>

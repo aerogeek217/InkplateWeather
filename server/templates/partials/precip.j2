@@ -7,9 +7,9 @@
           <div style="display: flex; justify-content: space-between; align-items: baseline">
             <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase">{{ p.title }}</span>
 {% if p.right_bold %}
-            <span style="font-size: 12px; font-weight: 700">{{ p.right_text }}</span>
+            <span style="font-size: 13px; font-weight: 700">{{ p.right_text }}</span>
 {% else %}
-            <span style="font-size: 12px; color: #494949">{{ p.right_text }}</span>
+            <span style="font-size: 13px; color: #494949">{{ p.right_text }}</span>
 {% endif %}
           </div>
           <svg width="300" height="{{ p.height }}" viewBox="0 0 300 {{ p.height }}" role="img" aria-label="{{ p.aria_label }}">
@@ -37,14 +37,14 @@
               {% for b in p.bars if b.label %}<text x="{{ b.x + 7.5 }}" y="{{ b.label_y }}">{{ b.label }}</text>{% endfor %}
 
             </g>
-            <g font-family="{{ font }}" font-size="11" fill="#494949">
+            <g font-family="{{ font }}" font-size="12.5" fill="#494949">
               {% for x, label, anchor in p.hour_labels %}<text x="{{ x }}" y="{{ p.hour_y }}"{% if anchor != "start" %} text-anchor="{{ anchor }}"{% endif %}>{{ label }}</text>{% endfor %}
 
             </g>
           </svg>
 {% endif %}
 {% if p.key %}
-          <div style="display: flex; gap: 14px; align-items: center; font-size: 11px; color: #494949">
+          <div style="display: flex; gap: 14px; align-items: center; font-size: 13px; color: #494949">
 {% for k in p.key %}
 {% if k == "ice" %}
             <span style="display: flex; gap: 5px; align-items: center"><svg width="11" height="11" viewBox="0 0 11 11" aria-hidden="true"><defs><pattern id="wKeyMix" width="3.5" height="3.5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="3.5" stroke="#000000" stroke-width="1.3"></line></pattern></defs><rect x="0.5" y="0.5" width="10" height="10" fill="url(#wKeyMix)" stroke="#000000"></rect></svg>{{ key_names[k] }}</span>
@@ -64,7 +64,7 @@
           </div>
           <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 6px; column-gap: 10px">
 {% for cell in g.cells %}
-            <div style="display: flex; flex-direction: column">{% if cell.value.text %}<span style="font-size: 20px; font-weight: 700; line-height: 1.1{% if cell.value.status == 'stale' %}; color: #6D6D6D{% endif %}">{{ cell.value.text }}</span>{% else %}<span style="display: flex; flex-direction: column; font-size: 11px; line-height: 1; white-space: nowrap"><span style="font-weight: 700">{{ cell.value.message or "" }}</span>{% if cell.value.sub %}<span style="color: #494949">{{ cell.value.sub }}</span>{% endif %}</span>{% endif %}<span style="font-size: 11px; color: #494949">{{ cell.label }}</span></div>
+            <div style="display: flex; flex-direction: column">{% if cell.value.text %}<span style="font-size: 20px; font-weight: 700; line-height: 1.1{% if cell.value.status == 'stale' %}; color: #6D6D6D{% endif %}">{{ cell.value.text }}</span>{% else %}<span style="display: flex; flex-direction: column; font-size: 13px; line-height: 1; white-space: nowrap"><span style="font-weight: 700">{{ cell.value.message or "" }}</span>{% if cell.value.sub %}<span style="color: #494949">{{ cell.value.sub }}</span>{% endif %}</span>{% endif %}<span style="font-size: 13px; color: #494949">{{ cell.label }}</span></div>
 {% endfor %}
           </div>
         </div>
