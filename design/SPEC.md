@@ -35,16 +35,18 @@ in `reference/` are the source of truth for exact visual appearance.
 - Key sizes: current temperature 180 px / 800, letter-spacing −0.065em · H/L 38 px (H 700, L 300) ·
   header city 22 px / 800 · section labels 13 px / 800, uppercase, 0.12em tracking ·
   forecast rows 14.5 px, temps 23 px · readings values 24 px / 700.
+- **Minimum text size** (readability pass, approved 2026-10-24): HTML text ≥ 13 px, except the readings labels
+  (12 px / 800, 0.08em tracking) and their secondary values (13 px); chart labels ≥ ~12 px on screen.
 - Numbers never wrap (H/L, temps are `nowrap`).
 
 ## Layout (px)
 
 ```
-padding 69 top/bottom, 71 left/right (6 mm more than v1 for the frame; reflowed 2026-10-24)
+padding 66 top/bottom, 68 left/right (about 5.5 mm more than v1 for the frame; reflowed 2026-10-24, trimmed 3 px the same day)
 ┌ header (44, 3px black rule under) ─────────────────────────────────────────────┐
-├ 12 gap ────────────────────────────────────────────────────────────────────────┤
-│ LEFT 530                              │24│ RIGHT 504                            │
-│ radar 530 × 567                       │  │ current temp block                   │
+├ 11 gap ────────────────────────────────────────────────────────────────────────┤
+│ LEFT 536                              │24│ RIGHT 504                            │
+│ radar 536 × 570                       │  │ current temp block                   │
 │                                       │  │ temperature trend (72 h)             │
 │                                       │  │ chance of precip (300) │ gauge       │
 │                                       │  │ sun (236) │ moon                     │
@@ -65,7 +67,7 @@ share the remaining height (flex), with a 24 px minimum per row.
   ("Svr T-storm Warning"; table in `messages.py`), and the impact is dropped only as a last resort (approved 2026-10-24).
 - Then a 1 px divider, battery icon + %, time (22/700). ("Next update" was removed 2026-10-24 to give the day line room.)
 
-### Radar (530 × 567, left column)
+### Radar (536 × 570, left column)
 - Base map: county lines `#DBDBDB`, state line dashed `#929292`, interstates `#B6B6B6` 3.5 px,
   city dots + labels with a white halo, home marked by a black square + "SAVOY".
 - Echo fills (same coding as the icon sheet `fills/`): light `#DBDBDB`, moderate `#929292`,
@@ -169,6 +171,10 @@ storm, partly cloudy; freezing drizzle; wintry mix; small moon phases), the rend
 `tools/icons_v1_1.py`); `source/icons.html` shows the fixed triangle. `source/Icons.dc.html` is the original v1 export.
 
 ## Reference renders
+
+Readability pass, approved 2026-10-24 (`tools/readability_v2.py` records the exact edits): margin −3 px per side,
+small text raised (see Typography), moon next-phase strip as a 2 × 2 grid, winter gauge labels "Snow depth" /
+"Season snow" with the note "in · snow via NWS", right-column gaps 7.
 
 Layout reflow, approved 2026-10-24: 6 mm (35 px) more margin on every side with every font size unchanged
 (`tools/reflow_margin.py` records the exact edits). Radar 530 × 567 at the same map scale (cropped around home);
