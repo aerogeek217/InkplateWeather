@@ -43,6 +43,7 @@ class Header(BaseModel):
     next_update: str | None = None  # "3:00"; hidden while an alert is shown
     battery_pct: int | None = None
     battery_low: bool = False
+    battery_fill: float = 0  # width of the battery icon's fill bar (0–20 px)
     time_text: str  # "2:30 PM"
     notice: str | None = None  # header summary sentence when ≥ 2 sections are missing (phase 2.6)
 
@@ -120,6 +121,9 @@ class PrecipChart(BaseModel):
     hour_labels: list[tuple[float, str, str]] = []  # (x, "6 PM", text-anchor)
     key: list[str] = []  # precip types shown in the key (only when > 1 type)
     aria_label: str = ""
+    axis_y: float = 56  # baseline of the bars (56 normally, 50 when the key needs room)
+    label_size: float = 10.5  # percent-label font size
+    hour_y: float = 70  # baseline of the hour labels
 
 
 class GaugeCell(BaseModel):
@@ -131,6 +135,7 @@ class Gauge(BaseModel):
     title: str  # "Rain gauge" | "Gauge"
     note: str  # "inches" | "liquid in · snow via NWS"
     cells: list[GaugeCell]
+    note_size: int = 12  # the winter note is longer and set at 11 px
 
 
 class Sun(BaseModel):
@@ -156,6 +161,7 @@ class Moon(BaseModel):
     rise_set: str  # "Rises 5:21 PM · sets 6:04 AM"
     next: list[MoonPhase]
     aria_label: str = ""
+    shadow_path: str = ""  # dark part of the 36 px phase drawing (viewBox -28 -28 56 56, r 25)
 
 
 class ForecastRow(BaseModel):

@@ -1,0 +1,9 @@
+{% macro slot_value(s, size, weight, sub_size) -%}
+{% if s.text %}<span style="font-size: {{ size }}px; font-weight: {{ weight }}; line-height: 1.1{% if s.status == 'stale' %}; color: #6D6D6D{% endif %}">{{ s.text }}{% if s.sub %} <span style="font-size: {{ sub_size }}px; font-weight: 400; color: #494949">{{ s.sub }}</span>{% endif %}{% if s.as_of %} <span style="font-size: 11px; font-weight: 400; color: #494949">{{ s.as_of }}</span>{% endif %}</span>{% else %}<span style="font-size: 12px; line-height: 1.2; color: #494949">{{ s.message or "" }}</span>{% endif %}
+{%- endmacro %}
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 0; border-top: 2px solid #000000; padding-top: 8px">
+{% for cell in ctx.readings %}
+{% if loop.first %}{% set pad = "padding-right: 12px" %}{% elif loop.last %}{% set pad = "padding-left: 12px; border-left: 1px solid #B6B6B6" %}{% else %}{% set pad = "padding: 0 12px; border-left: 1px solid #B6B6B6" %}{% endif %}
+        <div style="display: flex; flex-direction: column; gap: 1px; {{ pad }}"><span style="font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase">{{ cell.label }}</span>{{ slot_value(cell.slot, 24, 700, 13) }}</div>
+{% endfor %}
+      </div>

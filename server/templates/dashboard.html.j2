@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Inkplate weather</title>
+<link href="{{ asset_base }}fonts/inter-tight.css" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#494949}a:hover{color:#000000}
+</style>
+</head>
+<body>
+<div style="width: {{ ctx.width }}px; height: {{ ctx.height }}px; box-sizing: border-box; padding: 34px 36px; background: #FFFFFF; color: #000000; font-family: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+{% include "partials/header.j2" %}
+
+  <main style="flex: 1; min-height: 0; display: grid; grid-template-columns: 600px 504px; column-gap: 24px">
+
+    <section style="display: flex; flex-direction: column; gap: 12px; min-height: 0">
+{% include "partials/radar.j2" %}
+{% include "partials/readings.j2" %}
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 10px; min-height: 0">
+{% include "partials/current.j2" %}
+
+{% include "partials/trend.j2" %}
+
+{% include "partials/precip.j2" %}
+
+{% include "partials/sun_moon.j2" %}
+
+{% include "partials/forecast.j2" %}
+    </section>
+  </main>
+</div>
+</body>
+</html>

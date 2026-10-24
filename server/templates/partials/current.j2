@@ -1,0 +1,29 @@
+{% set c = ctx.current %}
+      <div style="display: flex; gap: 18px; align-items: flex-start; justify-content: space-between">
+{% if c.temp.text %}
+        <div style="font-size: 180px; font-weight: 800; line-height: 0.76; letter-spacing: -0.065em; margin: 2px 0 0 -6px; white-space: nowrap{% if c.temp.status == 'stale' %}; color: #6D6D6D{% endif %}">{{ c.temp.text }}</div>
+{% else %}
+        <div style="font-size: 17px; font-weight: 600; color: #494949; max-width: 220px">{{ c.temp.message or "" }}</div>
+{% endif %}
+        <div style="flex: 0 0 auto; display: flex; flex-direction: column; gap: 7px; padding-top: 0">
+{% if c.high or c.low %}
+          <div style="display: flex; gap: 14px; align-items: baseline; margin-top: 4px; white-space: nowrap">
+{% if c.high %}
+            <span style="font-size: 38px; font-weight: 700; line-height: 1; white-space: nowrap">{{ c.high }}</span>
+{% endif %}
+{% if c.low %}
+            <span style="font-size: 38px; font-weight: 300; line-height: 1; white-space: nowrap">{{ c.low }}</span>
+{% endif %}
+          </div>
+{% endif %}
+{% if c.feels %}
+          <span style="font-size: 17px">{{ c.feels }}</span>
+{% endif %}
+{% if c.wind %}
+          <span style="display: flex; gap: 6px; align-items: center; font-size: 17px">{% if c.wind.dir_text %}{{ icon_svg(wind_arrow(c.wind.dir_text), 15, label="Wind from the " ~ wind_names[c.wind.dir_text]) }}{% endif %}<span><span style="font-weight: 700">Wind {{ c.wind.dir_text }} {{ c.wind.speed }}</span>{% if c.wind.gust %} · gusts {{ c.wind.gust }}{% endif %}</span></span>
+{% endif %}
+{% if c.normals %}
+          <span style="font-size: 14px; color: #494949">{{ c.normals }}</span>
+{% endif %}
+        </div>
+      </div>
