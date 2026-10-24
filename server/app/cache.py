@@ -169,10 +169,11 @@ class ProviderCache:
         name = p.name
         st = self._state(name)
         h = st.health
-        h.ttl = p.ttl
+        ttl = _ttl(p)
+        h.ttl = ttl
         self._load(name, st)
         now = self._clock()
-        if st.entry is not None and p.ttl > timedelta(0) and now - st.entry.fetched_at < p.ttl:
+        if st.entry is not None and ttl > timedelta(0) and now - st.entry.fetched_at < ttl:
             self._served(h, "cache", now)
             return dict(st.entry.readings)
         if st.inflight is None or st.inflight.done():
@@ -250,7 +251,7 @@ class ProviderCache:
         return good
 
     def _within_cap(self, p: Provider, now: datetime, t: datetime) -> bool:
-        return now - t <= max(LAST_GOOD_MAX_AGE, 2 * p.ttl)
+        return now - t <= max(LAST_GOOD_MAX_AGE, 2 * _ttl(p))
 
     @staticmethod
     def _served(h: Health, how: str, now: datetime) -> None:
@@ -316,6 +317,11 @@ class ProviderCache:
             return
         st.entry = Entry(fetched_at=fetched_at, readings=readings, key_times=key_times, sig=data.get("sig"))
         st.health.cached_at = fetched_at
+
+
+def _ttl(p: Provider) -> timedelta:
+    ttl = getattr(p, "ttl", None)
+    return ttl if isinstance(ttl, timedelta) else timedelta(0)
 
 
 def _aware(t: datetime) -> datetime:
