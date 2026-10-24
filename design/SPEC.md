@@ -40,11 +40,11 @@ in `reference/` are the source of truth for exact visual appearance.
 ## Layout (px)
 
 ```
-padding 34 top/bottom, 36 left/right
+padding 69 top/bottom, 71 left/right (6 mm more than v1 for the frame; reflowed 2026-10-24)
 ┌ header (44, 3px black rule under) ─────────────────────────────────────────────┐
-├ 16 gap ────────────────────────────────────────────────────────────────────────┤
-│ LEFT 600                              │24│ RIGHT 504                            │
-│ radar 600 × 627                       │  │ current temp block                   │
+├ 12 gap ────────────────────────────────────────────────────────────────────────┤
+│ LEFT 530                              │24│ RIGHT 504                            │
+│ radar 530 × 567                       │  │ current temp block                   │
 │                                       │  │ temperature trend (72 h)             │
 │                                       │  │ chance of precip (300) │ gauge       │
 │                                       │  │ sun (236) │ moon                     │
@@ -62,9 +62,9 @@ share the remaining height (flex), with a 24 px minimum per row.
 - Right: **day line** (17/600), a one-sentence summary such as "Storms around 4 PM, then colder and windy."
   When an **NWS alert** is active, it replaces the day line: black tag with ⚠ + event name, then
   "until <time> · <key impact>".
-- Then a 1 px divider, "Next update h:mm" (when no alert), battery icon + %, time (22/700).
+- Then a 1 px divider, battery icon + %, time (22/700). ("Next update" was removed 2026-10-24 to give the day line room.)
 
-### Radar (600 × 627, left column)
+### Radar (530 × 567, left column)
 - Base map: county lines `#DBDBDB`, state line dashed `#929292`, interstates `#B6B6B6` 3.5 px,
   city dots + labels with a white halo, home marked by a black square + "SAVOY".
 - Echo fills (same coding as the icon sheet `fills/`): light `#DBDBDB`, moderate `#929292`,
@@ -91,7 +91,7 @@ Inside temp + RH · Garage temp + RH · Pressure + trend arrow · Air quality (U
 - Detail block: **H xx° L xx°** (one line) · "Feels xx° · Humidity xx%" · wind arrow + "Wind <dir> <speed> · gusts <g>" ·
   "Average xx° / xx°" (climate normal high/low for the date, small gray).
 
-### Temperature trend (504 × 85)
+### Temperature trend (504 × 75)
 - One continuous timeline: **past 24 h** (solid line, gray area) → **NOW** marker → **next 48 h** (dashed).
 - Gridlines every 10°, labels at left. Dotted midnight lines with day names below. Black bars under
   the axis mark night (sunset → sunrise).
@@ -115,7 +115,7 @@ Inside temp + RH · Garage temp + RH · Pressure + trend arrow · Air quality (U
   a strip of the next four principal phases with dates (Full / Last / New / First).
 
 ### 7-day forecast list
-- Columns: day (TODAY in a black tag) · icon 28 px · short description · wind (direction arrow + dir + speed,
+- Columns: day (TODAY in a black tag) · icon 24 px · short description · wind (direction arrow + dir + speed,
   **bold at ≥ 20 mph**) · precip (drop + % for rain, snowflake + amount for snow days, pellet + % for ice)
   · **high** (23/800, 16 px gap before it) · **low** (23/300 gray). Highs and lows each form their own
   left-aligned column.
@@ -166,6 +166,11 @@ storm, partly cloudy; freezing drizzle; wintry mix; small moon phases), the rend
 `tools/icons_v1_1.py`); `source/icons.html` shows the fixed triangle. `source/Icons.dc.html` is the original v1 export.
 
 ## Reference renders
+
+Layout reflow, approved 2026-10-24: 6 mm (35 px) more margin on every side with every font size unchanged
+(`tools/reflow_margin.py` records the exact edits). Radar 530 × 567 at the same map scale (cropped around home);
+readings strip columns sized to content; right-column gaps 8; trend plot 60 px tall; precip bars 8 px shorter;
+forecast icons 24 px, rows ≥ 24 px; header without "Next update".
 
 Regenerated 2026-10-24 with the user's approval:
 - `source/dashboard.html` and `dashboard-winter.html` now use the icon set (forecast-row icons, moon strip, alert
