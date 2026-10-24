@@ -11,7 +11,7 @@ from datetime import date, datetime, timedelta
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from . import icons, messages, summary
+from . import icons, messages, radarmap, summary
 from .config import AppConfig
 from .context import (
     Alert,
@@ -294,7 +294,19 @@ def radar_configured(d: _Data) -> bool:
     return r is not None and any(a.note != "no_such_key" for a in r.tried)
 
 
-def _radar(d: _Data, tz: ZoneInfo, inp: summary.Inputs) -> Radar:
+def _radar_layers(frame: dict, d: _Data, now: datetime, cfg: AppConfig | None) -> tuple[str, bool]:
+    """Fixture artwork as is; a live frame (classified masks) drawn on the generated base map with the last
+    30 minutes of lightning. → (SVG, bolts drawn)."""
+    if "layers" not in frame:
+        return frame.get("svg_layers", ""), bool(frame.get("lightning"))
+    ext = radarmap.extent()
+    home = (cfg.location.name.split(",")[0] if cfg else "") or "Home"
+    xy = ext.project(cfg.location.lon, cfg.location.lat) if cfg else (0.0, 0.0)
+    marks = radarmap.bolts(d.records("lightning.flashes"), now, ext)
+    return radarmap.layers(frame, home.upper(), xy, marks), bool(marks)
+
+
+def _radar(d: _Data, tz: ZoneInfo, inp: summary.Inputs, now: datetime, cfg: AppConfig | None = None) -> Radar:
     frame = d.get("radar.frame")
     callout = d.get("radar.callout")  # fixture text wins over generated text
     if not (isinstance(callout, dict) and callout.get("headline")):
@@ -311,13 +323,14 @@ def _radar(d: _Data, tz: ZoneInfo, inp: summary.Inputs) -> Radar:
                      status=Status.missing, message=msg)
     t = _dt(frame.get("time"), tz)
     types = set(frame.get("types") or [])
+    svg, lightning = _radar_layers(frame, d, now, cfg)
     return Radar(
         site_time=" ".join(x for x in (frame.get("site", ""), clock(t, d.tz) if t else "") if x),
-        legend="types" if types & {"snow", "ice"} else "intensity",
-        lightning_legend=bool(frame.get("lightning")),
+        legend=frame.get("legend") or ("types" if types & {"snow", "ice"} else "intensity"),
+        lightning_legend=lightning,
         callout=co,
         next_chip=f"Next: {hazard}" if hazard else None,
-        svg_layers=frame.get("svg_layers", ""),
+        svg_layers=svg,
         aria_label=frame.get("aria_label", "Radar map"),
     )
 
@@ -988,7 +1001,7 @@ def build(resolved: Mapping[str, Resolved], now: datetime, device: DeviceInfo | 
         width=cfg.server.width if cfg else 1200,
         height=cfg.server.height if cfg else 825,
         header=_header(d, now, device, cfg, inp, sections),
-        radar=_radar(d, tz, inp),
+        radar=_radar(d, tz, inp, now, cfg),
         readings=readings,
         current=_current(d, inp),
         trend=_trend(d, now, tz, sun_raw if isinstance(sun_raw, dict) else None),

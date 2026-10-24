@@ -3,6 +3,10 @@
 Written 2026-10-24 (end of the Phase 1 + Phase 2 session) for a fresh session. Tell it:
 "Read docs/ORCHESTRATOR_HANDOFF.md and proceed." (The Phase 1 version of this file is in git history, commit 5cb8fab.)
 
+**Update 2026-10-24, 14:30 CDT:** Phase 2 was approved and merged (eefc7de); Phase 3 (radar, 3.1–3.5) is built
+on `phase-3` and pushed, not yet deployed. `docs/BUILD_PLAN.md` (status + Phase 3 notes) is current; the
+"Where things stand" section below is from before that.
+
 ---
 
 You are the orchestrator for **Inkplate weather**, a wall-mounted e-paper weather display. You coordinate the build:

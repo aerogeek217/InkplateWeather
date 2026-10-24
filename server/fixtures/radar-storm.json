@@ -1,0 +1,581 @@
+{
+ "now": "2026-10-24T14:30:00-05:00",
+ "device": {
+  "battery_pct": 78,
+  "voltage_mv": 3980,
+  "wake_reason": "timer"
+ },
+ "readings": {
+  "outdoor.temperature": 58.4,
+  "outdoor.humidity": 64,
+  "outdoor.dew_point": 46.3,
+  "outdoor.feels_like": 58.1,
+  "outdoor.temperature_history": [
+   {
+    "t": "2026-10-23T15:30:00-05:00",
+    "v": 63
+   },
+   {
+    "t": "2026-10-23T16:30:00-05:00",
+    "v": 61
+   },
+   {
+    "t": "2026-10-23T17:30:00-05:00",
+    "v": 58
+   },
+   {
+    "t": "2026-10-23T18:30:00-05:00",
+    "v": 55
+   },
+   {
+    "t": "2026-10-23T19:30:00-05:00",
+    "v": 52
+   },
+   {
+    "t": "2026-10-23T20:30:00-05:00",
+    "v": 50
+   },
+   {
+    "t": "2026-10-23T21:30:00-05:00",
+    "v": 48
+   },
+   {
+    "t": "2026-10-23T22:30:00-05:00",
+    "v": 47
+   },
+   {
+    "t": "2026-10-23T23:30:00-05:00",
+    "v": 46
+   },
+   {
+    "t": "2026-10-24T00:30:00-05:00",
+    "v": 45
+   },
+   {
+    "t": "2026-10-24T01:30:00-05:00",
+    "v": 44
+   },
+   {
+    "t": "2026-10-24T02:30:00-05:00",
+    "v": 43
+   },
+   {
+    "t": "2026-10-24T03:30:00-05:00",
+    "v": 42
+   },
+   {
+    "t": "2026-10-24T04:30:00-05:00",
+    "v": 42
+   },
+   {
+    "t": "2026-10-24T05:30:00-05:00",
+    "v": 43
+   },
+   {
+    "t": "2026-10-24T06:30:00-05:00",
+    "v": 45
+   },
+   {
+    "t": "2026-10-24T07:30:00-05:00",
+    "v": 48
+   },
+   {
+    "t": "2026-10-24T08:30:00-05:00",
+    "v": 51
+   },
+   {
+    "t": "2026-10-24T09:30:00-05:00",
+    "v": 54
+   },
+   {
+    "t": "2026-10-24T10:30:00-05:00",
+    "v": 56
+   },
+   {
+    "t": "2026-10-24T11:30:00-05:00",
+    "v": 57
+   },
+   {
+    "t": "2026-10-24T12:30:00-05:00",
+    "v": 58
+   },
+   {
+    "t": "2026-10-24T13:30:00-05:00",
+    "v": 58.5
+   },
+   {
+    "t": "2026-10-24T14:30:00-05:00",
+    "v": 58.4
+   }
+  ],
+  "wind.speed": 14,
+  "wind.gust": 26,
+  "wind.direction": 180,
+  "uv.index": 2,
+  "solar.radiation": 210,
+  "indoor.temperature": 70.2,
+  "indoor.humidity": 41,
+  "garage.temperature": 52.8,
+  "garage.humidity": 58,
+  "pressure.sea_level": 29.94,
+  "pressure.trend_3h": -0.06,
+  "rain.today": 0.0,
+  "rain.week": 0.42,
+  "rain.month": 1.86,
+  "rain.year": 31.07,
+  "rain.rate": 0.0,
+  "air.aqi": 34,
+  "snow.depth": 0,
+  "snow.season": 0,
+  "normals.high": 63,
+  "normals.low": 42,
+  "conditions.current": "cloudy",
+  "forecast.hourly": [
+   {
+    "t": "2026-10-24T15:00:00-05:00",
+    "temp": 60,
+    "pop": 40,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-24T16:00:00-05:00",
+    "temp": 54,
+    "pop": 80,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-24T17:00:00-05:00",
+    "temp": 52.0,
+    "pop": 80,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-24T18:00:00-05:00",
+    "temp": 50,
+    "pop": 60,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-24T19:00:00-05:00",
+    "temp": 48.33,
+    "pop": 40,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-24T20:00:00-05:00",
+    "temp": 46.67,
+    "pop": 20,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-24T21:00:00-05:00",
+    "temp": 45,
+    "pop": 10,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-24T22:00:00-05:00",
+    "temp": 43.67,
+    "pop": 10,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-24T23:00:00-05:00",
+    "temp": 42.33,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T00:00:00-05:00",
+    "temp": 41,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T01:00:00-05:00",
+    "temp": 40.33,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T02:00:00-05:00",
+    "temp": 39.67,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T03:00:00-05:00",
+    "temp": 39,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T04:00:00-05:00",
+    "temp": 38.67,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T05:00:00-05:00",
+    "temp": 38.33,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T06:00:00-05:00",
+    "temp": 38,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T07:00:00-05:00",
+    "temp": 39.33,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T08:00:00-05:00",
+    "temp": 40.67,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T09:00:00-05:00",
+    "temp": 42,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T10:00:00-05:00",
+    "temp": 44.33,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T11:00:00-05:00",
+    "temp": 46.67,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T12:00:00-05:00",
+    "temp": 49,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T13:00:00-05:00",
+    "temp": 50.0,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T14:00:00-05:00",
+    "temp": 51.0,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T15:00:00-05:00",
+    "temp": 52,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T16:00:00-05:00",
+    "temp": 50.33,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T17:00:00-05:00",
+    "temp": 48.67,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T18:00:00-05:00",
+    "temp": 47,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T19:00:00-05:00",
+    "temp": 45.0,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T20:00:00-05:00",
+    "temp": 43.0,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T21:00:00-05:00",
+    "temp": 41,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T22:00:00-05:00",
+    "temp": 39.67,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-25T23:00:00-05:00",
+    "temp": 38.33,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T00:00:00-05:00",
+    "temp": 37,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T01:00:00-05:00",
+    "temp": 36.33,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T02:00:00-05:00",
+    "temp": 35.67,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T03:00:00-05:00",
+    "temp": 35,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T04:00:00-05:00",
+    "temp": 34.67,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T05:00:00-05:00",
+    "temp": 34.33,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T06:00:00-05:00",
+    "temp": 34,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T07:00:00-05:00",
+    "temp": 36.33,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T08:00:00-05:00",
+    "temp": 38.67,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T09:00:00-05:00",
+    "temp": 41,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T10:00:00-05:00",
+    "temp": 44.33,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T11:00:00-05:00",
+    "temp": 47.67,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T12:00:00-05:00",
+    "temp": 51,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T13:00:00-05:00",
+    "temp": 52.5,
+    "pop": 5,
+    "precip_type": "rain"
+   },
+   {
+    "t": "2026-10-26T14:00:00-05:00",
+    "temp": 54,
+    "pop": 5,
+    "precip_type": "rain"
+   }
+  ],
+  "forecast.daily": [
+   {
+    "date": "2026-10-24",
+    "icon": "thunderstorm",
+    "text": "Storms late",
+    "high": 60,
+    "low": 38,
+    "wind_dir": 180,
+    "wind_speed": 14,
+    "pop": 80,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2026-10-25",
+    "icon": "modifiers/sunny-wind",
+    "text": "Windy · frost at night",
+    "high": 52,
+    "low": 34,
+    "wind_dir": 315,
+    "wind_speed": 22,
+    "pop": 10,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2026-10-26",
+    "icon": "sunny",
+    "text": "Sunny",
+    "high": 55,
+    "low": 36,
+    "wind_dir": 270,
+    "wind_speed": 8,
+    "pop": 0,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2026-10-27",
+    "icon": "partly-cloudy",
+    "text": "Partly cloudy",
+    "high": 61,
+    "low": 43,
+    "wind_dir": 180,
+    "wind_speed": 10,
+    "pop": 10,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2026-10-28",
+    "icon": "cloudy",
+    "text": "Cloudy",
+    "high": 64,
+    "low": 48,
+    "wind_dir": 180,
+    "wind_speed": 14,
+    "pop": 30,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2026-10-29",
+    "icon": "rain",
+    "text": "Rain",
+    "high": 57,
+    "low": 41,
+    "wind_dir": 90,
+    "wind_speed": 12,
+    "pop": 60,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2026-10-30",
+    "icon": "partly-cloudy",
+    "text": "Some sun",
+    "high": 54,
+    "low": 37,
+    "wind_dir": 315,
+    "wind_speed": 10,
+    "pop": 20,
+    "precip_type": "rain",
+    "snow_in": 0
+   }
+  ],
+  "alerts.active": [],
+  "astro.sun": {
+   "sunrise": "2026-10-24T07:17:00-05:00",
+   "sunset": "2026-10-24T18:08:00-05:00",
+   "day_length_min": 651,
+   "delta_min_per_day": -2
+  },
+  "astro.moon": {
+   "phase_name": "waxing gibbous",
+   "illumination": 97,
+   "waxing": true,
+   "rise": "2026-10-24T17:21:00-05:00",
+   "set": "2026-10-25T06:04:00-05:00",
+   "next": [
+    {
+     "kind": "full",
+     "date": "2026-10-26"
+    },
+    {
+     "kind": "last",
+     "date": "2026-11-02"
+    },
+    {
+     "kind": "new",
+     "date": "2026-11-09"
+    },
+    {
+     "kind": "first",
+     "date": "2026-11-17"
+    }
+   ]
+  },
+  "radar.frame": {
+   "value": {
+    "site": "MRMS",
+    "time": "2026-10-24T14:25:00-05:00",
+    "legend": "intensity",
+    "types": [
+     "rain"
+    ],
+    "layers": [
+     {
+      "fill": "rain-light",
+      "png": "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"
+     },
+     {
+      "fill": "rain-moderate",
+      "png": "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"
+     },
+     {
+      "fill": "rain-heavy",
+      "png": "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"
+     },
+     {
+      "fill": "rain-extreme",
+      "png": "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"
+     }
+    ],
+    "echo_px": 150737,
+    "aria_label": "Radar map around Savoy: rain in view",
+    "recorded": "MRMS SeamlessHSR + PrecipFlag 2023-04-01T01:00Z"
+   },
+   "observed_at": "2026-10-24T14:25:00-05:00"
+  },
+  "radar.callout": {
+   "kind": "storm",
+   "headline": "Storms ~4 PM",
+   "detail": "22 mi west · ENE 15 mph · ~0.5 in"
+  },
+  "summary.day_line": "Storms around 4 PM, then colder and windy.",
+  "summary.next_hazard": "frost possible Sunday night (34°)"
+ }
+}

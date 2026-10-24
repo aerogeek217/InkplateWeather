@@ -18,8 +18,9 @@ server/tests/_out/
 .ruff_cache/
 *.egg-info/
 
-# Project-local tool installs
+# Project-local tool installs and download caches
 .tools/
+server/tools/.cache/
 
 # Agent worktrees
 .claude/worktrees/

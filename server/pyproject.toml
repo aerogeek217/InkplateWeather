@@ -15,6 +15,7 @@ dependencies = [
     "playwright>=1.47",
     "tzdata>=2024.1",  # zoneinfo data on Windows and slim images
     "astral>=3.2",  # sun and moon rise/set (pure Python, no runtime downloads)
+    "h5py>=3.10",  # GOES GLM lightning files are NetCDF4/HDF5 (wheels for arm64 and Windows)
 ]
 
 [project.optional-dependencies]
@@ -23,6 +24,9 @@ dev = [
     "pytest-asyncio>=0.24",
     "respx>=0.21",
     "ruff>=0.6",
+]
+basemap = [
+    "pyshp>=2.3",  # tools/build_basemap.py only (the base map is committed)
 ]
 
 [build-system]

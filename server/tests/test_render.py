@@ -12,7 +12,8 @@ from PIL import Image, ImageChops
 from app.providers.fixture import fixture_now
 from app.render.quantize import LEVELS, LUT, quantize
 
-GOLDEN = {"fall": "dashboard-eink.png", "winter": "dashboard-winter-eink.png"}
+GOLDEN = {"fall": "dashboard-eink.png", "winter": "dashboard-winter-eink.png",
+          "radar-storm": "radar-storm-eink.png", "radar-winter": "radar-winter-eink.png"}  # radar: approved renders
 MAX_DIFF_FRACTION = 0.005  # < 0.5 % of 1200 × 825 pixels
 TIMINGS: dict[str, float] = {}
 
@@ -90,7 +91,7 @@ def _timed_get(client, url):
 
 
 @pytest.mark.render
-@pytest.mark.parametrize("name", ["fall", "winter"])
+@pytest.mark.parametrize("name", list(GOLDEN))
 def test_golden(name, client, needs_chromium, out_dir):
     ref_path = reference_dir() / GOLDEN[name]
     r, ms = _timed_get(client, f"/fixtures/{name}.png")

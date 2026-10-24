@@ -118,13 +118,27 @@ Recommendation: **MRMS as primary, IEM as fallback.** Avoid RainViewer: its free
 
 | Option | What you get | Pros | Cons |
 |---|---|---|---|
-| **MRMS GRIB2** (`mrms.ncep.noaa.gov/data/2D/`): `ReflectivityAtLowestAltitude` or `MergedBaseReflectivityQC`, plus **`PrecipFlag`** | Raw dBZ + **precipitation type** on a 1 km grid, every 2 min | Raw numbers, so we draw our own grays and **rain/ice/snow patterns** exactly as designed; official NOAA data | CONUS files, so we crop to our box; needs a GRIB2 decoder (eccodes) in the image |
+| **MRMS GRIB2** (`mrms.ncep.noaa.gov/data/2D/`): `ReflectivityAtLowestAltitude` or `MergedBaseReflectivityQC`, plus **`PrecipFlag`** | Raw dBZ + **precipitation type** on a 1 km grid, every 2 min | Raw numbers, so we draw our own grays and **rain/ice/snow patterns** exactly as designed; official NOAA data | CONUS files, so we crop to our box; GRIB2 (PNG-packed, so Pillow decodes it; no eccodes needed) |
 | **IEM tiles / WMS** (`mesonet.agron.iastate.edu`): `ridge::ILX-N0B-0` (KILX single site) or `nexrad-n0q` mosaic; WMS GetMap with a bounding box | Colored PNG | Very simple; one request for our exact box | Colored image → must be mapped back to dBZ via the known color ramp; no precip type (IEM's HRRR `REFP` layer gives *modeled* type) |
 | NWS ArcGIS `radar_base_reflectivity` MapServer export | Colored PNG for a bounding box | Official, one request | Same color-decoding issue; no type |
 
 **Storm motion and arrival lines** ("Storms ~4 PM", the dashed 3/4/5 PM lines) need motion estimated from
 two or three recent frames (cross-correlation of the echo field). That's a **phase 2** feature. Phase 1 shows
 the current frame, legend and callout text from the forecast (e.g. "Storms likely 4–6 PM").
+
+As built (Phase 3, 2026-10-24):
+- `radar_mrms` fetches `ReflectivityAtLowestAltitude` + `PrecipFlag` (`mrms.ncep.noaa.gov/2D/…latest.grib2.gz`),
+  decodes them with `app/grib2.py` (template 3.0 + 5.41 PNG packing only) and crops to the extent.
+  `app/radar.py` reprojects onto the 536 × 570 px panel (one affine transform: the map is equirectangular around
+  home), dBZ bilinearly and type by nearest cell, then classifies into 1-bit masks the partial fills with the
+  design's grays/patterns: light ≥ 15, moderate ≥ 30, heavy ≥ 40, extreme ≥ 50 dBZ; with ≥ 100 px of snow/ice in
+  view the legend switches to Rain / Ice / Snow (snow from 10 dBZ, heavy snow ≥ 25).
+- PrecipFlag has no ice class. Liquid echoes over a ≤ 0 °C surface (MRMS `Model_SurfaceTemp`, ~14 MB hourly,
+  fetched only with rain in view, at most hourly, every 6 h while the grid is warm) are drawn as ice/sleet.
+- `radar_iem` (fallback) reads the IEM `n0q` CONUS mosaic: a palette PNG whose index is the value
+  (dBZ = index / 2 − 32.5), plus its world file and JSON time. Intensity only. It shows ~30 % more echo than MRMS
+  (strongest return of overlapping radars).
+- Frames are plain JSON (masks as base64 PNG), so the cache keeps a last-good frame.
 
 ## Lightning (map overlay, approved 2026-10-24)
 
@@ -138,7 +152,10 @@ Public options checked 2026-10-24:
 
 Because GLM arrives as many small files, the container runs a **light background poller** that keeps a rolling
 30-minute list of flashes inside the map extent. The render-on-request path then just reads that list, so this is
-the one place where data is gathered ahead of time.
+the one place where data is gathered ahead of time. As built (`app/lightning.py`): files are ~220 KB every 20 s
+(~1 GB/day), so the poller only runs while the radar shows echoes in view (for an hour after each render that did)
+and backfills the last 30 minutes when it wakes; files are read with h5py; the list is persisted in
+`cache/lightning.json`.
 
 Display (approved): small **lightning-bolt symbols** on the radar map, about 12 px tall. Flashes in the last 10 min
 are solid black bolts with a white halo; flashes 10–30 min old are outlined bolts (white fill, black outline), so
@@ -147,8 +164,9 @@ flashes are merged so bolts don't overlap (one bolt per ~8 px cell, newest wins)
 `design/icons/markers/lightning-recent.svg`, `lightning-older.svg`.
 
 **Base map**: generated once at build time from public-domain US Census TIGER/Line cartographic files
-(state and county lines, primary roads, places) clipped to our ~110 × 120 mile box, saved as GeoJSON and
-drawn in the template's SVG.
+(`server/tools/build_basemap.py`: county lines, the home state line, interstates, lakes ≥ 2 km², the board's towns)
+clipped to the approved board's framing (centered on home, 5.6 map units per mile, ~77 × 81 mi; `app/mapgeo.py`),
+saved as GeoJSON (`server/assets/basemap/`, committed) and drawn in the radar panel's SVG (`app/radarmap.py`).
 
 ## Error handling (plain language)
 
@@ -194,7 +212,7 @@ If rendering fails inside the server, it still returns `200` with the last good 
 ## Container
 
 - Base image: `mcr.microsoft.com/playwright/python` (arm64) or `python:3.12-slim` + `playwright install --with-deps chromium`.
-  Adds eccodes (GRIB2), Pillow, FastAPI/uvicorn, httpx, Jinja2, astral, PyYAML.
+  Adds Pillow (also decodes MRMS GRIB2), h5py (GLM lightning), FastAPI/uvicorn, httpx, Jinja2, astral, PyYAML.
 - Fonts (Inter Tight) and icons are **baked into the image**; no internet needed to render.
 - `docker-compose.yml` for the OMV compose plugin:
   - port `8080`

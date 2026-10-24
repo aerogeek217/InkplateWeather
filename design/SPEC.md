@@ -189,6 +189,12 @@ Regenerated 2026-10-24 with the user's approval:
   Windows rasterizes text slightly differently (about 4 % of pixels on text edges).
 - Fonts come from the bundled `server/assets/fonts`; see `tools/render_reference.py` for the commands.
 
+Radar boards, approved 2026-10-24 (Phase 3): `reference/radar-storm-eink.png` and `radar-winter-eink.png` are
+server renders of the `radar-storm` / `radar-winter` fixtures (real Census base map + recorded MRMS frames;
+`server/tests/build_radar_fixtures.py`), canonical in the container plus a Windows baseline
+(`server/tools/render_fixture_refs.py`). Map extent: the board's framing, 5.6 units per mile (~77 × 81 mi).
+Extreme echoes come from ≥ 50 dBZ; ice/sleet is liquid precipitation over a ≤ 0 °C surface.
+
 ## Error states (approved 2026-10-24)
 
 All wording lives in `server/app/messages.py`.

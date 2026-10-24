@@ -1,7 +1,8 @@
 # Build plan
 
-Status: **Phase 1 merged (2026-10-24). Phase 2 built, approved and deployed** (OMV Pi; first 2396c38 at 12:58 CDT,
-then the readability pass 2c22f9c at 13:30 CDT, 2026-10-24); now running on live data for a few days before the `phase-2` PR.
+Status: **Phases 1 and 2 merged** (2026-10-24; Phase 2 merge commit eefc7de, deployed on the OMV Pi as 2c22f9c).
+**Phase 3 (radar) built on `phase-3`** (tasks 3.1–3.5; radar boards approved 2026-10-24); deployed on the OMV Pi as
+f504d4e (14:25 CDT, 2026-10-24).
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 
@@ -31,7 +32,7 @@ config/
   config.yaml               real config (gitignored)
 server/
   pyproject.toml            deps: fastapi, uvicorn, httpx, jinja2, pydantic, pyyaml, pillow, playwright,
-                            astral (or skyfield), eccodes/cfgrib (phase 3), pytest, pytest-asyncio, respx
+                            astral, h5py (phase 3 lightning), pytest, pytest-asyncio, respx
   Dockerfile
   app/
     main.py                 FastAPI app + endpoints
@@ -172,11 +173,26 @@ clipped), "gusts" shown when equal to the wind speed.
 
 | # | WS | Task | Depends | Done when |
 |---|---|---|---|---|
-| 3.1 | C | Base map build script: TIGER/Line cartographic (states, counties, primary roads, places) clipped to the display extent around Savoy (≈ 110 × 120 mi, same framing as the design), simplified, saved as GeoJSON; label list | – | map layer renders in the template matching the reference framing |
-| 3.2 | C | `radar_mrms`: fetch latest `ReflectivityAtLowestAltitude` (or `MergedBaseReflectivityQC`) + `PrecipFlag` GRIB2 (gz) from `mrms.ncep.noaa.gov`, crop to extent, reproject to display pixels, classify into the 4 intensity grays and rain/ice/snow pattern masks | – | correct output on recorded files; < 5 s fetch+process on Pi 5 |
-| 3.3 | C | `radar_iem` fallback: KILX single site (`ridge::ILX-N0B-0`) or `nexrad-n0q` WMS GetMap for the extent; decode color ramp → intensity classes (no type) | – | works when MRMS is blocked in tests |
-| 3.4 | A | Radar partial: draw classified raster + patterns + base map + overlays (range ring, legend switching rain-only vs rain/ice/snow, callout) | 3.1–3.3, 2.5 | golden test against reference with recorded radar fixture |
-| 3.5 | C | `lightning_glm` background poller (GOES-East GLM L2 LCFA NetCDF from NOAA's open-data AWS bucket), rolling 30-min flash list clipped to the extent; radar partial draws **bolt symbols** (`markers/lightning-recent.svg` for ≤ 10 min, `lightning-older.svg` for 10–30 min), merges flashes per ~8 px cell, and shows a legend entry only when flashes exist | 3.4 | recorded GLM files produce the expected bolts; poller survives gaps and restarts |
+| 3.1 ✅ | C | Base map build script: TIGER/Line cartographic (states, counties, primary roads, places) clipped to the display extent around Savoy (≈ 110 × 120 mi, same framing as the design), simplified, saved as GeoJSON; label list | – | map layer renders in the template matching the reference framing |
+| 3.2 ✅ | C | `radar_mrms`: fetch latest `ReflectivityAtLowestAltitude` (or `MergedBaseReflectivityQC`) + `PrecipFlag` GRIB2 (gz) from `mrms.ncep.noaa.gov`, crop to extent, reproject to display pixels, classify into the 4 intensity grays and rain/ice/snow pattern masks | – | correct output on recorded files; < 5 s fetch+process on Pi 5 |
+| 3.3 ✅ | C | `radar_iem` fallback: KILX single site (`ridge::ILX-N0B-0`) or `nexrad-n0q` WMS GetMap for the extent; decode color ramp → intensity classes (no type) | – | works when MRMS is blocked in tests |
+| 3.4 ✅ | A | Radar partial: draw classified raster + patterns + base map + overlays (range ring, legend switching rain-only vs rain/ice/snow, callout) | 3.1–3.3, 2.5 | golden test against reference with recorded radar fixture |
+| 3.5 ✅ | C | `lightning_glm` background poller (GOES-East GLM L2 LCFA NetCDF from NOAA's open-data AWS bucket), rolling 30-min flash list clipped to the extent; radar partial draws **bolt symbols** (`markers/lightning-recent.svg` for ≤ 10 min, `lightning-older.svg` for 10–30 min), merges flashes per ~8 px cell, and shows a legend entry only when flashes exist | 3.4 | recorded GLM files produce the expected bolts; poller survives gaps and restarts |
+
+Phase 3 notes (2026-10-24):
+- Extent: the approved board's framing (open decision 4's default), ~77 × 81 mi at 5.6 units per mile; the base map
+  (`server/tools/build_basemap.py`, TIGER 2023) puts the board's towns within ~6 mi of where they were hand-drawn.
+- MRMS GRIB2 is PNG-packed, so `app/grib2.py` + Pillow decode it (no eccodes). PrecipFlag has no ice class: ice/sleet
+  = liquid echoes over a ≤ 0 °C surface (MRMS `Model_SurfaceTemp`, fetched hourly only while it's raining in view).
+  Extreme comes from ≥ 50 dBZ only (the "rain with hail" flag is far broader than the hail cores).
+- IEM fallback: `n0q` mosaic palette index = value; shows ~30 % more echo than MRMS (max of overlapping radars).
+- Lightning polls GLM only while the radar shows echoes (≈ 1 GB/day otherwise); bolts 12 px, merged per 8 px cell.
+- Tests: recorded MRMS (2023-04-01 storm line, 2022-02-02 snow/rain) cropped to the extent with `tests/record_mrms.py`;
+  `radar-storm` / `radar-winter` fixtures and goldens (approved renders; container 0 px, fall/winter 0.05 %).
+  572 tests pass on Windows and in the container. Live render on the dev PC: resolve 3.1 s, MRMS frame ok.
+- Deployed with the user's approval as f504d4e (rebuild 81 s on the Pi 4). The Pi's live `config/config.yaml` got the
+  `mrms`, `iem`, `glm` providers and the `radar.frame` / `lightning.flashes` fields (backup: `config.phase2.yaml.bak`).
+  On the Pi: radar.frame ok from MRMS; radar boards match the canonical references (0.000 %, 0.001 %).
 
 ### Phase 4: polish
 
