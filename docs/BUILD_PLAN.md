@@ -199,5 +199,6 @@ Milestone: the live screen runs on real data for a few days; the user reviews er
 - Ecowitt GW2000B: `http://192.168.1.135/get_livedata_info` (garage = channel 1; also wind, UV/solar; its lightning
   block is ignored by decision).
 - Location: Savoy, IL 61874 (≈ 40.06 N, 88.25 W), NWS station KCMI, radar KILX, tz America/Chicago.
+- Display: **Soldered** Inkplate 10 (FQBN `soldered-inkplate-boards:esp32:Inkplate10V2`, the firmware default).
 - Deployment target: OpenMediaVault Pi (Pi 4/5, compose plugin), fixed IP; Home Assistant Pi is a data source only.
 - Air quality: Open-Meteo now; PMS5003 later (probably via ESPHome → Home Assistant).

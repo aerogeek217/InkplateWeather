@@ -156,6 +156,14 @@ Inside temp + RH · Garage temp + RH · Pressure + trend arrow · Air quality (U
 `fills/` (radar / precip-bar fills). The renderer should map forecast weather codes
 (NWS icon codes or WMO codes) onto `conditions/` and add modifiers by rule (table above).
 
+The icon set is canonical: where a board drew an icon slightly differently from the set (forecast-row rain,
+storm, partly cloudy; freezing drizzle; wintry mix; small moon phases), the renderer uses the set's icon
+(user decision 2026-10-24).
+
+**v1.1 additions, proposed 2026-10-24 and awaiting approval** (drawn on the approved boards but missing from v1;
+sheet: `source/icons-proposed.html`): `modifiers/sunny-wind`, `markers/callout-storm`, `markers/callout-snow`,
+`markers/alert-triangle-inverse`.
+
 ## Known gaps to resolve during the build
 
 - Radar map geometry on the boards is hand-drawn. The real build needs a base map

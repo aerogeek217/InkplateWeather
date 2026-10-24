@@ -89,6 +89,8 @@ settings and the timeouts match the architecture. `config.h` is gitignored, so n
 
 ### Which board: Soldered or e-radionica?
 
+This project's display is the **Soldered** Inkplate 10, so the default (`Inkplate10V2`) is correct.
+
 There are two Inkplate 10 hardware versions, and they use different board definitions:
 
 | Board | Arduino board name | FQBN | `build.ps1 -Board` |
