@@ -20,6 +20,9 @@ FALLBACK = "{label} from {source}."
 SECTIONS_MISSING = "Some data is unavailable: {sections}."
 BATTERY_LOW = "Battery low: charge soon"
 SERVER_UNREACHABLE = "Can't reach the weather server at {host}. Will retry at {time}."
+# Precip chart when every hour of the next 12 is under 10 % (approved 2026-10-24); _COLD when it gets to ≤ 34 °F.
+NO_PRECIP = "No rain expected in the next 12 h"
+NO_PRECIP_COLD = "No rain or snow expected in the next 12 h"
 
 # Friendly names for provider types, used in "… didn't respond."
 SOURCE_NAMES = {

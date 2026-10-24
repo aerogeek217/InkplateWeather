@@ -13,6 +13,10 @@
 {% endif %}
           </div>
           <svg width="300" height="{{ p.height }}" viewBox="0 0 300 {{ p.height }}" role="img" aria-label="{{ p.aria_label }}">
+{% if p.empty_text %}
+            <text x="150" y="{{ (p.axis_y / 2) | round(2) }}" dominant-baseline="central" text-anchor="middle" font-family="{{ font }}" font-size="15" font-weight="600" fill="#494949">{{ p.empty_text }}</text>
+          </svg>
+{% else %}
 {% if p.patterned %}
             <defs>
               <pattern id="wBarSnow" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="#FFFFFF"></rect><circle cx="2" cy="2" r="1.15" fill="#000000"></circle></pattern>
@@ -38,6 +42,7 @@
 
             </g>
           </svg>
+{% endif %}
 {% if p.key %}
           <div style="display: flex; gap: 14px; align-items: center; font-size: 11px; color: #494949">
 {% for k in p.key %}

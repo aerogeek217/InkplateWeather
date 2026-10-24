@@ -49,7 +49,7 @@ class Header(BaseModel):
 
 
 class Callout(BaseModel):
-    kind: str  # storm | snow | rain → callout icon
+    kind: str  # storm | snow → callout icon; rain | ice | alert have none
     headline: str  # "Storms ~4 PM"
     detail: str  # "22 mi west · ENE 15 mph · ~0.5 in"
 
@@ -75,8 +75,9 @@ class Wind(BaseModel):
     dir_text: str  # "S"
     from_deg: float | None  # arrow rotation source; None = calm/unknown
     speed: str  # "14"
-    gust: str | None = None  # "26"
-    bold: bool = False  # gusts ≥ 20 mph (forecast list rule)
+    gust: str | None = None  # "26"; only when gusts are at least 5 mph above the speed
+    bold: bool = False  # sustained wind ≥ 20 mph (forecast list rule)
+    calm: bool = False  # < 1 mph: shown as "Calm" without an arrow
 
 
 class Current(BaseModel):
@@ -128,6 +129,7 @@ class PrecipChart(BaseModel):
     axis_y: float = 48  # baseline of the bars (48 normally, 42 when the key needs room)
     label_size: float = 10.5  # percent-label font size
     hour_y: float = 62  # baseline of the hour labels
+    empty_text: str | None = None  # every hour < 10 %: one centred sentence instead of the bars
 
 
 class GaugeCell(BaseModel):

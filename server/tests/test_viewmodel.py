@@ -164,6 +164,8 @@ async def test_forecast_rows():
 def test_icon_rules():
     assert icons.header_modifiers("conditions/clear-night", 5, 33, False) == ["frost"]
     assert icons.header_modifiers("conditions/thunderstorm", 25, 70, True) == ["wind", "alert"]
+    assert icons.header_modifiers("conditions/sunny", 8, 70, False, windy=True) == ["wind"]
+    assert icons.header_modifiers("conditions/clear-night", 5, 35, False) == []
     assert icons.resolve(Icon(name="conditions/thunderstorm", modifiers=["alert"])) == "modifiers/storm-nws-alert"
     assert icons.resolve(Icon(name="conditions/rain", modifiers=["wind"])) == "conditions/rain"
     assert icons.condition("no-such-thing") == "conditions/cloudy"

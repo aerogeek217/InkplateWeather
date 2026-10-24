@@ -7,9 +7,9 @@
 {% else %}
           <span style="font-size: 14.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase">{{ row.day }}</span>
 {% endif %}
-          {{ icon_svg(row.icon.name, 24) }}
+          {{ icon_svg(resolve_icon(row.icon), 24) }}
           <span style="font-size: 14.5px">{{ row.text }}</span>
-          <span style="display: flex; gap: 4px; align-items: center; font-size: 14.5px{% if row.wind.bold %}; font-weight: 700{% endif %}">{% if row.wind.dir_text %}{{ icon_svg(wind_arrow(row.wind.dir_text), 12, label="from the " ~ wind_names[row.wind.dir_text]) }}{% endif %}{{ row.wind.dir_text }} {{ row.wind.speed }}</span>
+          <span style="display: flex; gap: 4px; align-items: center; font-size: 14.5px{% if row.wind.bold %}; font-weight: 700{% endif %}">{% if row.wind.dir_text %}{{ icon_svg(wind_arrow(row.wind.dir_text), 12, label="from the " ~ wind_names[row.wind.dir_text]) }}{% endif %}{% if row.wind.calm %}Calm{% else %}{{ row.wind.dir_text }} {{ row.wind.speed }}{% endif %}</span>
 {% set pm = precip_markers[row.precip_kind] %}
           <span style="display: flex; gap: 3px; align-items: center; justify-content: flex-end; font-size: 14.5px; font-weight: 700">{{ icon_svg(pm[0], pm[1], pm[2]) }}{{ row.precip_text }}</span>
           <span style="font-size: 23px; font-weight: 800; line-height: 1; padding-left: 16px">{{ row.high }}</span><span style="font-size: 23px; font-weight: 300; color: #6D6D6D; line-height: 1">{{ row.low }}</span>

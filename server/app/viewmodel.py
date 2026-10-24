@@ -11,7 +11,7 @@ from datetime import date, datetime, timedelta
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from . import icons, messages
+from . import icons, messages, summary
 from .config import AppConfig
 from .context import (
     Alert,
@@ -37,6 +37,7 @@ from .context import (
 from .providers.base import DeviceInfo
 from .readings import Status
 from .resolver import Resolved
+from .textwidth import measure
 
 MINUS = "−"
 BOLD_WIND_MPH = 20
@@ -108,7 +109,10 @@ def uv_category(uv: float) -> str:
 def _dt(v: Any, tz: ZoneInfo) -> datetime | None:
     if v is None:
         return None
-    d = v if isinstance(v, datetime) else datetime.fromisoformat(str(v))
+    try:
+        d = v if isinstance(v, datetime) else datetime.fromisoformat(str(v))
+    except ValueError:
+        return None
     if d.tzinfo is None:
         d = d.replace(tzinfo=tz)
     return d.astimezone(tz)
@@ -148,6 +152,11 @@ class _Data:
             return default
         return r.reading.value
 
+    def records(self, field: str) -> list[dict]:
+        """A structured list field (forecast, history, alerts) as its dict entries; anything else → []."""
+        v = self.get(field)
+        return [x for x in v if isinstance(x, dict)] if isinstance(v, list) else []
+
     def num(self, field: str) -> float | None:
         v = self.get(field)
         try:
@@ -174,48 +183,72 @@ def _label(field: str) -> str:
 # ------------------------------------------------------------------ sections
 
 
-def _header(d: _Data, now: datetime, device: DeviceInfo, cfg: AppConfig | None, daily: list[dict]) -> Header:
+def _alert(d: _Data, now: datetime, tz: ZoneInfo, budget: float) -> Alert | None:
+    """Header takeover for the most severe active alert: 'until 9 AM Wed · 3–5 in snow' ('until 9 PM' today);
+    the impact is dropped if the line would not fit the header."""
+    a = summary.most_severe(d.records("alerts.active"))
+    if a is None:
+        return None
+    event = str(a.get("event") or "Weather alert")
+    until = None
+    ends = _dt(a.get("ends"), tz)
+    if ends and ends > now:
+        until = f"until {short_clock(ends)}" + ("" if ends.date() == now.date() else f" {ends:%a}")
+    impact = str(a["impact"]) if a.get("impact") else None
+    for parts in ([until, impact], [until], [impact]):
+        detail = " · ".join(p for p in parts if p)
+        if summary.alert_width(event, detail) <= budget:
+            return Alert(event=event, detail=detail)
+    return Alert(event=event, detail="")
+
+
+def _current_code(d: _Data) -> tuple[str, bool]:
+    """conditions.current as (icon code, source says windy). Accepts a name or {name, windy}."""
+    v = d.get("conditions.current")
+    if isinstance(v, dict):
+        return str(v.get("name") or ""), bool(v.get("windy"))
+    return str(v or ""), False
+
+
+def _header(d: _Data, now: datetime, device: DeviceInfo, cfg: AppConfig | None, inp: summary.Inputs) -> Header:
     tz = ZoneInfo(d.tz)
-    code = d.get("conditions.current") or ""
-    alerts = d.get("alerts.active") or []
-    alert = None
-    if alerts:
-        a = alerts[0]
-        ends = _dt(a.get("ends"), tz)
-        detail = []
-        if ends:
-            when = short_clock(ends)
-            if ends.date() != now.date():
-                when += f" {ends:%a}"
-            detail.append(f"until {when}")
-        if a.get("impact"):
-            detail.append(a["impact"])
-        alert = Alert(event=a.get("event", "Weather alert"), detail=" · ".join(detail))
+    code, windy = _current_code(d)
+    city = cfg.location.name if cfg else ""
+    date_text = f"{now:%A} {now.day} {now:%B}"
+    batt = device.battery_pct
+    time_text = clock(now, d.tz)
+    alert = _alert(d, now, tz, summary.header_budget(city, date_text, batt, time_text, gap=18))
     name = icons.condition(code)
-    mods = icons.header_modifiers(name, d.num("wind.gust"), d.num("outdoor.temperature"), bool(alert))
-    label = "Now: " + (code.replace("-", " ") if code else "unknown")
+    mods = icons.header_modifiers(name, d.num("wind.gust"), d.num("outdoor.temperature"), bool(alert), windy)
+    label = "Now: " + (code.split("/")[-1].replace("-", " ") if code else "unknown")
     if "wind" in mods:
         label += " and windy"
-    batt = device.battery_pct
+    if "frost" in mods:
+        label += ", frost"
+    day_line = d.get("summary.day_line")  # fixtures carry their own text; live text is generated to fit
+    if not day_line:
+        day_line = summary.day_line(inp, summary.header_budget(city, date_text, batt, time_text))
     nxt = next_refresh(now, (cfg.server.refresh_minutes if cfg else 30))
     return Header(
         icon=Icon(name=name, modifiers=mods, label=label),
-        city=cfg.location.name if cfg else "",
-        date_text=f"{now:%A} {now.day} {now:%B}",
-        day_line=d.get("summary.day_line"),
+        city=city,
+        date_text=date_text,
+        day_line=day_line,
         alert=alert,
         next_update=None if alert else f"{nxt.hour % 12 or 12}:{nxt.minute:02d}",
         battery_pct=batt,
         battery_low=batt is not None and batt <= BATTERY_LOW_PCT,
         battery_fill=round(20 * max(0, min(100, batt)) / 100, 1) if batt is not None else 0,
-        time_text=clock(now, d.tz),
+        time_text=time_text,
     )
 
 
-def _radar(d: _Data, tz: ZoneInfo) -> Radar:
+def _radar(d: _Data, tz: ZoneInfo, inp: summary.Inputs) -> Radar:
     frame = d.get("radar.frame")
-    callout = d.get("radar.callout")
-    hazard = d.get("summary.next_hazard")
+    callout = d.get("radar.callout")  # fixture text wins over generated text
+    if not (isinstance(callout, dict) and callout.get("headline")):
+        callout = summary.callout(inp)
+    hazard = d.get("summary.next_hazard") or summary.next_hazard(inp, summary.callout_event(inp))
     co = None
     if isinstance(callout, dict) and callout.get("headline"):
         co = Callout(kind=callout.get("kind", "rain"), headline=callout["headline"], detail=callout.get("detail", ""))
@@ -261,19 +294,27 @@ def _readings(d: _Data) -> list[ReadingCell]:
     ]
 
 
+CALM_MPH = 1  # below this the wind reads "Calm"
+GUST_SHOWN_ABOVE = 5  # "gusts N" only when gusts are at least this much above the speed
+
+
 def _wind(from_deg: float | None, speed: float | None, gust: float | None = None) -> Wind:
+    calm = speed is not None and speed < CALM_MPH
+    s = None if speed is None else _round(speed)
+    g = None if gust is None or s is None else _round(gust)
     return Wind(
-        dir_text=icons.wind_dir(from_deg),
-        from_deg=from_deg,
-        speed="" if speed is None else str(_round(speed)),
-        gust=None if gust is None else str(_round(gust)),
-        bold=speed is not None and _round(speed) >= BOLD_WIND_MPH,
+        dir_text="" if calm else icons.wind_dir(from_deg),
+        from_deg=None if calm else from_deg,
+        speed="" if s is None else str(s),
+        gust=str(g) if g is not None and not calm and g >= s + GUST_SHOWN_ABOVE else None,
+        bold=s is not None and s >= BOLD_WIND_MPH,
+        calm=calm,
     )
 
 
-def _current(d: _Data, daily: list[dict]) -> Current:
+def _current(d: _Data, inp: summary.Inputs) -> Current:
     t = d.num("outdoor.temperature")
-    today = daily[0] if daily else {}
+    today = inp.day(0) or (inp.daily[0] if inp.daily else {})
     feels = d.num("outdoor.feels_like")
     rh = d.num("outdoor.humidity")
     feels_parts = []
@@ -341,17 +382,124 @@ def _runs(vals: list[float]) -> list[tuple[int, int, float]]:
     return runs
 
 
+TREND_LABEL_SIZE = 12  # trend.j2 point labels: 12 px / 700, text-anchor middle
+LABEL_ASCENT = 0.73 * TREND_LABEL_SIZE  # digit/degree height above the baseline
+LABEL_TOP_MIN = 0.5  # label tops stay inside the svg
+TREND_VIEW_W = 544.0
+EXTREME_MIN_DEG = 2  # an upcoming low/high must differ from its neighbours by this much to be labelled
+LABEL_SHIFTS = (0.0, -10.0, 10.0, -18.0, 18.0)
+DAY_LABEL_GAP = 12  # min space between NOW and a day name under the axis
+Span = tuple[float, float]
+
+
+def _trend_items(past: list[tuple[float, float]], fut: list[tuple[float, float]]) -> list[tuple[Span, float, bool]]:
+    """Labelled points ((first, last) hours of the run, value, is_low): past low, upcoming lows/highs, end value."""
+    items: list[tuple[Span, float, bool]] = []
+    if past:  # past low (middle of the lowest run)
+        vals = [v for _, v in past]
+        a, b, v = min(_runs(vals), key=lambda r: r[2])
+        items.append(((past[a][0], past[b][0]), v, True))
+    if len(fut) >= 3:
+        vals = [v for _, v in fut]
+        runs = _runs(vals)
+        ext: list[tuple[Span, float, bool]] = []  # interior extremes
+        for j in range(1, len(runs) - 1):
+            a, b, v = runs[j]
+            if a == 0 or b == len(vals) - 1:
+                continue
+            prev_v, next_v = runs[j - 1][2], runs[j + 1][2]
+            if (v < prev_v and v < next_v) or (v > prev_v and v > next_v):
+                ext.append(((fut[a][0], fut[b][0]), v, v < prev_v))
+        # zigzag filter: drop small wiggles (a low/high pair closer than EXTREME_MIN_DEG) so only real
+        # turns get a label; the endpoints anchor the comparison.
+        while ext:
+            chain = [vals[0], *(e[1] for e in ext), vals[-1]]
+            diffs = [abs(chain[i + 1] - chain[i]) for i in range(len(chain) - 1)]
+            i = min(range(len(diffs)), key=diffs.__getitem__)
+            if diffs[i] >= EXTREME_MIN_DEG:
+                break
+            if i == 0:  # start point – first extreme
+                del ext[0]
+            elif i == len(diffs) - 1:  # last extreme – end point
+                del ext[-1]
+            else:  # two neighbouring extremes (a low and a high): drop the pair
+                del ext[i - 1:i + 1]
+        items += ext
+        items.append(((fut[-1][0], fut[-1][0]), vals[-1], vals[-1] < vals[-2]))
+    return items
+
+
+def _seg_hits_box(p: tuple[float, float], q: tuple[float, float], box: tuple[float, float, float, float]) -> bool:
+    x0, y0, x1, y1 = box
+    n = max(1, int(math.hypot(q[0] - p[0], q[1] - p[1])))
+    for i in range(n + 1):
+        t = i / n
+        px, py = p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t
+        if x0 <= px <= x1 and y0 <= py <= y1:
+            return True
+    return False
+
+
+def _place_label(px: float, py: float, low: bool, text: str, gridline_ys: list[float],
+                 placed: list[tuple[float, float, float, float]], line: list[tuple[float, float]],
+                 now_pt: tuple[float, float]) -> tuple[float, float] | None:
+    """Label position for a chart point: below a low / above a high when that is clear, else nudged sideways or
+    to the other side. Never outside the chart, never over another label, the NOW marker or (if avoidable) the
+    line. The first choice is the reference boards' rule, so their labels stay where they were."""
+    w = measure(text, TREND_LABEL_SIZE, 700)
+    base_x = min(max(px, TREND_X0 + 8), TREND_X1 - 8)
+    sides = ("below", "above") if low else ("above", "below")
+    cands = [(side, dx) for side in sides for dx in LABEL_SHIFTS]
+    cands.sort(key=lambda c: (abs(c[1]) > 0, sides.index(c[0]), abs(c[1])))  # both sides unshifted first
+
+    def ok(side: str, dx: float, strict: bool) -> tuple[float, float] | None:
+        lx = min(max(base_x + dx, w / 2 + 1), TREND_VIEW_W - w / 2 - 1)
+        if side == "below":
+            ly = py + LABEL_BELOW
+            if ly > LABEL_BOTTOM_MAX or any(ly - LABEL_CAP <= g <= ly for g in gridline_ys):
+                return None
+        else:
+            ly = py - LABEL_ABOVE
+        box = (lx - w / 2, ly - LABEL_ASCENT, lx + w / 2, ly + 0.5)
+        if box[1] < LABEL_TOP_MIN:
+            return None
+        if any(box[0] - 2 < b[2] and b[0] < box[2] + 2 and box[1] - 1 < b[3] and b[1] < box[3] + 1 for b in placed):
+            return None
+        if box[0] - 2 <= now_pt[0] <= box[2] + 2:  # the NOW rule runs the full plot height
+            return None
+        # The line may clip a label's corners (the reference boards do, at sharp lows); it must not run through
+        # the middle of the text.
+        core = (lx - w / 4, ly - LABEL_ASCENT * 0.8, lx + w / 4, ly - LABEL_ASCENT * 0.2)
+        if strict and any(_seg_hits_box(a, b, core) for a, b in zip(line, line[1:], strict=False)):
+            return None
+        return _r2(lx), _r2(ly)
+
+    for strict in (True, False):
+        for side, dx in cands:
+            pos = ok(side, dx, strict)
+            if pos is not None:
+                return pos
+    return None
+
+
 def _trend(d: _Data, now: datetime, tz: ZoneInfo, sun: dict | None) -> TrendChart:
-    hist = d.get("outdoor.temperature_history") or []
-    hourly = d.get("forecast.hourly") or []
     t_now = d.num("outdoor.temperature")
 
-    def hours(t: Any) -> float:
-        return (_dt(t, tz) - now).total_seconds() / 3600
+    def series(field: str, key: str) -> list[tuple[float, float]]:
+        out = []
+        for p in d.records(field):
+            t = _dt(p.get("t"), tz)
+            try:
+                v = float(p[key])
+            except (KeyError, TypeError, ValueError):
+                continue
+            if t is not None and math.isfinite(v):
+                out.append(((t - now).total_seconds() / 3600, v))
+        return sorted(out)
 
-    past = sorted((hours(p["t"]), float(p["v"])) for p in hist if p.get("v") is not None)
+    past = series("outdoor.temperature_history", "v")
     past = [(h, v) for h, v in past if -PAST_H - 1e-6 <= h <= 1e-6]
-    fut = sorted((hours(p["t"]), float(p["temp"])) for p in hourly if p.get("temp") is not None)
+    fut = series("forecast.hourly", "temp")
     fut = _downsample_future([(h, v) for h, v in fut if 1e-6 < h <= FUTURE_H + 1e-6])
     if t_now is None and past:
         t_now = past[-1][1]
@@ -361,6 +509,15 @@ def _trend(d: _Data, now: datetime, tz: ZoneInfo, sun: dict | None) -> TrendChar
 
     values = [v for _, v in past] + [v for _, v in fut] + [t_now]
     lo, span = _trend_scale(values)
+    items = _trend_items(past, fut)
+    # Headroom: a label above the highest labelled point must stay inside the chart; widen the domain upward
+    # (2° at a time) until it does. Past and future values both count (the scale covers the whole timeline).
+    for _ in range(40):
+        k = (TREND_AXIS - TREND_TOP) / span
+        tops = [TREND_AXIS - (v - lo) * k for _, v, low in items if not low]
+        if not tops or min(tops) - LABEL_ABOVE - LABEL_ASCENT >= LABEL_TOP_MIN:
+            break
+        span += 2
     k = (TREND_AXIS - TREND_TOP) / span
 
     def x(h: float) -> float:
@@ -385,6 +542,16 @@ def _trend(d: _Data, now: datetime, tz: ZoneInfo, sun: dict | None) -> TrendChar
         m = datetime.combine(m.date() + timedelta(days=1), datetime.min.time(), tzinfo=tz)
     if not midnights or midnights[0] - TREND_X0 >= 30:
         day_labels.insert(0, (TREND_X0 + 4, f"{start:%a}".upper()))
+    # Keep day names clear of the NOW label: one just after NOW (late evening) moves right, one running into it
+    # from the left is left out.
+    now_half = measure("NOW", 11.5, 800) / 2 + DAY_LABEL_GAP
+    clear = []
+    for lx, s in day_labels:
+        if lx + measure(s, 11.5, 700) < NOW_X - now_half or lx > NOW_X + now_half:
+            clear.append((lx, s))
+        elif lx > NOW_X:
+            clear.append((float(_round(NOW_X + now_half)), s))
+    day_labels = clear
 
     # nights: sunset → sunrise, extrapolated from today's times (day-length change split evenly)
     nights = []
@@ -404,38 +571,19 @@ def _trend(d: _Data, now: datetime, tz: ZoneInfo, sun: dict | None) -> TrendChar
     now_pt = (x(0), y(t_now))
     fut_pts = [(x(h), y(v)) for h, v in fut]
 
-    def label_pos(px: float, py: float, low: bool) -> tuple[float, float]:
-        lx = _r2(min(max(px, TREND_X0 + 8), TREND_X1 - 8))
-        if low:
-            below = py + LABEL_BELOW
-            if below <= LABEL_BOTTOM_MAX and not any(below - LABEL_CAP <= g <= below for g in gridline_ys):
-                return lx, _r2(below)
-        return lx, _r2(py - LABEL_ABOVE)
-
+    line = [*past_pts, now_pt, *fut_pts]
+    placed: list[tuple[float, float, float, float]] = []
     points: list[tuple[float, float, float, float, str]] = []
-
-    def add(px: float, v: float, low: bool) -> None:
-        py = y(v)
-        lx, ly = label_pos(px, py, low)
-        points.append((_r2(px), py, lx, ly, deg(v)))
-
-    if past:  # past low (middle of the lowest run)
-        vals = [v for _, v in past]
-        lo_run = min(_runs(vals), key=lambda r: r[2])
-        add((past_pts[lo_run[0]][0] + past_pts[lo_run[1]][0]) / 2, lo_run[2], True)
-    if len(fut) >= 3:  # upcoming lows/highs (interior extremes), then the end value
-        vals = [v for _, v in fut]
-        runs = _runs(vals)
-        for j in range(1, len(runs) - 1):
-            a, b, v = runs[j]
-            if a == 0 or b == len(vals) - 1:
-                continue
-            prev_v, next_v = runs[j - 1][2], runs[j + 1][2]
-            if v < prev_v and v < next_v:
-                add((fut_pts[a][0] + fut_pts[b][0]) / 2, v, True)
-            elif v > prev_v and v > next_v:
-                add((fut_pts[a][0] + fut_pts[b][0]) / 2, v, False)
-        add(fut_pts[-1][0], vals[-1], vals[-1] < vals[-2])
+    for (ha, hb), v, low in items:
+        px, py = (x(ha) + x(hb)) / 2, y(v)  # middle of the run, as the reference boards place it
+        text = deg(v)
+        pos = _place_label(px, py, low, text, gridline_ys, placed, line, now_pt)
+        if pos is None:
+            continue  # nowhere to put it without covering another label: leave the point unlabelled
+        lx, ly = pos
+        w = measure(text, TREND_LABEL_SIZE, 700)
+        placed.append((lx - w / 2, ly - LABEL_ASCENT, lx + w / 2, ly + 0.5))
+        points.append((_r2(px), py, lx, ly, text))
 
     aria = f"Temperature, past 24 hours and next 48: now {deg(t_now)}"
     return TrendChart(
@@ -477,15 +625,14 @@ def _rain_fill(pop: float) -> str:
     return "#B6B6B6"
 
 
-def _snow_range(total: float) -> str:
-    if total < 1:
-        return f"{total:.1f} in"
-    lo, hi = math.floor(total * 0.75), math.ceil(total * 1.25)
-    return f"{lo} in" if lo == hi else f"{lo}–{hi} in"
+KEY_MIN_POP = 10  # hours below this chance don't count toward the type, key or patterning
+EMPTY_MAX_POP = 10  # every hour below this: no bars, one sentence (approved 2026-10-24)
+COLD_F = 34  # ... "rain or snow" when any of those hours gets this cold
+SNOW_SHOWN_IN, ICE_SHOWN_IN, RAIN_SHOWN_IN = 0.05, 0.01, 0.1  # amounts worth a heading
 
 
 def _precip(d: _Data, now: datetime, tz: ZoneInfo) -> PrecipChart:
-    hourly = d.get("forecast.hourly") or []
+    hourly = [h for h in d.records("forecast.hourly") if _dt(h.get("t"), tz)]
     rows = sorted(((_dt(h["t"], tz), h) for h in hourly), key=lambda r: r[0])
     rows = [(t, h) for t, h in rows if t > now][:PRECIP_HOURS]
     if not rows:
@@ -495,20 +642,37 @@ def _precip(d: _Data, now: datetime, tz: ZoneInfo) -> PrecipChart:
         k = h.get("precip_type") or "rain"
         return k if k in PRECIP_NAMES else "rain"
 
+    def pop_of(h: dict) -> float:
+        return float(h.get("pop") or 0)
+
     kinds = [kind(h) for _, h in rows]
     weights: dict[str, float] = {}
     for (_, h), k in zip(rows, kinds, strict=True):
-        weights[k] = weights.get(k, 0) + float(h.get("pop") or 0)
-    present = [k for k in KEY_ORDER if k in kinds]
-    dominant = max(present, key=lambda k: (weights.get(k, 0), -KEY_ORDER.index(k)))
-    patterned = any(k in ("snow", "ice") for k in kinds)
+        if pop_of(h) >= KEY_MIN_POP:
+            weights[k] = weights.get(k, 0) + pop_of(h)
+    present = [k for k in KEY_ORDER if k in weights]
+    if present:  # dominant type by summed chance (ties: ice, then snow)
+        dominant = max(present, key=lambda k: (weights[k], -KEY_ORDER.index(k)))
+    else:  # nothing likely: the type most hours would bring (rain on a tie)
+        dominant = max(("rain", "snow", "ice"), key=lambda k: (kinds.count(k), k == "rain"))
+    patterned = any(k in ("snow", "ice") for k in present)
     key = present if len(present) > 1 else []
     compact = bool(key)
     axis, scale, size, dy, hour_y, height = PRECIP_COMPACT if compact else PRECIP_NORMAL
+    title = f"Chance of {PRECIP_NAMES[dominant]}"
+    pops = ", ".join(f"{hour_label(t)} {_round(pop_of(h))}%" for t, h in rows)
+    aria = f"Chance of precipitation, next 12 hours: {pops}"
+
+    if all(pop_of(h) < EMPTY_MAX_POP for _, h in rows):
+        temps = [float(h["temp"]) for _, h in rows if h.get("temp") is not None]
+        cold = bool(temps) and min(temps) <= COLD_F
+        return PrecipChart(title=title, right_text="next 12 h", height=height, aria_label=aria, axis_y=axis,
+                           label_size=size, hour_y=hour_y,
+                           empty_text=messages.NO_PRECIP_COLD if cold else messages.NO_PRECIP)
 
     bars, hour_labels = [], []
     for i, ((t, h), k) in enumerate(zip(rows, kinds, strict=True)):
-        pop = float(h.get("pop") or 0)
+        pop = pop_of(h)
         bh = _r2(pop * scale)
         bx = 5 + i * BAR_PITCH
         by = _r2(axis - bh)
@@ -525,14 +689,16 @@ def _precip(d: _Data, now: datetime, tz: ZoneInfo) -> PrecipChart:
 
     snow = sum(float(h.get("snow_in") or 0) for _, h in rows)
     ice = sum(float(h.get("ice_in") or 0) for _, h in rows)
+    rain = sum(float(h.get("rain_in") or 0) for _, h in rows)
     amounts = []
-    if snow > 0:
-        amounts.append(_snow_range(snow))
-    if ice > 0:
+    if snow >= SNOW_SHOWN_IN:
+        amounts.append(summary.snow_range(snow))
+    if ice >= ICE_SHOWN_IN:
         amounts.append(f"ice {ice:.2f} in")
-    pops = ", ".join(f"{hour_label(t)} {_round(float(h.get('pop') or 0))}%" for t, h in rows)
+    if not amounts and dominant == "rain" and rain >= RAIN_SHOWN_IN:
+        amounts.append(summary.rain_amount(rain))
     return PrecipChart(
-        title=f"Chance of {PRECIP_NAMES[dominant]}",
+        title=title,
         right_text=" · ".join(amounts) if amounts else "next 12 h",
         right_bold=bool(amounts),
         patterned=patterned,
@@ -540,7 +706,7 @@ def _precip(d: _Data, now: datetime, tz: ZoneInfo) -> PrecipChart:
         bars=bars,
         hour_labels=hour_labels,
         key=key,
-        aria_label=f"Chance of precipitation, next 12 hours: {pops}",
+        aria_label=aria,
         axis_y=axis,
         label_size=size,
         hour_y=hour_y,
@@ -557,9 +723,21 @@ def _snow_in(v: float | None) -> str:
     return f"{v:.0f} in" if abs(v - round(v)) < 0.05 else f"{v:.1f} in"
 
 
+SNOW_ON_GROUND_IN = 1.0
+SNOW_SEASON_MONTHS = {11, 12, 1, 2, 3}
+
+
+def winter_gauge(depth: float | None, season: float | None, now: datetime) -> bool:
+    """SPEC: the gauge switches to liquid totals + NWS snow when snow is on the ground (≥ 1 in) or, from November
+    to March, once the season has had any snow. (A spring snow that melted in April doesn't keep winter mode.)"""
+    if depth is not None and depth >= SNOW_ON_GROUND_IN:
+        return True
+    return now.month in SNOW_SEASON_MONTHS and season is not None and season > 0
+
+
 def _gauge(d: _Data, now: datetime) -> Gauge:
     depth, season = d.num("snow.depth"), d.num("snow.season")
-    winter = (depth or 0) > 0 or (season or 0) > 0
+    winter = winter_gauge(depth, season, now)
     month = f"{now:%B}"
 
     def cell(field: str, text: str, label: str) -> GaugeCell:
@@ -658,26 +836,37 @@ def _moon(d: _Data, tz: ZoneInfo) -> Moon | None:
 # --- 7-day list ---
 
 
+SNOW_DAY_IN = 0.5  # a day with at least this much snow shows snowflake + amount instead of %
+
+
 def _forecast(daily: list[dict], now: datetime) -> list[ForecastRow]:
+    dated = [(_date(day.get("date")), day) for day in daily]
+    if all(dt is not None for dt, _ in dated):  # drop days already past (a forecast cached overnight)
+        dated = [(dt, day) for dt, day in dated if dt >= now.date()]
     rows = []
-    for i, day in enumerate(daily[:7]):
-        dt = _date(day.get("date")) or (now.date() + timedelta(days=i))
+    for i, (dt, day) in enumerate(dated[:7]):
+        dt = dt or (now.date() + timedelta(days=i))
         kind = day.get("precip_type") or "rain"
         kind = kind if kind in ("rain", "snow", "ice") else "rain"
         snow = float(day.get("snow_in") or 0)
-        if kind == "snow" and snow >= 0.5:
-            ptext = _snow_in(snow)
+        if snow >= SNOW_DAY_IN:
+            kind, ptext = "snow", _snow_in(snow)
         else:
             ptext = pct(float(day.get("pop") or 0))
         wd = day.get("wind_dir")
         if isinstance(wd, str) and wd.upper() in icons.WIND_DIRS:
             wd = icons.WIND_DIRS.index(wd.upper()) * 45.0
+        speed = day.get("wind_speed")
+        name = icons.forecast(day.get("icon"))
+        mods = icons.forecast_modifiers(name, None if speed is None else _round(float(speed)))
+        label = str(day.get("text", "")) + (", windy" if mods else "")
+        is_today = dt == now.date()
         rows.append(ForecastRow(
-            day="Today" if i == 0 else f"{dt:%a}",
-            is_today=i == 0,
-            icon=Icon(name=icons.forecast(day.get("icon")), label=day.get("text", "")),
+            day="Today" if is_today else f"{dt:%a}",
+            is_today=is_today,
+            icon=Icon(name=name, modifiers=mods, label=label),
             text=day.get("text", ""),
-            wind=_wind(None if wd is None else float(wd), day.get("wind_speed")),
+            wind=_wind(None if wd is None else float(wd), speed),
             precip_kind=kind,
             precip_text=ptext,
             high=deg(day.get("high")),
@@ -697,7 +886,9 @@ def build(resolved: Mapping[str, Resolved], now: datetime, device: DeviceInfo | 
     device = device or DeviceInfo()
     types = {n: p.type for n, p in cfg.providers.items()} if cfg else {}
     d = _Data(resolved, tz_name, types)
-    daily = [x for x in (d.get("forecast.daily") or []) if isinstance(x, dict)]
+    daily = d.records("forecast.daily")
+    inp = summary.Inputs.build(now, tz, d.records("forecast.hourly"), daily, _current_code(d)[0],
+                               d.records("alerts.active"), d.num("outdoor.temperature"))
     sun_raw = d.get("astro.sun")
     sun = _sun(d, now, tz) or Sun(rise="", set="", day_length="", delta="", arc_end=None)
     moon = _moon(d, tz) or Moon(illumination="", phase_name="", terminator_rx=0, waxing=True, rise_set="", next=[])
@@ -706,10 +897,10 @@ def build(resolved: Mapping[str, Resolved], now: datetime, device: DeviceInfo | 
         tz=tz_name,
         width=cfg.server.width if cfg else 1200,
         height=cfg.server.height if cfg else 825,
-        header=_header(d, now, device, cfg, daily),
-        radar=_radar(d, tz),
+        header=_header(d, now, device, cfg, inp),
+        radar=_radar(d, tz, inp),
         readings=_readings(d),
-        current=_current(d, daily),
+        current=_current(d, inp),
         trend=_trend(d, now, tz, sun_raw if isinstance(sun_raw, dict) else None),
         precip=_precip(d, now, tz),
         gauge=_gauge(d, now),
