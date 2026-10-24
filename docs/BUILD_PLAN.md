@@ -1,6 +1,7 @@
 # Build plan
 
-Status: **Phase 1 merged (2026-10-24). Phase 2 built and approved** on branch `phase-2`; next: deploy and run on live data for a few days.
+Status: **Phase 1 merged (2026-10-24). Phase 2 built, approved and deployed** (commit 2396c38 on the OMV Pi,
+2026-10-24 12:58 CDT); now running on live data for a few days before the `phase-2` PR.
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 
