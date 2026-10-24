@@ -1,6 +1,6 @@
 # Build plan
 
-Status: **ready to start, not started** (2026-10-24).
+Status: **Phase 1 in progress** on branch `phase-1` (started 2026-10-24).
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 
@@ -121,13 +121,13 @@ Parallel workstreams are marked **[A] server/render**, **[B] data providers**, *
 
 | # | WS | Task | Depends | Done when |
 |---|---|---|---|---|
-| 1.1 | A | Python project scaffold (`server/pyproject.toml`, app package, pytest, ruff), `config.example.yaml`, gitignore entries | – | `pytest` runs green on Windows and in the container |
-| 1.2 | A | `readings.py`, `fields.py`, `config.py`, `resolver.py`, `messages.py` with unit tests (priority, max_age → stale, all-missing → missing with plain text) | 1.1 | tests cover fallback order, staleness, provenance |
-| 1.3 | A | `fixture` provider + `fixtures/fall.json` and `winter.json` reproducing the reference boards' values | 1.2 | fixtures load and resolve every field the template needs |
-| 1.4 | A | Jinja2 template port of `design/source/dashboard.html` driven by `DashboardContext` (both states, alert/no-alert, snow/rain precip, winter gauge), icons inlined from `assets/icons` | 1.3 | rendered HTML for `fall` is visually identical to `design/source/dashboard.html` |
-| 1.5 | A | `render/browser.py` (persistent Chromium, 1200×825, fonts local) + `quantize.py`; endpoints `/display.png`, `/preview`, `/health`, `/fixtures/{name}.png` | 1.4 | **golden test**: `fall` and `winter` renders differ from `design/reference/*-eink.png` by < 0.5 % of pixels (radar region may be masked until phase 3); render < 3 s on the dev machine |
-| 1.6 | E | Dockerfile (arm64-capable), `docker-compose.yml` (port 8080, `./config` + `./cache` volumes, healthcheck, `TZ`) | 1.5 | `docker compose up` serves `/display.png` from fixtures locally; image builds for `linux/arm64` (buildx) |
-| 1.7 | D | Inkplate firmware: Wi-Fi, read battery, `GET /display.png?batt=&mv=&reason=`, draw, deep sleep aligned to :00/:30, wake button, error screen + 5-min retry ×3 | 1.5 (endpoint contract only) | compiles with Arduino CLI for Inkplate 10; documented flashing steps; **user flashes it** |
+| 1.1 ✅ | A | Python project scaffold (`server/pyproject.toml`, app package, pytest, ruff), `config.example.yaml`, gitignore entries | – | `pytest` runs green on Windows and in the container |
+| 1.2 ✅ | A | `readings.py`, `fields.py`, `config.py`, `resolver.py`, `messages.py` with unit tests (priority, max_age → stale, all-missing → missing with plain text) | 1.1 | tests cover fallback order, staleness, provenance |
+| 1.3 🔄 | A | `fixture` provider + `fixtures/fall.json` and `winter.json` reproducing the reference boards' values | 1.2 | fixtures load and resolve every field the template needs |
+| 1.4 🔄 | A | Jinja2 template port of `design/source/dashboard.html` driven by `DashboardContext` (both states, alert/no-alert, snow/rain precip, winter gauge), icons inlined from `assets/icons` | 1.3 | rendered HTML for `fall` is visually identical to `design/source/dashboard.html` |
+| 1.5 🔄 | A | `render/browser.py` (persistent Chromium, 1200×825, fonts local) + `quantize.py`; endpoints `/display.png`, `/preview`, `/health`, `/fixtures/{name}.png` | 1.4 | **golden test**: `fall` and `winter` renders differ from `design/reference/*-eink.png` by < 0.5 % of pixels (radar region may be masked until phase 3); render < 3 s on the dev machine |
+| 1.6 🔄 | E | Dockerfile (arm64-capable), `docker-compose.yml` (port 8080, `./config` + `./cache` volumes, healthcheck, `TZ`) | 1.5 | `docker compose up` serves `/display.png` from fixtures locally; image builds for `linux/arm64` (buildx) |
+| 1.7 🔄 | D | Inkplate firmware: Wi-Fi, read battery, `GET /display.png?batt=&mv=&reason=`, draw, deep sleep aligned to :00/:30, wake button, error screen + 5-min retry ×3 | 1.5 (endpoint contract only) | compiles with Arduino CLI for Inkplate 10; documented flashing steps; **user flashes it** |
 
 Milestone: the Inkplate shows the fall reference board served from the Pi (after the user approves deployment).
 
