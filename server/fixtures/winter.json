@@ -1,0 +1,667 @@
+{
+ "now": "2027-01-19T15:30:00-06:00",
+ "device": {
+  "battery_pct": 61,
+  "voltage_mv": 3850,
+  "wake_reason": "timer"
+ },
+ "readings": {
+  "outdoor.temperature": 29.0,
+  "outdoor.humidity": 88,
+  "outdoor.dew_point": 26.1,
+  "outdoor.feels_like": 19.2,
+  "outdoor.temperature_history": [
+   {
+    "t": "2027-01-18T16:30:00-06:00",
+    "v": 34
+   },
+   {
+    "t": "2027-01-18T17:30:00-06:00",
+    "v": 33
+   },
+   {
+    "t": "2027-01-18T18:30:00-06:00",
+    "v": 31
+   },
+   {
+    "t": "2027-01-18T19:30:00-06:00",
+    "v": 30
+   },
+   {
+    "t": "2027-01-18T20:30:00-06:00",
+    "v": 29
+   },
+   {
+    "t": "2027-01-18T21:30:00-06:00",
+    "v": 28
+   },
+   {
+    "t": "2027-01-18T22:30:00-06:00",
+    "v": 27
+   },
+   {
+    "t": "2027-01-18T23:30:00-06:00",
+    "v": 27
+   },
+   {
+    "t": "2027-01-19T00:30:00-06:00",
+    "v": 26
+   },
+   {
+    "t": "2027-01-19T01:30:00-06:00",
+    "v": 26
+   },
+   {
+    "t": "2027-01-19T02:30:00-06:00",
+    "v": 25
+   },
+   {
+    "t": "2027-01-19T03:30:00-06:00",
+    "v": 25
+   },
+   {
+    "t": "2027-01-19T04:30:00-06:00",
+    "v": 25
+   },
+   {
+    "t": "2027-01-19T05:30:00-06:00",
+    "v": 26
+   },
+   {
+    "t": "2027-01-19T06:30:00-06:00",
+    "v": 26
+   },
+   {
+    "t": "2027-01-19T07:30:00-06:00",
+    "v": 27
+   },
+   {
+    "t": "2027-01-19T08:30:00-06:00",
+    "v": 28
+   },
+   {
+    "t": "2027-01-19T09:30:00-06:00",
+    "v": 28
+   },
+   {
+    "t": "2027-01-19T10:30:00-06:00",
+    "v": 29
+   },
+   {
+    "t": "2027-01-19T11:30:00-06:00",
+    "v": 29
+   },
+   {
+    "t": "2027-01-19T12:30:00-06:00",
+    "v": 30
+   },
+   {
+    "t": "2027-01-19T13:30:00-06:00",
+    "v": 30
+   },
+   {
+    "t": "2027-01-19T14:30:00-06:00",
+    "v": 29
+   },
+   {
+    "t": "2027-01-19T15:30:00-06:00",
+    "v": 29
+   }
+  ],
+  "wind.speed": 16,
+  "wind.gust": 28,
+  "wind.direction": 45,
+  "uv.index": 1,
+  "solar.radiation": 40,
+  "indoor.temperature": 68.5,
+  "indoor.humidity": 38,
+  "garage.temperature": 34.1,
+  "garage.humidity": 61,
+  "pressure.sea_level": 29.71,
+  "pressure.trend_3h": -0.08,
+  "rain.today": 0.21,
+  "rain.week": 0.35,
+  "rain.month": 1.12,
+  "rain.year": 1.12,
+  "rain.rate": 0.04,
+  "air.aqi": 22,
+  "snow.depth": 4,
+  "snow.season": 11.8,
+  "normals.high": 33,
+  "normals.low": 18,
+  "conditions.current": "sleet",
+  "forecast.hourly": [
+   {
+    "t": "2027-01-19T16:00:00-06:00",
+    "temp": 29,
+    "pop": 90,
+    "precip_type": "ice",
+    "snow_in": 0,
+    "ice_in": 0.03
+   },
+   {
+    "t": "2027-01-19T17:00:00-06:00",
+    "temp": 28,
+    "pop": 90,
+    "precip_type": "ice",
+    "snow_in": 0,
+    "ice_in": 0.02
+   },
+   {
+    "t": "2027-01-19T18:00:00-06:00",
+    "temp": 27.5,
+    "pop": 90,
+    "precip_type": "snow",
+    "snow_in": 0.3,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-19T19:00:00-06:00",
+    "temp": 27,
+    "pop": 100,
+    "precip_type": "snow",
+    "snow_in": 0.6,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-19T20:00:00-06:00",
+    "temp": 26.67,
+    "pop": 100,
+    "precip_type": "snow",
+    "snow_in": 0.7,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-19T21:00:00-06:00",
+    "temp": 26.33,
+    "pop": 100,
+    "precip_type": "snow",
+    "snow_in": 0.7,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-19T22:00:00-06:00",
+    "temp": 26,
+    "pop": 90,
+    "precip_type": "snow",
+    "snow_in": 0.6,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-19T23:00:00-06:00",
+    "temp": 25.33,
+    "pop": 80,
+    "precip_type": "snow",
+    "snow_in": 0.4,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T00:00:00-06:00",
+    "temp": 24.67,
+    "pop": 70,
+    "precip_type": "snow",
+    "snow_in": 0.3,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T01:00:00-06:00",
+    "temp": 24,
+    "pop": 60,
+    "precip_type": "snow",
+    "snow_in": 0.2,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T02:00:00-06:00",
+    "temp": 23.33,
+    "pop": 50,
+    "precip_type": "snow",
+    "snow_in": 0.1,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T03:00:00-06:00",
+    "temp": 22.67,
+    "pop": 40,
+    "precip_type": "snow",
+    "snow_in": 0.1,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T04:00:00-06:00",
+    "temp": 22,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T05:00:00-06:00",
+    "temp": 21.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T06:00:00-06:00",
+    "temp": 20.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T07:00:00-06:00",
+    "temp": 20,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T08:00:00-06:00",
+    "temp": 19.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T09:00:00-06:00",
+    "temp": 19.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T10:00:00-06:00",
+    "temp": 19,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T11:00:00-06:00",
+    "temp": 19.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T12:00:00-06:00",
+    "temp": 19.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T13:00:00-06:00",
+    "temp": 20,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T14:00:00-06:00",
+    "temp": 20.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T15:00:00-06:00",
+    "temp": 20.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T16:00:00-06:00",
+    "temp": 21,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T17:00:00-06:00",
+    "temp": 20.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T18:00:00-06:00",
+    "temp": 19.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T19:00:00-06:00",
+    "temp": 18,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T20:00:00-06:00",
+    "temp": 17.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T21:00:00-06:00",
+    "temp": 16.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T22:00:00-06:00",
+    "temp": 15,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T23:00:00-06:00",
+    "temp": 14.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T00:00:00-06:00",
+    "temp": 13.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T01:00:00-06:00",
+    "temp": 13,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T02:00:00-06:00",
+    "temp": 12.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T03:00:00-06:00",
+    "temp": 12.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T04:00:00-06:00",
+    "temp": 12,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T05:00:00-06:00",
+    "temp": 11.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T06:00:00-06:00",
+    "temp": 11.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T07:00:00-06:00",
+    "temp": 11,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T08:00:00-06:00",
+    "temp": 12.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T09:00:00-06:00",
+    "temp": 13.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T10:00:00-06:00",
+    "temp": 14,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T11:00:00-06:00",
+    "temp": 15.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T12:00:00-06:00",
+    "temp": 17.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T13:00:00-06:00",
+    "temp": 19,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T14:00:00-06:00",
+    "temp": 20.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T15:00:00-06:00",
+    "temp": 21,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   }
+  ],
+  "forecast.daily": [
+   {
+    "date": "2027-01-19",
+    "icon": "sleet-snow",
+    "text": "Sleet → snow",
+    "high": 31,
+    "low": 19,
+    "wind_dir": 45,
+    "wind_speed": 16,
+    "pop": 100,
+    "precip_type": "snow",
+    "snow_in": 4
+   },
+   {
+    "date": "2027-01-20",
+    "icon": "snow",
+    "text": "Snow ends, blowing",
+    "high": 22,
+    "low": 11,
+    "wind_dir": 315,
+    "wind_speed": 24,
+    "pop": 60,
+    "precip_type": "snow",
+    "snow_in": 1
+   },
+   {
+    "date": "2027-01-21",
+    "icon": "sunny",
+    "text": "Sunny, frigid",
+    "high": 24,
+    "low": 9,
+    "wind_dir": 270,
+    "wind_speed": 10,
+    "pop": 0,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2027-01-22",
+    "icon": "cloudy",
+    "text": "Cloudy",
+    "high": 30,
+    "low": 17,
+    "wind_dir": 180,
+    "wind_speed": 12,
+    "pop": 10,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2027-01-23",
+    "icon": "freezing-drizzle",
+    "text": "Freezing drizzle",
+    "high": 34,
+    "low": 26,
+    "wind_dir": 135,
+    "wind_speed": 10,
+    "pop": 40,
+    "precip_type": "ice",
+    "snow_in": 0
+   },
+   {
+    "date": "2027-01-24",
+    "icon": "wintry-mix",
+    "text": "Wintry mix",
+    "high": 37,
+    "low": 24,
+    "wind_dir": 180,
+    "wind_speed": 14,
+    "pop": 50,
+    "precip_type": "ice",
+    "snow_in": 0
+   },
+   {
+    "date": "2027-01-25",
+    "icon": "flurries",
+    "text": "Flurries",
+    "high": 29,
+    "low": 15,
+    "wind_dir": 315,
+    "wind_speed": 18,
+    "pop": 20,
+    "precip_type": "snow",
+    "snow_in": 0
+   }
+  ],
+  "alerts.active": [
+   {
+    "event": "Winter Storm Warning",
+    "ends": "2027-01-20T09:00:00-06:00",
+    "headline": "Winter Storm Warning until 9 AM Wednesday",
+    "impact": "3–5 in snow",
+    "severity": "Severe"
+   }
+  ],
+  "astro.sun": {
+   "sunrise": "2027-01-19T07:12:00-06:00",
+   "sunset": "2027-01-19T17:05:00-06:00",
+   "day_length_min": 593,
+   "delta_min_per_day": 2
+  },
+  "astro.moon": {
+   "phase_name": "waxing gibbous",
+   "illumination": 90,
+   "waxing": true,
+   "rise": "2027-01-19T13:32:00-06:00",
+   "set": "2027-01-20T04:18:00-06:00",
+   "next": [
+    {
+     "kind": "full",
+     "date": "2027-01-22"
+    },
+    {
+     "kind": "last",
+     "date": "2027-01-29"
+    },
+    {
+     "kind": "new",
+     "date": "2027-02-06"
+    },
+    {
+     "kind": "first",
+     "date": "2027-02-14"
+    }
+   ]
+  },
+  "radar.frame": {
+   "value": {
+    "site": "KILX",
+    "time": "2027-01-19T15:25:00-06:00",
+    "types": [
+     "snow",
+     "ice",
+     "rain"
+    ],
+    "artwork": "radar/winter.svg",
+    "aria_label": "Radar map: a winter storm covering the area — snow to the north, a band of sleet and freezing rain over Savoy, rain to the south; the snow line moves south past Savoy by 6 PM"
+   },
+   "observed_at": "2027-01-19T15:25:00-06:00"
+  },
+  "radar.callout": {
+   "kind": "snow",
+   "headline": "Snow by 6 PM",
+   "detail": "Sleet now · heaviest 7–11 PM · 3–5 in"
+  },
+  "summary.day_line": "Sleet changing to snow by 6 PM; 3–5 in by morning.",
+  "summary.next_hazard": "wind chill −2° Thursday morning"
+ }
+}

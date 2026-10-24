@@ -1,0 +1,89 @@
+from datetime import timedelta
+
+import pytest
+from conftest import REPO_DIR, TEST_CONFIG
+
+from app import collector, config, fields
+from app.config import ProviderCfg
+from app.providers import base
+from app.providers.base import RequestContext
+from app.providers.fixture import FixtureError, FixtureProvider, available, fixture_device, fixture_now, readings_for
+from app.readings import Status
+
+FIXTURES = ["fall", "winter"]
+# Every field the template uses (device.* comes from the request, the rest is informational).
+NOT_REQUIRED = {"device.battery_pct", "device.voltage_mv", "device.wake_reason", "outdoor.dew_point",
+                "solar.radiation", "rain.rate"}
+REQUIRED = sorted(set(fields.FIELDS) - NOT_REQUIRED)
+
+
+def test_fixtures_are_listed():
+    assert set(FIXTURES) <= set(available())
+
+
+@pytest.mark.parametrize("name,now,batt", [("fall", "2026-10-24T14:30:00-05:00", 78),
+                                           ("winter", "2027-01-19T15:30:00-06:00", 61)])
+def test_pinned_now_and_device(name, now, batt):
+    assert fixture_now(name).isoformat() == now
+    assert fixture_device(name).battery_pct == batt
+
+
+@pytest.mark.parametrize("name", FIXTURES)
+async def test_fixture_resolves_every_template_field(name):
+    now = fixture_now(name)
+    resolved = await collector.collect_fixture(name, RequestContext(now=now))
+    bad = {f: resolved[f].reading.status for f in REQUIRED if resolved[f].reading.status is not Status.ok}
+    assert not bad
+    for f in REQUIRED:
+        r = resolved[f].reading
+        assert r.observed_at is not None and r.observed_at <= now
+        assert r.source == "fixture"
+
+
+@pytest.mark.parametrize("name", FIXTURES)
+def test_unit_free_fields_have_sane_values(name):
+    rs = readings_for(name)
+    assert unknown_keys(rs) == set()
+    hist = rs["outdoor.temperature_history"].value
+    assert len(hist) == 24
+    assert len(rs["forecast.daily"].value) == 7
+    assert len(rs["forecast.hourly"].value) >= 48
+    frame = rs["radar.frame"].value
+    assert frame["svg_layers"].lstrip().startswith("<!--") and "SAVOY" in frame["svg_layers"]
+
+
+def unknown_keys(rs):
+    return set(rs) - set(fields.FIELDS)
+
+
+async def test_provider_from_config_uses_fixture_name():
+    app_cfg = config.load(TEST_CONFIG)
+    p = base.build("fx", ProviderCfg(type="fixture", name="winter"), app_cfg)
+    assert isinstance(p, FixtureProvider)
+    out = await p.fetch(RequestContext(now=fixture_now("winter")))
+    assert out["outdoor.temperature"].value == 29.0
+    assert out["outdoor.temperature"].source == "fx"
+    assert p.ttl == timedelta(0)
+
+
+async def test_config_driven_collect_matches_fixture_collect():
+    app_cfg = config.load(TEST_CONFIG)
+    providers = collector.build_providers(app_cfg)
+    ctx = RequestContext(now=fixture_now("fall"))
+    resolved = await collector.collect(providers, app_cfg.fields, ctx)
+    assert resolved["summary.day_line"].reading.value == "Storms around 4 PM, then colder and windy."
+    assert set(resolved) == set(app_cfg.fields)
+
+
+def test_example_config_covers_required_fields():
+    p = REPO_DIR / "config" / "config.example.yaml"
+    if not p.is_file():
+        pytest.skip("config/config.example.yaml not present (container image)")
+    cfg = config.load(p)
+    assert set(REQUIRED) <= set(cfg.fields)
+
+
+@pytest.mark.parametrize("bad", ["../fall", "fall.json", "", "nope", "_x", "a/b"])
+def test_bad_fixture_names_rejected(bad):
+    with pytest.raises(FixtureError):
+        readings_for(bad)
