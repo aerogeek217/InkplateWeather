@@ -40,7 +40,10 @@ to each.
 
 ## Rules (non-negotiable)
 
-- **Ask the user before**: pushing to any git remote, deploying to either Raspberry Pi, flashing the Inkplate,
+- **Branch and PR**: do all Phase 1 work on a branch named `phase-1` created from `main`. Pushing `phase-1` to `origin`
+  and opening a pull request into `main` (with `gh pr create`) are pre-approved. Never push to, merge into, or rewrite
+  `main`; the user merges after review.
+- **Ask the user before**: any other push, deploying to either Raspberry Pi, flashing the Inkplate,
   installing anything system-wide on the dev machine beyond project-local environments, or sending any request to the
   user's devices other than read-only GETs to the Ecowitt gateway (`http://192.168.1.135/get_livedata_info`).
 - **No secrets in git**: real config is `config/config.yaml` (gitignored) and firmware `config.h` (gitignored); commit only
@@ -48,6 +51,11 @@ to each.
   it is public and can go in `config.example.yaml`.
 - **Design fidelity**: golden image tests compare fixture renders with `design/reference/*-eink.png` (threshold in the plan).
   If real constraints force a visual change, stop and ask; never silently restyle.
+- **Cross-platform baseline**: the references were rendered by Edge on Windows; the container renders with Chromium on
+  Linux, so font anti-aliasing can differ. If a golden test fails **only** because of text-edge differences (layout,
+  positions and sizes match), do not loosen the threshold or change the design. Save the diff image, include it in your
+  report, and propose regenerating the references inside the container (`design/tools/render_reference.py` pointed at
+  the container's Chromium). Regenerate them only after the user approves.
 - **Do not use the weather station's lightning data.** Lightning on the map comes from NOAA GLM (task 3.5, approved),
   drawn with the bolt markers in `design/icons/markers/lightning-*.svg`.
 - 8 gray levels only; fonts (Inter Tight) and icons bundled; LF line endings; tests must pass on Windows (dev) and in the
@@ -67,8 +75,8 @@ to each.
 
 ## Report at the end of Phase 1
 
-1. What was built, with commit hashes.
-2. Test results, including golden-image diff percentages and render times.
+1. What was built, with commit hashes and the **PR link** (`phase-1` → `main`).
+2. Test results, including golden-image diff percentages and render times (and any baseline proposal, with diff images).
 3. The rendered `fall` and `winter` PNGs next to the references (paths).
 4. Exact commands for the user to build the arm64 image, run it on the OMV Pi, and flash the Inkplate (to be run only after
    they approve).

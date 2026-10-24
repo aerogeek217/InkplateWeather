@@ -15,9 +15,12 @@ The reference renders in `design/reference/` are the visual source of truth.
   variables (`config/config.yaml` is gitignored; commit `config/config.example.yaml`).
 - **Line endings LF** (enforced by `.gitattributes`). Target platform: Linux arm64 container. Development also happens on
   Windows, so tests must not depend on the host OS.
-- **Ask before** pushing to any remote, deploying to the Pis, flashing the Inkplate, or contacting the user's devices
+- **Branches and PRs.** Each phase is built on its own branch (`phase-1`, `phase-2`, …) cut from `main` and delivered as a
+  pull request into `main` (remote: https://github.com/aerogeek217/InkplateWeather). Pushing the phase branch and opening
+  its PR are allowed; pushing to, merging into or rewriting `main` is not. The user reviews and merges.
+- **Ask before** any other push, deploying to the Pis, flashing the Inkplate, or contacting the user's devices
   beyond read-only GETs to the Ecowitt gateway.
-- Keep commits small and focused; one phase task per commit or PR-sized change.
+- Keep commits small and focused; one phase task per commit.
 
 ## Target layout
 
@@ -166,6 +169,10 @@ Milestone: the live screen runs on real data for a few days; the user reviews er
 - **Unit tests** for parsers, resolver, view-model rules (pytest, no network; recorded responses with respx).
 - **Golden image tests**: render fixtures and compare against `design/reference/*-eink.png` with a pixel-diff threshold;
   failures write a diff image to `server/tests/_out/`.
+- **Cross-platform baseline**: the references come from Edge on Windows, while the container uses Chromium on Linux, so text
+  anti-aliasing may differ. If a golden test fails only on text edges (layout, positions and sizes match), don't loosen the
+  threshold or touch the design. Report it with the diff image and propose regenerating the references inside the container;
+  regenerate only after the user approves, then commit the new references with a note in `design/SPEC.md`.
 - **Contract test** for the firmware endpoint: `/display.png` returns `image/png`, 1200×825, only the 8 allowed levels.
 - **Live smoke test** (manual, opt-in flag): hits the real gateway and NWS once and prints `/status`.
 
