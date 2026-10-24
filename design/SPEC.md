@@ -35,8 +35,8 @@ in `reference/` are the source of truth for exact visual appearance.
 - Key sizes: current temperature 180 px / 800, letter-spacing −0.065em · H/L 38 px (H 700, L 300) ·
   header city 22 px / 800 · section labels 13 px / 800, uppercase, 0.12em tracking ·
   forecast rows 14.5 px, temps 23 px · readings values 24 px / 700.
-- **Minimum text size** (readability pass, approved 2026-10-24): HTML text ≥ 13 px, except the readings labels
-  (12 px / 800, 0.08em tracking) and their secondary values (13 px); chart labels ≥ ~12 px on screen.
+- **Minimum text size** (readability pass, approved 2026-10-24): HTML text ≥ 13 px (readings labels
+  13 px / 800 with 0.08em tracking; their secondary values 13 px); chart labels ≥ ~12 px on screen.
 - Numbers never wrap (H/L, temps are `nowrap`).
 
 ## Layout (px)

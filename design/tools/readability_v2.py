@@ -5,7 +5,7 @@ again on already-updated boards fails its own checks.
 
   margin   69/71 → 66/68 px, header→main gap 12 → 11; the 6 px gained go to the radar column (530 → 536) and the main area height
   radar    536 × 570 at the same map scale (viewBox −214.4 −228 428.8 456)
-  HTML     11 → 12 px (readings labels: tracking 0.1 → 0.08 em, cell padding 12 → 8, no wrapping) or 13 px (gauge, sun, moon, key labels);
+  HTML     11 → 13 px: readings labels (tracking 0.1 → 0.08 em, cell padding 12 → 8, no wrapping), gauge, sun, moon, key;
            12 → 13 px; 12.5 → 13.5 px (readings' secondary values stay 13 px: 14 px wraps them)
   charts   effective sizes ≈ 12–12.5 px: trend axis/day labels 11/11.5 → 13 units, point labels 12 → 13.5;
            precip % labels 10.5 → 12 (winter 9.5 → 11.5), hours 11 → 12.5; sun day length 11 → 12.5
@@ -50,7 +50,7 @@ def update(s: str, winter: bool) -> str:
             '<rect x="-214.4" y="-228" width="428.8" height="456" fill="#FFFFFF">', 1)
     # Readings strip: labels 11 → 12 px; tighter cell padding so the larger labels fit.
     s = sub(s, "font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase",
-            "font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase", 5)
+            "font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase", 5)
     s = sub(s, "gap: 1px; padding-right: 12px", "gap: 1px; padding-right: 8px; white-space: nowrap", 1)
     s = sub(s, "gap: 1px; padding: 0 12px; border-left", "gap: 1px; padding: 0 8px; white-space: nowrap; border-left", 3)
     s = sub(s, "gap: 1px; padding-left: 12px; border-left", "gap: 1px; padding-left: 8px; white-space: nowrap; border-left", 1)
