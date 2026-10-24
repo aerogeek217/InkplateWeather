@@ -417,6 +417,7 @@ TREND_TOP = 4.0 * _TS
 LABEL_ABOVE, LABEL_BELOW, LABEL_BOTTOM_MAX, LABEL_CAP = 5.6 * _TS, 9.75 * _TS, 66.0 * _TS, 9.0 * _TS
 GRID_MIN, GRID_MAX = 2.0 * _TS, 68.0 * _TS  # gridlines kept only inside this band
 GRID_LABEL_DY = _r2(3.0 * _TS)  # gridline label baseline below its line
+GRID_LABEL_MIN_GAP = 15.0  # 13-unit gridline labels crowd below this spacing; closer lines label every other one
 NIGHT_Y, DAY_LABEL_Y = TREND_AXIS + 2, TREND_AXIS + 18  # night bars and day names, below the axis
 
 
@@ -599,6 +600,9 @@ def _trend(d: _Data, now: datetime, tz: ZoneInfo, sun: dict | None) -> TrendChar
 
     grid = [(y(g), f"{g}°") for g in reversed(range(int(math.ceil(lo / 10) * 10), lo + span + 1, 10))
             if GRID_MIN <= TREND_AXIS - (g - lo) * k <= GRID_MAX]  # top to bottom
+    if any(b[0] - a[0] < GRID_LABEL_MIN_GAP for a, b in zip(grid, grid[1:], strict=False)):
+        # Lines too close for their labels (wide temperature range): label every other line, from the bottom up.
+        grid = [(gy, label if (len(grid) - 1 - i) % 2 == 0 else "") for i, (gy, label) in enumerate(grid)]
     gridline_ys = [g for g, _ in grid]
 
     # midnights and day names

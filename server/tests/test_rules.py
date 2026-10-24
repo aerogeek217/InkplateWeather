@@ -263,7 +263,7 @@ async def test_trend_scale_covers_the_forecast_highs():
     assert labels == ["44°", "71°", "46°", "75°", "49°", "68°"]
     hi = next(p for p in t.points if p[4] == "75°")
     assert hi[3] - 0.73 * 12 >= 0.5  # the label clears the top (the first live render clipped it)
-    assert [g[1] for g in t.gridlines] == ["80°", "70°", "60°", "50°"]
+    assert [g[1] for g in t.gridlines] == ["", "70°", "", "50°"]  # four lines ~13 units apart: every other label
 
 
 async def test_trend_short_history_and_late_evening():
@@ -332,3 +332,10 @@ def test_render_new_fixtures(name, needs_chromium, out_dir, tmp_path, monkeypatc
     img = Image.open(io.BytesIO(r.content))
     assert img.size == (1200, 825)
     img.save(out_dir / f"{name}.png")
+
+
+async def test_trend_gridline_labels_thin_out_on_a_wide_range():
+    """Live 2026-10-24 spans 44–77°F: four gridlines ~13 units apart would make their labels touch."""
+    ctx = await build("live-2026-10-24")
+    labels = [label for _, label in ctx.trend.gridlines]
+    assert len(labels) >= 4 and labels[-1] and all(bool(lb) == (i % 2 == 0) for i, lb in enumerate(reversed(labels)))
