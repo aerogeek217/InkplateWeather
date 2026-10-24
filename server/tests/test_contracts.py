@@ -34,6 +34,11 @@ def test_every_condition_has_an_icon():
     ("https://api.weather.gov/icons/land/day/rain_snow,70?size=medium", "Rain And Snow", ("wintry-mix", False)),
     ("https://api.weather.gov/icons/land/night/ovc?size=medium", "Patchy Drizzle", ("drizzle", False)),
     ("https://api.weather.gov/icons/land/day/sct?size=medium", "Sunny and Breezy", ("partly-cloudy", True)),
+    ("https://api.weather.gov/icons/land/day/bkn?size=medium", "Partly Sunny", ("partly-cloudy", False)),
+    ("https://api.weather.gov/icons/land/night/bkn?size=medium", "Partly Cloudy", ("partly-cloudy-night", False)),
+    ("https://api.weather.gov/icons/land/day/bkn?size=medium", "Mostly Cloudy", ("cloudy", False)),
+    ("https://api.weather.gov/icons/land/day/rain,40?size=medium", "Partly Sunny then Chance Showers",
+     ("rain", False)),
     (None, None, ("cloudy", False)),
 ])
 def test_from_nws(url, text, expected):

@@ -94,6 +94,10 @@ def from_nws(icon_url: str | None, short_forecast: str | None = None, is_day: bo
         if rx.search(text) and (sky_only or precip_type(cand) == precip_type(name)):
             name = cand
             break
+    else:
+        # NWS draws "Partly Sunny" with the broken-cloud (bkn) icon; show it as partly cloudy, not cloudy.
+        if sky_only and re.search(r"\bpartly (sunny|cloudy)\b", text, re.I):
+            name = "partly-cloudy"
     windy |= bool(re.search(r"\bwindy|breezy\b", text, re.I))
     return Condition(night_variant(name, day if is_day is None else is_day), windy)
 
