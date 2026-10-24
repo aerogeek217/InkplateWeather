@@ -5,3 +5,18 @@ venv/
 .env
 .DS_Store
 Thumbs.db
+
+# Real config and firmware secrets (commit only *.example.*)
+config/config.yaml
+firmware/**/config.h
+
+# Runtime and test output
+cache/
+server/cache/
+server/tests/_out/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Project-local tool installs
+.tools/
