@@ -7,7 +7,7 @@
 {% else %}
           <span style="font-size: 14.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase">{{ row.day }}</span>
 {% endif %}
-          {{ icon_svg(row.icon.name, 28) }}
+          {{ icon_svg(row.icon.name, 24) }}
           <span style="font-size: 14.5px">{{ row.text }}</span>
           <span style="display: flex; gap: 4px; align-items: center; font-size: 14.5px{% if row.wind.bold %}; font-weight: 700{% endif %}">{% if row.wind.dir_text %}{{ icon_svg(wind_arrow(row.wind.dir_text), 12, label="from the " ~ wind_names[row.wind.dir_text]) }}{% endif %}{{ row.wind.dir_text }} {{ row.wind.speed }}</span>
 {% set pm = precip_markers[row.precip_kind] %}

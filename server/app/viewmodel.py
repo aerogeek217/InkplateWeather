@@ -1,7 +1,7 @@
 """Resolved readings → DashboardContext: all formatting, icon choice and chart geometry.
 
 Phase-1 rules (enough to reproduce the reference boards from the fixtures); phase 2.5 refines them.
-Geometry constants are those of design/source/dashboard.html.
+Geometry constants are those of design/source/dashboard.html (reflowed layout, 2026-10-24).
 """
 from __future__ import annotations
 
@@ -293,14 +293,21 @@ def _current(d: _Data, daily: list[dict]) -> Current:
     )
 
 
-# --- temperature trend (544 × 92 viewBox) ---
+# --- temperature trend (544 × 81 viewBox: plot area 0–60, night bars and day labels below the axis) ---
 
 TREND_X0, TREND_X1 = 30.0, 540.0
 PAST_H, FUTURE_H = 23.0, 47.5
 PX_PER_H = (TREND_X1 - TREND_X0) / (PAST_H + FUTURE_H)
 NOW_X = TREND_X0 + PAST_H * PX_PER_H
-TREND_TOP, TREND_AXIS = 4.0, 70.0
-LABEL_ABOVE, LABEL_BELOW, LABEL_BOTTOM_MAX, LABEL_CAP = 5.6, 9.75, 66.0, 9.0
+TREND_AXIS = 60.0
+# The 2026-10-24 reflow scaled the original 70 px plot to 60 px; every vertical offset inside the plot scaled with
+# it (labels too), so label placement decisions are unchanged.
+_TS = TREND_AXIS / 70.0
+TREND_TOP = 4.0 * _TS
+LABEL_ABOVE, LABEL_BELOW, LABEL_BOTTOM_MAX, LABEL_CAP = 5.6 * _TS, 9.75 * _TS, 66.0 * _TS, 9.0 * _TS
+GRID_MIN, GRID_MAX = 2.0 * _TS, 68.0 * _TS  # gridlines kept only inside this band
+GRID_LABEL_DY = _r2(3.0 * _TS)  # gridline label baseline below its line
+NIGHT_Y, DAY_LABEL_Y = TREND_AXIS + 2, TREND_AXIS + 18  # night bars and day names, below the axis
 
 
 def _trend_scale(values: list[float]) -> tuple[float, float]:
@@ -349,7 +356,8 @@ def _trend(d: _Data, now: datetime, tz: ZoneInfo, sun: dict | None) -> TrendChar
     if t_now is None and past:
         t_now = past[-1][1]
     if t_now is None or not (past or fut):
-        return TrendChart(aria_label="Temperature trend unavailable")
+        return TrendChart(aria_label="Temperature trend unavailable", axis_y=TREND_AXIS, grid_label_dy=GRID_LABEL_DY,
+                          night_y=NIGHT_Y, day_label_y=DAY_LABEL_Y)
 
     values = [v for _, v in past] + [v for _, v in fut] + [t_now]
     lo, span = _trend_scale(values)
@@ -362,7 +370,7 @@ def _trend(d: _Data, now: datetime, tz: ZoneInfo, sun: dict | None) -> TrendChar
         return _r2(TREND_AXIS - (v - lo) * k)
 
     grid = [(y(g), f"{g}°") for g in reversed(range(int(math.ceil(lo / 10) * 10), lo + span + 1, 10))
-            if 2 <= TREND_AXIS - (g - lo) * k <= 68]  # top to bottom
+            if GRID_MIN <= TREND_AXIS - (g - lo) * k <= GRID_MAX]  # top to bottom
     gridline_ys = [g for g, _ in grid]
 
     # midnights and day names
@@ -440,12 +448,20 @@ def _trend(d: _Data, now: datetime, tz: ZoneInfo, sun: dict | None) -> TrendChar
         nights=nights,
         now=now_pt,
         points=points,
+        axis_y=TREND_AXIS,
+        grid_label_dy=GRID_LABEL_DY,
+        night_y=NIGHT_Y,
+        day_label_y=DAY_LABEL_Y,
     )
 
 
 # --- precip chart (300 wide) ---
 
 PRECIP_HOURS = 12
+# (axis y, px per %, label size, label dy, hour-label y, svg height). The 2026-10-24 reflow raised the baseline
+# 8 px and scaled the bars to fit (48/56 normal, 42/50 with the key); labels below the baseline moved up 8.
+PRECIP_NORMAL = (48.0, 0.5 * 48 / 56, 10.5, -4.0 * 48 / 56, 62.0, 66)
+PRECIP_COMPACT = (42.0, 0.36 * 42 / 50, 9.5, -3.0 * 42 / 50, 54.0, 56)
 BAR_PITCH, BAR_W = 25.0, 15.0
 PRECIP_NAMES = {"rain": "rain", "snow": "snow", "ice": "ice"}
 KEY_ORDER = ["ice", "snow", "rain"]
@@ -488,8 +504,7 @@ def _precip(d: _Data, now: datetime, tz: ZoneInfo) -> PrecipChart:
     patterned = any(k in ("snow", "ice") for k in kinds)
     key = present if len(present) > 1 else []
     compact = bool(key)
-    axis, scale, size, dy, hour_y, height = (
-        (50.0, 0.36, 9.5, -3.0, 62.0, 64) if compact else (56.0, 0.5, 10.5, -4.0, 70.0, 74))
+    axis, scale, size, dy, hour_y, height = PRECIP_COMPACT if compact else PRECIP_NORMAL
 
     bars, hour_labels = [], []
     for i, ((t, h), k) in enumerate(zip(rows, kinds, strict=True)):

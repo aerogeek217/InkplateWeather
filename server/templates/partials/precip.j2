@@ -2,7 +2,7 @@
 {% set g = ctx.gauge %}
 {% set font = "Inter Tight, Arial, sans-serif" %}
 {% set key_names = {"ice": "Sleet / ice", "snow": "Snow", "rain": "Rain"} %}
-      <div style="display: grid; grid-template-columns: 300px minmax(0, 1fr); column-gap: 0; border-top: 2px solid #000000; padding-top: 10px">
+      <div style="display: grid; grid-template-columns: 300px minmax(0, 1fr); column-gap: 0; border-top: 2px solid #000000; padding-top: 8px">
         <div style="display: flex; flex-direction: column; gap: 4px; padding-right: 16px">
           <div style="display: flex; justify-content: space-between; align-items: baseline">
             <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase">{{ p.title }}</span>
@@ -15,7 +15,7 @@
           <svg width="300" height="{{ p.height }}" viewBox="0 0 300 {{ p.height }}" role="img" aria-label="{{ p.aria_label }}">
 {% if p.patterned %}
             <defs>
-              <pattern id="wBarSnow" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="#FFFFFF"></rect><circle cx="2" cy="2" r="1.15" fill="#000000"></circle></pattern>
+              <pattern id="wBarSnow" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="#FFFFFF"></rect><circle cx="2" cy="1.68" r="1.15" fill="#000000"></circle></pattern>
               <pattern id="wBarMix" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="4" fill="#FFFFFF"></rect><line x1="0" y1="0" x2="0" y2="4" stroke="#000000" stroke-width="1.6"></line></pattern>
             </defs>
             <g stroke="#000000" stroke-width="1">

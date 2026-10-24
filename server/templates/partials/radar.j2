@@ -1,14 +1,14 @@
 {% set r = ctx.radar %}
-      <div style="position: relative; width: 600px; height: 627px; flex-shrink: 0">
-        <svg width="600" height="627" viewBox="-240 -250.8 480 501.6" role="img" aria-label="{{ r.aria_label }}" style="display: block; outline: 1px solid #000000">
+      <div style="position: relative; width: 530px; height: 567px; flex-shrink: 0">
+        <svg width="530" height="567" viewBox="-212 -226.8 424 453.6" role="img" aria-label="{{ r.aria_label }}" style="display: block; outline: 1px solid #000000">
 {% if r.svg_layers %}
 {{ r.svg_layers | safe }}
 {% else %}
-          <rect x="-240" y="-250.8" width="480" height="501.6" fill="#FFFFFF"></rect>
+          <rect x="-212" y="-226.8" width="424" height="453.6" fill="#FFFFFF"></rect>
 {% endif %}
         </svg>
 {% if r.message %}
-        <div style="position: absolute; left: 60px; right: 60px; top: 280px; text-align: center; font-size: 17px; font-weight: 600; color: #494949">{{ r.message }}</div>
+        <div style="position: absolute; left: 60px; right: 60px; top: 250px; text-align: center; font-size: 17px; font-weight: 600; color: #494949">{{ r.message }}</div>
 {% endif %}
 {% if r.site_time %}
         <div style="position: absolute; left: 10px; top: 10px; background: #FFFFFF; border: 1px solid #000000; padding: 6px 10px; display: flex; gap: 10px; align-items: center; font-size: 12px">
