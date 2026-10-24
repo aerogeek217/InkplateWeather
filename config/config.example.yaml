@@ -15,6 +15,7 @@ nws:
 server:
   refresh_minutes: 30
   cache_dir: cache
+  history_sample_minutes: 10   # record station temperature/pressure for the charts; 0 disables
   # Render a saved test board instead of live data (server/fixtures/<name>.json):
   # fixture: fall
 

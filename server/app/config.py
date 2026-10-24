@@ -79,6 +79,7 @@ class ServerCfg(BaseModel):
     refresh_minutes: int = 30  # Inkplate wakes at :00/:30
     fixture: str | None = None  # when set, /display.png renders this fixture instead of live data
     cache_dir: str = "cache"
+    history_sample_minutes: float = 10  # background station sampler for the history provider; 0 disables
 
 
 class AppConfig(BaseModel):
