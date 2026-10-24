@@ -262,8 +262,8 @@ def _last_good_time(cfg: AppConfig) -> datetime | None:
 
 # ------------------------------------------------------------------ error strip (render failed)
 
-STRIP_Y0, STRIP_Y1 = 57, 117  # black band over the header (header 69–113): inside the frame, clearly visible
-STRIP_X = 71  # text starts at the content's left edge
+STRIP_Y0, STRIP_Y1 = 57, 117  # black band over the header (header 66–110): inside the frame, clearly visible
+STRIP_X = 68  # text starts at the content's left edge
 STRIP_FONT_PX, STRIP_FONT_WEIGHT = 17, 600  # the header day line's size and weight
 
 
