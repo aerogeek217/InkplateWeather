@@ -20,3 +20,6 @@ server/tests/_out/
 
 # Project-local tool installs
 .tools/
+
+# Agent worktrees
+.claude/worktrees/
