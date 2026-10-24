@@ -1,0 +1,260 @@
+{
+ "_note": "Crafted for tests (not recorded): winter storm like design/reference/dashboard-winter.png, same shape as the real api.weather.gov responses.",
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.winter-storm-warning",
+   "type": "Feature",
+   "geometry": null,
+   "properties": {
+    "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.winter-storm-warning",
+    "@type": "wx:Alert",
+    "id": "urn:oid:2.49.0.1.840.0.winter-storm-warning",
+    "areaDesc": "Champaign",
+    "geocode": {
+     "SAME": [
+      "017019"
+     ],
+     "UGC": [
+      "ILZ045"
+     ]
+    },
+    "affectedZones": [
+     "https://api.weather.gov/zones/forecast/ILZ045"
+    ],
+    "references": [
+     {
+      "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.winter-weather-advisory",
+      "identifier": "urn:oid:2.49.0.1.840.0.winter-weather-advisory",
+      "sender": "w-nws.webmaster@noaa.gov",
+      "sent": "2027-01-19T03:12:00-06:00"
+     }
+    ],
+    "sent": "2027-01-19T14:58:00-06:00",
+    "effective": "2027-01-19T14:58:00-06:00",
+    "onset": "2027-01-19T12:00:00-06:00",
+    "expires": "2027-01-20T03:00:00-06:00",
+    "ends": "2027-01-20T09:00:00-06:00",
+    "status": "Actual",
+    "messageType": "Update",
+    "category": "Met",
+    "severity": "Severe",
+    "certainty": "Likely",
+    "urgency": "Expected",
+    "event": "Winter Storm Warning",
+    "sender": "w-nws.webmaster@noaa.gov",
+    "senderName": "NWS Lincoln IL",
+    "headline": "Winter Storm Warning issued January 19 at 2:58PM CST until January 20 at 9:00AM CST by NWS Lincoln IL",
+    "description": "* WHAT...Sleet changing to heavy snow this evening. Total snow accumulations of 3 to 5 inches and ice accumulations of a light glaze. Winds gusting as high as 35 mph.\n\n* WHERE...Champaign, Vermilion and Douglas Counties.\n\n* WHEN...Until 9 AM CST Wednesday.\n\n* IMPACTS...Travel could be very difficult.",
+    "instruction": "",
+    "response": "Prepare",
+    "parameters": {
+     "AWIPSidentifier": [
+      "WSWILX"
+     ],
+     "NWSheadline": [
+      "WINTER STORM WARNING IN EFFECT"
+     ]
+    }
+   }
+  },
+  {
+   "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.winter-weather-advisory",
+   "type": "Feature",
+   "geometry": null,
+   "properties": {
+    "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.winter-weather-advisory",
+    "@type": "wx:Alert",
+    "id": "urn:oid:2.49.0.1.840.0.winter-weather-advisory",
+    "areaDesc": "Champaign",
+    "geocode": {
+     "SAME": [
+      "017019"
+     ],
+     "UGC": [
+      "ILZ045"
+     ]
+    },
+    "affectedZones": [
+     "https://api.weather.gov/zones/forecast/ILZ045"
+    ],
+    "references": [],
+    "sent": "2027-01-19T14:58:00-06:00",
+    "effective": "2027-01-19T14:58:00-06:00",
+    "onset": "2027-01-19T12:00:00-06:00",
+    "expires": "2027-01-20T03:00:00-06:00",
+    "ends": "2027-01-20T06:00:00-06:00",
+    "status": "Actual",
+    "messageType": "Alert",
+    "category": "Met",
+    "severity": "Moderate",
+    "certainty": "Likely",
+    "urgency": "Expected",
+    "event": "Winter Weather Advisory",
+    "sender": "w-nws.webmaster@noaa.gov",
+    "senderName": "NWS Lincoln IL",
+    "headline": "Winter Weather Advisory issued January 19 at 2:58PM CST until 2027-01-20T06:00:00-06:00 by NWS Lincoln IL",
+    "description": "* WHAT...Mixed precipitation. Total snow accumulations of 1 to 2 inches.",
+    "instruction": "",
+    "response": "Prepare",
+    "parameters": {
+     "AWIPSidentifier": [
+      "WSWILX"
+     ],
+     "NWSheadline": [
+      "WINTER WEATHER ADVISORY IN EFFECT"
+     ]
+    }
+   }
+  },
+  {
+   "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.wind-chill",
+   "type": "Feature",
+   "geometry": null,
+   "properties": {
+    "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.wind-chill",
+    "@type": "wx:Alert",
+    "id": "urn:oid:2.49.0.1.840.0.wind-chill",
+    "areaDesc": "Champaign",
+    "geocode": {
+     "SAME": [
+      "017019"
+     ],
+     "UGC": [
+      "ILZ045"
+     ]
+    },
+    "affectedZones": [
+     "https://api.weather.gov/zones/forecast/ILZ045"
+    ],
+    "references": [],
+    "sent": "2027-01-19T14:58:00-06:00",
+    "effective": "2027-01-19T14:58:00-06:00",
+    "onset": "2027-01-20T18:00:00-06:00",
+    "expires": "2027-01-20T03:00:00-06:00",
+    "ends": "2027-01-21T10:00:00-06:00",
+    "status": "Actual",
+    "messageType": "Alert",
+    "category": "Met",
+    "severity": "Moderate",
+    "certainty": "Likely",
+    "urgency": "Expected",
+    "event": "Cold Weather Advisory",
+    "sender": "w-nws.webmaster@noaa.gov",
+    "senderName": "NWS Lincoln IL",
+    "headline": "Cold Weather Advisory issued January 19 at 2:58PM CST until 2027-01-21T10:00:00-06:00 by NWS Lincoln IL",
+    "description": "* WHAT...Very cold wind chills expected. Wind chills as low as 15 below zero.\n\n* WHERE...Champaign.",
+    "instruction": "",
+    "response": "Prepare",
+    "parameters": {
+     "AWIPSidentifier": [
+      "WSWILX"
+     ],
+     "NWSheadline": [
+      "COLD WEATHER ADVISORY IN EFFECT"
+     ]
+    }
+   }
+  },
+  {
+   "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.cancelled",
+   "type": "Feature",
+   "geometry": null,
+   "properties": {
+    "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.cancelled",
+    "@type": "wx:Alert",
+    "id": "urn:oid:2.49.0.1.840.0.cancelled",
+    "areaDesc": "Champaign",
+    "geocode": {
+     "SAME": [
+      "017019"
+     ],
+     "UGC": [
+      "ILZ045"
+     ]
+    },
+    "affectedZones": [
+     "https://api.weather.gov/zones/forecast/ILZ045"
+    ],
+    "references": [],
+    "sent": "2027-01-19T14:58:00-06:00",
+    "effective": "2027-01-19T14:58:00-06:00",
+    "onset": "2027-01-19T12:00:00-06:00",
+    "expires": "2027-01-20T03:00:00-06:00",
+    "ends": "2027-01-19T21:00:00-06:00",
+    "status": "Actual",
+    "messageType": "Cancel",
+    "category": "Met",
+    "severity": "Moderate",
+    "certainty": "Likely",
+    "urgency": "Expected",
+    "event": "Wind Advisory",
+    "sender": "w-nws.webmaster@noaa.gov",
+    "senderName": "NWS Lincoln IL",
+    "headline": "Wind Advisory issued January 19 at 2:58PM CST until 2027-01-19T21:00:00-06:00 by NWS Lincoln IL",
+    "description": "The Wind Advisory has been cancelled.",
+    "instruction": "",
+    "response": "Prepare",
+    "parameters": {
+     "AWIPSidentifier": [
+      "WSWILX"
+     ],
+     "NWSheadline": [
+      "WIND ADVISORY IN EFFECT"
+     ]
+    }
+   }
+  },
+  {
+   "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.test",
+   "type": "Feature",
+   "geometry": null,
+   "properties": {
+    "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.test",
+    "@type": "wx:Alert",
+    "id": "urn:oid:2.49.0.1.840.0.test",
+    "areaDesc": "Champaign",
+    "geocode": {
+     "SAME": [
+      "017019"
+     ],
+     "UGC": [
+      "ILZ045"
+     ]
+    },
+    "affectedZones": [
+     "https://api.weather.gov/zones/forecast/ILZ045"
+    ],
+    "references": [],
+    "sent": "2027-01-19T14:58:00-06:00",
+    "effective": "2027-01-19T14:58:00-06:00",
+    "onset": "2027-01-19T12:00:00-06:00",
+    "expires": "2027-01-20T03:00:00-06:00",
+    "ends": "2027-01-20T09:00:00-06:00",
+    "status": "Test",
+    "messageType": "Alert",
+    "category": "Met",
+    "severity": "Extreme",
+    "certainty": "Likely",
+    "urgency": "Expected",
+    "event": "Blizzard Warning",
+    "sender": "w-nws.webmaster@noaa.gov",
+    "senderName": "NWS Lincoln IL",
+    "headline": "Blizzard Warning issued January 19 at 2:58PM CST until 2027-01-20T09:00:00-06:00 by NWS Lincoln IL",
+    "description": "This is a test.",
+    "instruction": "",
+    "response": "Prepare",
+    "parameters": {
+     "AWIPSidentifier": [
+      "WSWILX"
+     ],
+     "NWSheadline": [
+      "BLIZZARD WARNING IN EFFECT"
+     ]
+    }
+   }
+  }
+ ],
+ "title": "Current watches, warnings, and advisories for 40.0617 N, 88.2517 W",
+ "updated": "2027-01-19T21:00:00+00:00"
+}
