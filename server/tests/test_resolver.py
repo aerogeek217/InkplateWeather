@@ -117,6 +117,7 @@ def test_example_config_loads():
     from app.config import load
 
     cfg = load(Path(__file__).resolve().parents[2] / "config" / "config.example.yaml")
-    assert cfg.server.fixture == "fall"
-    assert cfg.providers["fixture"].type == "fixture"
-    assert cfg.fields["air.aqi"][0].from_ == "fixture"
+    assert cfg.server.fixture is None  # live data by default
+    assert cfg.providers["ecowitt"].type == "ecowitt_local"
+    assert [s.from_ for s in cfg.fields["outdoor.temperature"]] == ["ecowitt", "nws_obs", "om"]
+    assert cfg.fields["outdoor.temperature"][0].key == "0x02"
