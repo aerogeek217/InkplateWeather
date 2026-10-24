@@ -115,7 +115,8 @@ def test_poller_runs_only_after_echoes():
     assert lightning.Poller(lightning.Store(None), BBOX, "(test)", always=True).active(T0)
 
 
-async def test_provider_reads_the_rolling_list(tmp_path):
+async def test_provider_reads_the_rolling_list(tmp_path, monkeypatch):
+    monkeypatch.delenv("INKPLATE_CACHE_DIR", raising=False)  # set in the container image
     app = AppConfig(location=LocationCfg(name="Savoy, IL", lat=40.0617, lon=-88.2517, tz="America/Chicago"),
                     server=ServerCfg(cache_dir=str(tmp_path)))
     p = base.build("glm", ProviderCfg(type="lightning_glm"), app)

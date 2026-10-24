@@ -112,9 +112,9 @@ def echoes(frame: dict) -> str:
     return "".join(out)
 
 
-# Lightning bolt (icons/markers/lightning-*.svg, viewBox 16 18.5 22 31) drawn ~12 px tall: 9.6 map units.
+# Lightning bolt (icons/markers/lightning-*.svg, viewBox 16 18.5 22 31) drawn 12 px (9.6 map units) tall.
 BOLT_PATH = "M26 21 H35 L28 31 H34 L22 47 L26 35 H19 Z"
-BOLT_SCALE = 9.6 / 31
+BOLT_SCALE = 9.6 / 26  # the path itself is 26 of the 31 icon units tall
 BOLT_CELL = 6.4  # map units (8 px): flashes closer than this merge into one bolt, newest wins
 RECENT = timedelta(minutes=10)
 WINDOW = timedelta(minutes=30)
