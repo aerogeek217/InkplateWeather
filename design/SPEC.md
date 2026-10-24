@@ -183,10 +183,27 @@ Regenerated 2026-10-24 with the user's approval:
   Windows rasterizes text slightly differently (about 4 % of pixels on text edges).
 - Fonts come from the bundled `server/assets/fonts`; see `tools/render_reference.py` for the commands.
 
+## Error states (approved 2026-10-24)
+
+All wording lives in `server/app/messages.py`.
+- **Stale** values (older than their max age) are drawn in `#6D6D6D`. The current-temperature block adds "as of h:mm";
+  smaller cells have no room, so their "as of" goes to the notes box.
+- **Missing** values: readings and gauge cells show "No data" over a short cause ("since 11:40 AM", "no response");
+  larger sections (current temperature, charts, sun & moon, 7-day list) show a plain sentence in their own space.
+- **Notes box**: a bordered white box at the top-left of the radar panel (under the legend, ≤ 6 lines) with the
+  full sentences: alerts that couldn't be checked, missing/stale readings grouped by cause, fallbacks such as
+  "Forecast from Open-Meteo (NWS unavailable)."
+- **Header**: when ≥ 2 sections are missing the day line becomes "Some data is unavailable: …" (an alert still wins).
+  Radar counts only once a radar source is configured; until then the panel reads "Radar arrives in a later update."
+- **Battery**: ≤ 15 % adds "Battery low: charge soon" beside the battery (the day line shortens); ≤ 5 % adds a black
+  strip across the top of the radar panel, which replaces the radar legend while shown.
+- **Render failure**: the last good image is served with a black band over the header: "Display couldn't update at
+  h:mm: <reason>. Showing the screen from h:mm."
+
 ## Known gaps to resolve during the build
 
 - Radar map geometry on the boards is hand-drawn. The real build needs a base map
   (simplified county/road vectors) plus radar tiles reprojected to the same extent.
 - Chart label placement (lows/highs) must avoid collisions with real data.
 - A test fixture set (fall, winter storm, alert, missing data) should reproduce the reference boards.
-- Behavior when a source is stale or unavailable (dim value + "as of" time) is not yet designed.
+- ~~Behavior when a source is stale or unavailable~~: designed and approved, see *Error states*.

@@ -1,6 +1,6 @@
 # Build plan
 
-Status: **Phase 1 merged (2026-10-24). Phase 2 built; 2.6 error states awaiting user review** on branch `phase-2`.
+Status: **Phase 1 merged (2026-10-24). Phase 2 built and approved** on branch `phase-2`; next: deploy and run on live data for a few days.
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 
@@ -152,7 +152,7 @@ Phase 1 notes (2026-10-24):
 | 2.3 ✅ | B | `open_meteo` (us_aqi, uv_index, fallback hourly/daily), `acis` (normals, season snow, snow depth), `astro` (sunrise/set, day length delta, moon phase %, rise/set, next 4 principal phases) | 1.2 | tests against recorded responses; astro verified against a known date |
 | 2.4 ✅ | B | `home_assistant` generic entity provider (token via env) and `device` provider | 1.2 | tests with recorded HA state JSON |
 | 2.5 ✅ | A | `viewmodel.py` real logic: icon mapping + modifiers (SPEC table), dominant precip type, snow amounts, day line (template-based sentence from forecast; NWS short forecast fallback), alert takeover, gauge winter swap, wind bold ≥ 20 mph, frost modifier, chart series + label placement without collisions | 2.1–2.3 | fixture-driven tests for each conditional behavior in SPEC |
-| 2.6 👀 | A | Error states per ARCHITECTURE *Error handling*: stale styling + "as of", missing-slot sentences, header summary when ≥ 2 sections missing, battery low notice; `fixtures/outage.json` | 2.5 | outage fixture renders readable plain-language messages; reviewed by user |
+| 2.6 ✅ | A | Error states per ARCHITECTURE *Error handling*: stale styling + "as of", missing-slot sentences, header summary when ≥ 2 sections missing, battery low notice; `fixtures/outage.json` | 2.5 | outage fixture renders readable plain-language messages; reviewed by user |
 | 2.7 ✅ | A | `/status` page (per-field winner, ages, attempts) and `/admin/reload` | 1.2 | shows provenance for all fields |
 
 Milestone: the live screen runs on real data for a few days; the user reviews error wording.
