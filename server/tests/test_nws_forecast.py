@@ -74,7 +74,7 @@ async def test_recorded_fall(app):
     assert [h.t for h in hourly] == [hourly[0].t + timedelta(hours=i) for i in range(len(hourly))]
     h0 = hourly[0]
     assert (h0.temp, h0.pop, h0.precip_type, h0.wind_speed, h0.wind_dir, h0.icon) == (
-        64.0, 1, "rain", 6.0, 157.5, "cloudy")
+        64.0, 1, "rain", 6.0, 157.5, "partly-cloudy")  # "Partly Sunny" (bkn)
     assert h0.wind_gust == 8.1  # grid windGust 13 km/h
     assert sum(h.rain_in + h.snow_in + h.ice_in for h in hourly) == 0  # dry week
 
@@ -82,8 +82,8 @@ async def test_recorded_fall(app):
     assert [(d.high, d.low) for d in daily] == [(72, 45), (75, 48), (75, 48), (73, 50), (77, 52), (75, 48), (74, 49)]
     assert [d.text for d in daily] == ["Partly sunny", "Mostly sunny", "Partly sunny", "Mostly cloudy",
                                        "Mostly sunny", "Sunny", "Mostly sunny"]
-    assert [d.icon for d in daily] == ["cloudy", "partly-cloudy", "cloudy", "cloudy", "partly-cloudy", "sunny",
-                                       "partly-cloudy"]
+    assert [d.icon for d in daily] == ["partly-cloudy", "partly-cloudy", "partly-cloudy", "cloudy", "partly-cloudy",
+                                       "sunny", "partly-cloudy"]
     assert [d.pop for d in daily] == [1, 1, 0, 1, 6, 6, 17]  # the higher of day and night
     assert (daily[4].wind_speed, daily[4].wind_dir) == (10, 180)  # "6 to 10 mph" S → upper value
     assert daily[0].detail.startswith("Partly sunny, with a high near 72.")
