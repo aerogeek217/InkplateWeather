@@ -133,8 +133,8 @@ Inside temp + RH · Garage temp + RH · Pressure + trend arrow · Air quality (U
 
 | Field | Source |
 |---|---|
-| Outdoor / indoor / garage temp & RH, rain gauge, pressure | Ecowitt GW2000B local API (LAN) |
-| Wind (current), present weather | NWS observations, KCMI (Willard Airport) |
+| Outdoor / indoor / garage temp & RH, rain gauge, pressure, **wind**, **UV** | Ecowitt GW2000B local API (LAN) |
+| Present weather; wind/UV fallback | NWS observations, KCMI (Willard Airport); Open-Meteo |
 | Hourly + daily forecast, precip chance/type/amounts | NWS gridpoint forecast (Open-Meteo as fallback) |
 | Alerts | NWS alerts API for the county/zone |
 | Radar | NEXRAD composite (e.g. Iowa Environmental Mesonet tiles), site KILX |

@@ -72,7 +72,7 @@ outdoor temperature from Ecowitt to NWS, lives in config, not code.
 
 | Provider | Offers | Notes |
 |---|---|---|
-| `ecowitt_local` | outdoor/indoor/garage temp & RH, pressure, rain totals & rate, and any other channel the gateway reports (PM2.5, lightning, soil…) | Polls the gateway's local HTTP endpoint (`/get_livedata_info`). Channel → field mapping in config, so a newly paired sensor is a config change. |
+| `ecowitt_local` | outdoor temp/RH/dew point/feels-like, **wind speed/gust/direction**, **UV & solar radiation**, indoor temp/RH + pressure (WH25 block), garage (channel 1), rain event/rate/day/week/month/year, **lightning** (distance, last strike, count) | Polls `http://192.168.1.135/get_livedata_info`. Sample response saved in `server/fixtures/ecowitt_get_livedata_info.sample.json`. Values come as strings with units (e.g. `"2.24 mph"`, `"72%"`); `common_list` uses hex IDs (0x02 outdoor temp, 0x07 RH, 0x03 dew point, 0x0A wind dir, 0x0B wind, 0x0C gust, 0x15 solar, 0x17 UV; rain 0x0D event, 0x0E rate, 0x10 day, 0x11 week, 0x12 month, 0x13 year). Channel → field mapping lives in config, so a newly paired sensor is a config change. |
 | `ecowitt_push` (later) | same | Alternative: the gateway's "customized upload" POSTs to the container. More robust; no polling. |
 | `nws_observations` | wind, pressure, present weather, visibility | Station `KCMI` (Willard Airport), `/stations/KCMI/observations/latest`. |
 | `nws_forecast` | hourly + daily forecast, precip probability/type/amounts, sky | `/points/{lat},{lon}` → `forecastHourly` + `forecastGridData` (snow and ice amounts, weather type). |
@@ -100,10 +100,11 @@ providers:
 fields:
   outdoor.temperature:  [{from: ecowitt, key: outdoor.temp, max_age: 10m}, {from: nws_obs, max_age: 90m}]
   garage.temperature:   [{from: ecowitt, key: ch2.temp, max_age: 15m}]
-  wind.speed:           [{from: nws_obs, max_age: 90m}, {from: om}]
-  air.aqi:              [{from: om, key: us_aqi}]          # today
-  # later, when your sensor works:
-  # air.aqi:            [{from: ha, entity: sensor.backyard_aqi, max_age: 20m}, {from: om, key: us_aqi}]
+  wind.speed:           [{from: ecowitt, key: "0x0B", max_age: 10m}, {from: nws_obs, max_age: 90m}]
+  uv.index:             [{from: ecowitt, key: "0x17", max_age: 15m}, {from: om, key: uv_index}]
+  air.aqi:              [{from: om, key: us_aqi}]          # public data for now
+  # later, when the PMS5003 works (e.g. via ESPHome → Home Assistant):
+  # air.aqi:            [{from: ha, entity: sensor.pms5003_aqi, max_age: 20m}, {from: om, key: us_aqi}]
 ```
 
 Swapping a source is a config edit plus a container restart (or a reload at `/admin/reload`).
@@ -198,12 +199,14 @@ firmware/      Inkplate sketch
 
 ## Open questions
 
-1. The Ecowitt gateway's IP, and which channel numbers your indoor and garage sensors use (I'll read
-   them from a live `get_livedata_info` response).
-2. Your air-quality sensor model (Ecowitt WH41/WH45, PurpleAir, other?). That decides whether it comes through
-   the gateway, Home Assistant or its own provider.
-3. Do you want the Inkplate's battery reported into Home Assistant too (via MQTT or the HA API)?
-4. A contact email for the NWS User-Agent (required by NWS; stays in your config, not in the repo).
+Answered 2026-10-24: gateway at `192.168.1.135` (garage = channel 1; the station also reports wind, UV/solar
+and lightning); air quality from public data for now (PMS5003 later, likely via Home Assistant); Inkplate
+battery does **not** need to go to Home Assistant.
+
+1. The NWS User-Agent contact. NWS has no API keys; it asks each client to identify itself with a contact
+   (email or URL) in the `User-Agent` header. Stays in local config, not in the repo.
+2. Should the station's **lightning** data (distance, strike count) appear on the display? The approved design
+   has no slot for it yet.
 
 ## Sources consulted
 

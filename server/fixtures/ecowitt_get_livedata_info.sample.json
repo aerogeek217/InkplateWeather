@@ -1,0 +1,79 @@
+{
+	"common_list":	[{
+	"id":	"0x02",
+	"val":	"59.5",
+	"unit":	"F"
+}, {
+	"id":	"0x07",
+	"val":	"72%"
+}, {
+	"id":	"3",
+	"val":	"59.5",
+	"unit":	"F"
+}, {
+	"id":	"0x03",
+	"val":	"50.5",
+	"unit":	"F",
+	"battery":	"0"
+}, {
+	"id":	"0x0B",
+	"val":	"0.00 mph"
+}, {
+	"id":	"0x0C",
+	"val":	"0.00 mph"
+}, {
+	"id":	"0x19",
+	"val":	"2.24 mph"
+}, {
+	"id":	"0x15",
+	"val":	"26.91 W/m2"
+}, {
+	"id":	"0x17",
+	"val":	"0"
+}, {
+	"id":	"0x0A",
+	"val":	"47",
+	"battery":	"5"
+}],
+	"rain":	[{
+	"id":	"0x0D",
+	"val":	"0.00 in"
+}, {
+	"id":	"0x0E",
+	"val":	"0.00 in/Hr"
+}, {
+	"id":	"0x10",
+	"val":	"0.00 in"
+}, {
+	"id":	"0x11",
+	"val":	"0.00 in"
+}, {
+	"id":	"0x12",
+	"val":	"1.22 in"
+}, {
+	"id":	"0x13",
+	"val":	"27.15 in",
+	"battery":	"0"
+}],
+	"wh25":	[{
+	"intemp":	"71.6",
+	"unit":	"F",
+	"inhumi":	"52%",
+	"abs":	"29.62 inHg",
+	"rel":	"29.62 inHg"
+}],
+	"lightning":	[{
+	"distance":	"8.7 mi",
+	"timestamp":	"10/24/2026 00:45:54",
+	"count":	"1",
+	"battery":	"5"
+}],
+	"ch_aisle":	[{
+	"channel":	"1",
+	"name":	"Garage",
+	"battery":	"0",
+	"temp":	"63.7",
+	"unit":	"F",
+	"humidity":	"52%"
+}]
+}
