@@ -58,8 +58,8 @@ fields:
   air.aqi:              [{from: om, max_age: 3h}]
   # later, when the PMS5003 works (e.g. via ESPHome → Home Assistant):
   # air.aqi:            [{from: ha, entity: sensor.pms5003_aqi, max_age: 20m}, {from: om, max_age: 3h}]
-  snow.depth:           [{from: acis, max_age: 36h}]
-  snow.season:          [{from: acis, max_age: 36h}]
+  snow.depth:           [{from: acis, max_age: 48h}]   # ACIS posts the 8 AM report late in the day
+  snow.season:          [{from: acis, max_age: 48h}]
   normals.high:         [{from: acis}]
   normals.low:          [{from: acis}]
   conditions.current:   [{from: nws_obs, max_age: 90m}, {from: om, max_age: 90m}]
