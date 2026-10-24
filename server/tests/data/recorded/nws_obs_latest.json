@@ -1,0 +1,97 @@
+{
+ "id": "https://api.weather.gov/stations/KCMI/observations/2026-10-24T16:05:00+00:00",
+ "type": "Feature",
+ "properties": {
+  "@id": "https://api.weather.gov/stations/KCMI/observations/2026-10-24T16:05:00+00:00",
+  "@type": "wx:ObservationStation",
+  "elevation": {
+   "unitCode": "wmoUnit:m",
+   "value": 230
+  },
+  "station": "https://api.weather.gov/stations/KCMI",
+  "stationId": "KCMI",
+  "stationName": "University of Illinois - Willard",
+  "timestamp": "2026-10-24T16:05:00+00:00",
+  "rawMessage": "",
+  "textDescription": "Clear",
+  "icon": "https://api.weather.gov/icons/land/day/skc?size=medium",
+  "presentWeather": [],
+  "temperature": {
+   "unitCode": "wmoUnit:degC",
+   "value": 18,
+   "qualityControl": "V"
+  },
+  "dewpoint": {
+   "unitCode": "wmoUnit:degC",
+   "value": 8,
+   "qualityControl": "V"
+  },
+  "windDirection": {
+   "unitCode": "wmoUnit:degree_(angle)",
+   "value": 160,
+   "qualityControl": "V"
+  },
+  "windSpeed": {
+   "unitCode": "wmoUnit:km_h-1",
+   "value": 9.252,
+   "qualityControl": "V"
+  },
+  "windGust": {
+   "unitCode": "wmoUnit:km_h-1",
+   "value": null,
+   "qualityControl": "Z"
+  },
+  "barometricPressure": {
+   "unitCode": "wmoUnit:Pa",
+   "value": 103013.95,
+   "qualityControl": "V"
+  },
+  "seaLevelPressure": {
+   "unitCode": "wmoUnit:Pa",
+   "value": null,
+   "qualityControl": "Z"
+  },
+  "visibility": {
+   "unitCode": "wmoUnit:m",
+   "value": 16093.44,
+   "qualityControl": "C"
+  },
+  "maxTemperatureLast24Hours": {
+   "unitCode": "wmoUnit:degC",
+   "value": null
+  },
+  "minTemperatureLast24Hours": {
+   "unitCode": "wmoUnit:degC",
+   "value": null
+  },
+  "precipitationLast3Hours": {
+   "unitCode": "wmoUnit:mm",
+   "value": null,
+   "qualityControl": "Z"
+  },
+  "relativeHumidity": {
+   "unitCode": "wmoUnit:percent",
+   "value": 52.013467849557,
+   "qualityControl": "V"
+  },
+  "windChill": {
+   "unitCode": "wmoUnit:degC",
+   "value": null,
+   "qualityControl": "V"
+  },
+  "heatIndex": {
+   "unitCode": "wmoUnit:degC",
+   "value": null,
+   "qualityControl": "V"
+  },
+  "cloudLayers": [
+   {
+    "base": {
+     "unitCode": "wmoUnit:m",
+     "value": 3810
+    },
+    "amount": "CLR"
+   }
+  ]
+ }
+}
