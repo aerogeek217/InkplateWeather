@@ -1,0 +1,687 @@
+{
+ "now": "2027-01-19T15:30:00-06:00",
+ "device": {
+  "battery_pct": 61,
+  "voltage_mv": 3850,
+  "wake_reason": "timer"
+ },
+ "readings": {
+  "outdoor.temperature": 29.0,
+  "outdoor.humidity": 88,
+  "outdoor.dew_point": 26.1,
+  "outdoor.feels_like": 19.2,
+  "outdoor.temperature_history": [
+   {
+    "t": "2027-01-18T16:30:00-06:00",
+    "v": 34
+   },
+   {
+    "t": "2027-01-18T17:30:00-06:00",
+    "v": 33
+   },
+   {
+    "t": "2027-01-18T18:30:00-06:00",
+    "v": 31
+   },
+   {
+    "t": "2027-01-18T19:30:00-06:00",
+    "v": 30
+   },
+   {
+    "t": "2027-01-18T20:30:00-06:00",
+    "v": 29
+   },
+   {
+    "t": "2027-01-18T21:30:00-06:00",
+    "v": 28
+   },
+   {
+    "t": "2027-01-18T22:30:00-06:00",
+    "v": 27
+   },
+   {
+    "t": "2027-01-18T23:30:00-06:00",
+    "v": 27
+   },
+   {
+    "t": "2027-01-19T00:30:00-06:00",
+    "v": 26
+   },
+   {
+    "t": "2027-01-19T01:30:00-06:00",
+    "v": 26
+   },
+   {
+    "t": "2027-01-19T02:30:00-06:00",
+    "v": 25
+   },
+   {
+    "t": "2027-01-19T03:30:00-06:00",
+    "v": 25
+   },
+   {
+    "t": "2027-01-19T04:30:00-06:00",
+    "v": 25
+   },
+   {
+    "t": "2027-01-19T05:30:00-06:00",
+    "v": 26
+   },
+   {
+    "t": "2027-01-19T06:30:00-06:00",
+    "v": 26
+   },
+   {
+    "t": "2027-01-19T07:30:00-06:00",
+    "v": 27
+   },
+   {
+    "t": "2027-01-19T08:30:00-06:00",
+    "v": 28
+   },
+   {
+    "t": "2027-01-19T09:30:00-06:00",
+    "v": 28
+   },
+   {
+    "t": "2027-01-19T10:30:00-06:00",
+    "v": 29
+   },
+   {
+    "t": "2027-01-19T11:30:00-06:00",
+    "v": 29
+   },
+   {
+    "t": "2027-01-19T12:30:00-06:00",
+    "v": 30
+   },
+   {
+    "t": "2027-01-19T13:30:00-06:00",
+    "v": 30
+   },
+   {
+    "t": "2027-01-19T14:30:00-06:00",
+    "v": 29
+   },
+   {
+    "t": "2027-01-19T15:30:00-06:00",
+    "v": 29
+   }
+  ],
+  "wind.speed": 16,
+  "wind.gust": 28,
+  "wind.direction": 45,
+  "uv.index": 1,
+  "solar.radiation": 40,
+  "indoor.temperature": 68.5,
+  "indoor.humidity": 38,
+  "garage.temperature": 34.1,
+  "garage.humidity": 61,
+  "pressure.sea_level": 29.71,
+  "pressure.trend_3h": -0.08,
+  "rain.today": 0.21,
+  "rain.week": 0.35,
+  "rain.month": 1.12,
+  "rain.year": 1.12,
+  "rain.rate": 0.04,
+  "air.aqi": 22,
+  "snow.depth": 4,
+  "snow.season": 11.8,
+  "normals.high": 33,
+  "normals.low": 18,
+  "conditions.current": "sleet",
+  "forecast.hourly": [
+   {
+    "t": "2027-01-19T16:00:00-06:00",
+    "temp": 29,
+    "pop": 90,
+    "precip_type": "ice",
+    "snow_in": 0,
+    "ice_in": 0.03
+   },
+   {
+    "t": "2027-01-19T17:00:00-06:00",
+    "temp": 28,
+    "pop": 90,
+    "precip_type": "ice",
+    "snow_in": 0,
+    "ice_in": 0.02
+   },
+   {
+    "t": "2027-01-19T18:00:00-06:00",
+    "temp": 27.5,
+    "pop": 90,
+    "precip_type": "snow",
+    "snow_in": 0.3,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-19T19:00:00-06:00",
+    "temp": 27,
+    "pop": 100,
+    "precip_type": "snow",
+    "snow_in": 0.6,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-19T20:00:00-06:00",
+    "temp": 26.67,
+    "pop": 100,
+    "precip_type": "snow",
+    "snow_in": 0.7,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-19T21:00:00-06:00",
+    "temp": 26.33,
+    "pop": 100,
+    "precip_type": "snow",
+    "snow_in": 0.7,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-19T22:00:00-06:00",
+    "temp": 26,
+    "pop": 90,
+    "precip_type": "snow",
+    "snow_in": 0.6,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-19T23:00:00-06:00",
+    "temp": 25.33,
+    "pop": 80,
+    "precip_type": "snow",
+    "snow_in": 0.4,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T00:00:00-06:00",
+    "temp": 24.67,
+    "pop": 70,
+    "precip_type": "snow",
+    "snow_in": 0.3,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T01:00:00-06:00",
+    "temp": 24,
+    "pop": 60,
+    "precip_type": "snow",
+    "snow_in": 0.2,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T02:00:00-06:00",
+    "temp": 23.33,
+    "pop": 50,
+    "precip_type": "snow",
+    "snow_in": 0.1,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T03:00:00-06:00",
+    "temp": 22.67,
+    "pop": 40,
+    "precip_type": "snow",
+    "snow_in": 0.1,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T04:00:00-06:00",
+    "temp": 22,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T05:00:00-06:00",
+    "temp": 21.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T06:00:00-06:00",
+    "temp": 20.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T07:00:00-06:00",
+    "temp": 20,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T08:00:00-06:00",
+    "temp": 19.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T09:00:00-06:00",
+    "temp": 19.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T10:00:00-06:00",
+    "temp": 19,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T11:00:00-06:00",
+    "temp": 19.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T12:00:00-06:00",
+    "temp": 19.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T13:00:00-06:00",
+    "temp": 20,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T14:00:00-06:00",
+    "temp": 20.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T15:00:00-06:00",
+    "temp": 20.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T16:00:00-06:00",
+    "temp": 21,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T17:00:00-06:00",
+    "temp": 20.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T18:00:00-06:00",
+    "temp": 19.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T19:00:00-06:00",
+    "temp": 18,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T20:00:00-06:00",
+    "temp": 17.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T21:00:00-06:00",
+    "temp": 16.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T22:00:00-06:00",
+    "temp": 15,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-20T23:00:00-06:00",
+    "temp": 14.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T00:00:00-06:00",
+    "temp": 13.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T01:00:00-06:00",
+    "temp": 13,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T02:00:00-06:00",
+    "temp": 12.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T03:00:00-06:00",
+    "temp": 12.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T04:00:00-06:00",
+    "temp": 12,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T05:00:00-06:00",
+    "temp": 11.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T06:00:00-06:00",
+    "temp": 11.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T07:00:00-06:00",
+    "temp": 11,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T08:00:00-06:00",
+    "temp": 12.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T09:00:00-06:00",
+    "temp": 13.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T10:00:00-06:00",
+    "temp": 14,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T11:00:00-06:00",
+    "temp": 15.67,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T12:00:00-06:00",
+    "temp": 17.33,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T13:00:00-06:00",
+    "temp": 19,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T14:00:00-06:00",
+    "temp": 20.0,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   },
+   {
+    "t": "2027-01-21T15:00:00-06:00",
+    "temp": 21,
+    "pop": 5,
+    "precip_type": "snow",
+    "snow_in": 0,
+    "ice_in": 0
+   }
+  ],
+  "forecast.daily": [
+   {
+    "date": "2027-01-19",
+    "icon": "wintry-mix",
+    "text": "Sleet → snow",
+    "high": 31,
+    "low": 19,
+    "wind_dir": 45,
+    "wind_speed": 16,
+    "pop": 100,
+    "precip_type": "snow",
+    "snow_in": 4
+   },
+   {
+    "date": "2027-01-20",
+    "icon": "snow",
+    "text": "Snow ends, blowing",
+    "high": 22,
+    "low": 11,
+    "wind_dir": 315,
+    "wind_speed": 24,
+    "pop": 60,
+    "precip_type": "snow",
+    "snow_in": 1
+   },
+   {
+    "date": "2027-01-21",
+    "icon": "sunny",
+    "text": "Sunny, frigid",
+    "high": 24,
+    "low": 9,
+    "wind_dir": 270,
+    "wind_speed": 10,
+    "pop": 0,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2027-01-22",
+    "icon": "cloudy",
+    "text": "Cloudy",
+    "high": 30,
+    "low": 17,
+    "wind_dir": 180,
+    "wind_speed": 12,
+    "pop": 10,
+    "precip_type": "rain",
+    "snow_in": 0
+   },
+   {
+    "date": "2027-01-23",
+    "icon": "freezing-rain",
+    "text": "Freezing drizzle",
+    "high": 34,
+    "low": 26,
+    "wind_dir": 135,
+    "wind_speed": 10,
+    "pop": 40,
+    "precip_type": "ice",
+    "snow_in": 0
+   },
+   {
+    "date": "2027-01-24",
+    "icon": "wintry-mix",
+    "text": "Wintry mix",
+    "high": 37,
+    "low": 24,
+    "wind_dir": 180,
+    "wind_speed": 14,
+    "pop": 50,
+    "precip_type": "ice",
+    "snow_in": 0
+   },
+   {
+    "date": "2027-01-25",
+    "icon": "flurries",
+    "text": "Flurries",
+    "high": 29,
+    "low": 15,
+    "wind_dir": 315,
+    "wind_speed": 18,
+    "pop": 20,
+    "precip_type": "snow",
+    "snow_in": 0
+   }
+  ],
+  "alerts.active": [
+   {
+    "event": "Winter Storm Warning",
+    "ends": "2027-01-20T09:00:00-06:00",
+    "headline": "Winter Storm Warning until 9 AM Wednesday",
+    "impact": "3–5 in snow",
+    "severity": "Severe"
+   }
+  ],
+  "astro.sun": {
+   "sunrise": "2027-01-19T07:12:00-06:00",
+   "sunset": "2027-01-19T17:05:00-06:00",
+   "day_length_min": 593,
+   "delta_min_per_day": 2
+  },
+  "astro.moon": {
+   "phase_name": "waxing gibbous",
+   "illumination": 90,
+   "waxing": true,
+   "rise": "2027-01-19T13:32:00-06:00",
+   "set": "2027-01-20T04:18:00-06:00",
+   "next": [
+    {
+     "kind": "full",
+     "date": "2027-01-22"
+    },
+    {
+     "kind": "last",
+     "date": "2027-01-29"
+    },
+    {
+     "kind": "new",
+     "date": "2027-02-06"
+    },
+    {
+     "kind": "first",
+     "date": "2027-02-14"
+    }
+   ]
+  },
+  "radar.frame": {
+   "value": {
+    "site": "MRMS",
+    "time": "2027-01-19T15:25:00-06:00",
+    "legend": "types",
+    "types": [
+     "ice",
+     "rain",
+     "snow"
+    ],
+    "layers": [
+     {
+      "fill": "rain",
+      "png": "iVBORw0KGgoAAAANSUhEUgAAAhgAAAI6AQAAAABNmwyAAAADJUlEQVR42u2aMW7bQBBF/64YkwEMmEXKwOIRDKRxEcA8SnKNNGKRA+QGyU1CAylT+AhU4MJuDMJwIQMUJ4UoiorTcGYBMcp/hSEb8NfM7Ozs7JAAIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYSQhYzHB/jeqWgECMdRxSN8TK+EMbXjhr/Mmv8+HsE13h6RL9k08tS1djv8RGJ6GkAjtcdUG9Ij3bdnLetYYI1FzXhQY/J9UCq1/YyKV3ZfmqNcl0KtEfV/Ku0xFb0v7YsPhnj8qNQavQu52Y7qK+4L+9quzPF4sOdYFiJPn8LslzKARq7efd2Ft+w/Ke7IxTaoTh+Pctuker1GFbIGRWM1XvxDffrOasd15gP4kuZGjWU+fmmHJ56ISKWZxezs6AqZKxXxONl+/JgDle7QivvkOhMpMBs/U3KI79P+6F9HmvN/aHrS/7DcCZ/wQbNfZDWopTf4ktrsyFE6ZfnaJkQsNdxqrpr1bTUuUSsPB5GhRa5RjB1x9dDvl6bbNON9eeyje6uuhdtUf69u8f6YO0QqjbKEFS+FXWO/hUs0GtH+AEXV+Hu/F9vGsi4/N460Bo3ZBYBYuUTe7TVjYrBjE9pZ4XQag3vcm1y5XwYpkVyc6zSiQW4lmSEeqbJ96TS8ua30cMWuinoY6vpCRKRWPRXre4cCAG70fWGmvlCGvyObilk0cMMtTHZUAHZd1ehuEOKBeWWPRzaR2YWIy/BcmDRyAN+0Sea7zrgF6rtcb0e2GU+lmeE6WQOLBlctRL9vky4kTp9jWEeQ9atWZrbnQMWsDZNjEiJPC/26NMBcRFrMTfX0DoBDrffFh5wXrvQaLoQdhWlpNxrdfj2Hqa4DgFsevhYmATRqmKYNAJ5ft2Y7YltUnPDZCTWoQQ1qhJ3R/wqg8T3/599z3E0OlTdkkd0Z5cTsy9LZ41FNJU8/BdD4bNe4PvD7DvL3IajGjnWAdbk9sWtUl8dTT8tp1KBW+Zr18F75eOh7Q9AaVJs1Kqxw0PeDfgPYr50820BytgAAAABJRU5ErkJggg=="
+     },
+     {
+      "fill": "ice",
+      "png": "iVBORw0KGgoAAAANSUhEUgAAAhgAAAI6AQAAAABNmwyAAAADcElEQVR42u2cv3LTQBDG9yxNlIJBLj0MY5s3SEmRGavkMSh4CBeZsTI8CHkISgrDE/AIMg0UFOJPoeKipZDkcWKMfLc7+KJ8v0ZJ4S973+3enk6ODAng5jIiOdBoSOEHNP6ThpGXPjwdrgbDjzvUChpWQaNS0CgD8bSQr0G3cRhjsQoalYLGZ5V6ES0czMwsGkuiNy8xDSc/KJAc04ijDCSOQqKxbC7rQMaSB9NvBaXfLB9MqNt7CnIN89a/3ybVcPZ0S8U4NPrt+0D63Cv/e8LIDvH+xeAeaJePmVxjLc8xHi28//yibS8W9/uD1Qhobn2ZtWnKlUIc1YP3w3R2cKkQR4l6GbCGvGcX3nFMd9qctPTrK6JIqkFEiYKnEwWN1wpjCeFM2lC0kedp/EyucR57fjDdLqeUsszTH5+IxlJPF0Rzolik8ZVy6ZmBmVDm/eHW01/MBbM4T400jpbTPSdk9ChljYThh7bGEn5o1/7OSRA8VdK4hB/aebqXpo/b05lFzSnnmKmxjmlrPIUf6nnK8HTYGoWCRnnysayIiKhSiONDIPOSi+qWm7MoK4rjhm7FY/lGVmofR5zvnvL7nF3kCvOyFmu8pCL/y6LqpHF2v9o8NExBtMn3ksrNj/HFlbBAUq6Yi52v9XjNrVGoubPmcu6vcUFENFao/SeTPZ2Rw6OwNRFR9IZoLn2cZolWd+fFOO9ueUTicymz9z1gI9plu8bBGut6FsaeLi2xDwpwr83wFBrhayTwQ1sjqeCH8noaWeSYsqeHt1GP09Mp1jFohF+3PWULTz00pvBDO08P35TCU2ioaKxK+KHMgnuBp+qWwlO3/hJZrIXaGs/hh7bGrEDd0nEH4sgxPw2GH9oaCfxQ11jCD21WfCTw9NgeFVnUrbLGzCLHHM5uTzWWWkHjt4IGe2i0Z7ecU/d2Hu846pvup7n/WDbtdf3lNL2h/edpu32rVnS4N8Q90zBpf0+/y8cyjt01fvZPR69GSS5vVPoX13XmHUfamWryI+I66GmmVfuZyI9xRkT0onsnjymd18Lu8YCNvceyPf6Nw1hPi4e/t9wuFe8C2VvOybvfRlYch6sE9oX9GpfwQ3tv6bKrhKdHabhbCk97NNIafgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIBw+ANbxuIbZtW4IgAAAABJRU5ErkJggg=="
+     },
+     {
+      "fill": "snow",
+      "png": "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"
+     },
+     {
+      "fill": "snow-heavy",
+      "png": "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"
+     }
+    ],
+    "echo_px": 298308,
+    "aria_label": "Radar map around Savoy: rain, ice or sleet, and snow in view",
+    "recorded": "MRMS SeamlessHSR + PrecipFlag 2022-02-02T09:00Z; surface temperature synthetic (<= 0 C north of 39.86 N)"
+   },
+   "observed_at": "2027-01-19T15:25:00-06:00"
+  },
+  "radar.callout": {
+   "kind": "snow",
+   "headline": "Snow by 6 PM",
+   "detail": "Sleet now · heaviest 7–11 PM · 3–5 in"
+  },
+  "summary.day_line": "Sleet changing to snow by 6 PM; 3–5 in by morning.",
+  "summary.next_hazard": "wind chill −2° Thursday morning"
+ }
+}

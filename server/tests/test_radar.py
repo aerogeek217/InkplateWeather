@@ -178,3 +178,25 @@ def test_layers_order_follows_the_legend():
     assert svg.index('mask="url(#rdM1)"') < svg.index('stroke="#6D6D6D" stroke-width="2"')
     assert 'stroke-width="3.5"' not in svg
     assert 'fill="#000000" stroke="#FFFFFF" stroke-width="2"></rect>' in svg
+
+
+# --- radar boards (fixtures from tests/build_radar_fixtures.py) ---------------------------------------------------
+
+async def test_radar_fixtures_compose_on_the_base_map():
+    from conftest import TEST_CONFIG
+
+    from app import collector, config, viewmodel
+    from app.providers.base import RequestContext
+    from app.providers.fixture import fixture_device, fixture_now
+
+    cfg = config.load(TEST_CONFIG)
+    for name, legend, site, fills in (
+            ("radar-storm", "intensity", "MRMS 2:25 PM", ["#DBDBDB", "#929292", "#494949", "#000000"]),
+            ("radar-winter", "types", "MRMS 3:25 PM", ["#B6B6B6", "url(#rdIce)", "url(#rdSnow)", "url(#rdSnowHeavy)"])):
+        now = fixture_now(name)
+        resolved = await collector.collect_fixture(name, RequestContext(now=now))
+        r = viewmodel.build(resolved, now, fixture_device(name), cfg).radar
+        assert (r.legend, r.site_time, r.status.value) == (legend, site, "ok")
+        assert [f for f in radarmap.FILLS.values() if f'fill="{f}" mask=' in r.svg_layers] == fills
+        assert ">SAVOY<" in r.svg_layers and ">Bloomington<" in r.svg_layers
+        assert r.callout is not None
