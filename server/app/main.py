@@ -118,6 +118,7 @@ def _apply_config(state, cfg: AppConfig, path: Path | None) -> dict[str, list[st
     state.config = cfg
     state.config_path = path
     state.config_loaded_at = datetime.now(ZoneInfo(cfg.location.tz))
+    _stop_pollers(state)
     state.providers = None
     state.provider_errors = {}
     return kept
@@ -128,7 +129,17 @@ def providers_for(state, cfg: AppConfig) -> dict:
         errors: dict[str, str] = {}
         state.providers = collector.build_providers(cfg, errors)
         state.provider_errors = errors
+        if not cfg.server.fixture:
+            for p in state.providers.values():  # background pollers (lightning)
+                if hasattr(p, "start"):
+                    p.start()
     return state.providers
+
+
+def _stop_pollers(state) -> None:
+    for p in (getattr(state, "providers", None) or {}).values():
+        if hasattr(p, "stop"):
+            p.stop()
 
 
 async def sample_history(state) -> None:
@@ -188,6 +199,7 @@ async def lifespan(app: FastAPI):
     finally:
         task = st.sampler
         _stop_sampler(st)
+        _stop_pollers(st)
         if task is not None:
             with suppress(asyncio.CancelledError, Exception):
                 await task
@@ -219,6 +231,11 @@ async def resolve_now(cfg: AppConfig, fixture: str | None, device: DeviceInfo | 
         return now, dev, await collector.collect(collector.build_providers(cfg), cfg.fields, ctx)
     providers = providers_for(app_state, cfg)
     resolved = await collector.collect(providers, cfg.fields, ctx, cache=app_state.cache, history=app_state.history)
+    radar = resolved.get("radar.frame")
+    frame = radar.reading.value if radar is not None and radar.reading.usable else None
+    for p in providers.values():  # the lightning poller runs while the radar shows echoes
+        if hasattr(p, "note_radar"):
+            p.note_radar(frame, now)
     return now, dev, resolved
 
 

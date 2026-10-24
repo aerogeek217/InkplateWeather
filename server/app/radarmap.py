@@ -12,6 +12,7 @@ The base map comes from `assets/basemap/basemap.geojson` (`tools/build_basemap.p
 from __future__ import annotations
 
 import json
+from datetime import datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -111,9 +112,44 @@ def echoes(frame: dict) -> str:
     return "".join(out)
 
 
+# Lightning bolt (icons/markers/lightning-*.svg, viewBox 16 18.5 22 31) drawn ~12 px tall: 9.6 map units.
+BOLT_PATH = "M26 21 H35 L28 31 H34 L22 47 L26 35 H19 Z"
+BOLT_SCALE = 9.6 / 31
+BOLT_CELL = 6.4  # map units (8 px): flashes closer than this merge into one bolt, newest wins
+RECENT = timedelta(minutes=10)
+WINDOW = timedelta(minutes=30)
+
+
+def bolts(flashes: list[dict], now: datetime, ext: Extent) -> list[tuple[float, float, bool]]:
+    """Flashes of the last 30 min → [(x, y, recent)], one per ~8 px cell (the newest), older ones first."""
+    cells: dict[tuple[int, int], tuple[datetime, float, float]] = {}
+    for f in flashes:
+        try:
+            t = datetime.fromisoformat(f["t"])
+            x, y = ext.project(float(f["lon"]), float(f["lat"]))
+        except (KeyError, TypeError, ValueError):
+            continue
+        age = now - t
+        if not (timedelta(minutes=-1) <= age <= WINDOW) or abs(x) > HALF_W or abs(y) > HALF_H:
+            continue
+        key = (int((x + HALF_W) // BOLT_CELL), int((y + HALF_H) // BOLT_CELL))
+        if key not in cells or t > cells[key][0]:
+            cells[key] = (t, x, y)
+    marks = [(x, y, now - t <= RECENT, t) for t, x, y in cells.values()]
+    marks.sort(key=lambda m: m[3])
+    return [(x, y, recent) for x, y, recent, _ in marks]
+
+
+def _bolt(x: float, y: float, recent: bool) -> str:
+    style = ('fill="#000000" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke"' if recent
+             else 'fill="#FFFFFF" stroke="#000000" stroke-width="2"')
+    return (f'<path d="{BOLT_PATH}" transform="translate({_f(x)} {_f(y)}) scale({BOLT_SCALE:.4f}) translate(-27 -34)" '
+            f'{style} stroke-linejoin="round"></path>')
+
+
 def layers(frame: dict | None, home_name: str, home_xy: tuple[float, float] = (0.0, 0.0),
-           path: Path = BASEMAP) -> str:
-    """The SVG inside the radar panel's <svg>: base map, echoes (if any), overlays."""
+           marks: list[tuple[float, float, bool]] | None = None, path: Path = BASEMAP) -> str:
+    """The SVG inside the radar panel's <svg>: base map, echoes (if any), lightning bolts, overlays."""
     base = _base(path)
     typed = bool(frame) and frame.get("legend") == "types"
     r = RING_MILES * UNITS_PER_MILE
@@ -126,6 +162,7 @@ def layers(frame: dict | None, home_name: str, home_xy: tuple[float, float] = (0
         echoes(frame) if frame else "",
         base["roads_over"] if typed else "",
         f'<circle cx="{_f(hx)}" cy="{_f(hy)}" r="{_f(r)}" fill="none" stroke="#6D6D6D" stroke-width="1"></circle>',
+        "".join(_bolt(*m) for m in marks or ()),
         f'<g font-family="{FONT}" font-size="11.5" font-weight="600" fill="#000000" stroke="#FFFFFF" '
         f'stroke-width="4" paint-order="stroke">{base["places"]}'
         f'<text x="{_f(hx + 102)}" y="{_f(hy - 100)}" font-weight="400" fill="#494949">{RING_MILES} mi</text></g>',

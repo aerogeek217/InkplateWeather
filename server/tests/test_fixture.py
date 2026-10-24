@@ -13,7 +13,7 @@ from app.readings import Status
 FIXTURES = ["fall", "winter"]
 # Every field the template uses (device.* comes from the request, the rest is informational).
 NOT_REQUIRED = {"device.battery_pct", "device.voltage_mv", "device.wake_reason", "outdoor.dew_point",
-                "solar.radiation", "rain.rate"}
+                "solar.radiation", "rain.rate", "lightning.flashes"}
 REQUIRED = sorted(set(fields.FIELDS) - NOT_REQUIRED)
 
 

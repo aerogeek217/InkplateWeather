@@ -72,6 +72,7 @@ FIELDS: dict[str, Field] = {
               "{phase_name, illumination, rise, set, phase_angle, next: [{kind: full|last|new|first, date}]}"),
         # Radar (phase 3 replaces the phase-1 fixture artwork)
         Field("radar.frame", None, _X, "Radar", "{site, time, layers...}; see providers/radar_*"),
+        Field("lightning.flashes", None, _X, "Lightning", "[{t, lat, lon}], last 30 min; see app/lightning.py"),
         # Generated text (phase 2 derives these from forecast/radar; phase 1 reads them from fixtures)
         Field("summary.day_line", None, _T, "Day summary"),
         Field("summary.next_hazard", None, _T, "Next hazard"),

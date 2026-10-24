@@ -15,6 +15,7 @@ dependencies = [
     "playwright>=1.47",
     "tzdata>=2024.1",  # zoneinfo data on Windows and slim images
     "astral>=3.2",  # sun and moon rise/set (pure Python, no runtime downloads)
+    "h5py>=3.10",  # GOES GLM lightning files are NetCDF4/HDF5 (wheels for arm64 and Windows)
 ]
 
 [project.optional-dependencies]
