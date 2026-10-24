@@ -89,7 +89,7 @@ outdoor temperature from Ecowitt to NWS, lives in config, not code.
 
 ```yaml
 location: {name: "Savoy, IL", lat: 40.0617, lon: -88.2517, tz: America/Chicago}
-nws: {user_agent: "(inkplate-weather, you@example.com)", station: KCMI}
+nws: {user_agent: "(InkplateWeather, https://github.com/aerogeek217/InkplateWeather)", station: KCMI}
 
 providers:
   ecowitt: {type: ecowitt_local, host: 192.168.1.50, ttl: 0s}
@@ -126,7 +126,7 @@ Recommendation: **MRMS as primary, IEM as fallback.** Avoid RainViewer: its free
 two or three recent frames (cross-correlation of the echo field). That's a **phase 2** feature. Phase 1 shows
 the current frame, legend and callout text from the forecast (e.g. "Storms likely 4–6 PM").
 
-## Lightning (proposed map overlay, needs a design addition)
+## Lightning (map overlay, approved 2026-10-24)
 
 Public options checked 2026-10-24:
 
@@ -140,8 +140,11 @@ Because GLM arrives as many small files, the container runs a **light background
 30-minute list of flashes inside the map extent. The render-on-request path then just reads that list, so this is
 the one place where data is gathered ahead of time.
 
-Display idea (needs your approval as a design change): small `+` marks on the radar map, black for the last
-10 min and gray for 10–30 min, plus a legend entry "Lightning · 30 min". When there are no flashes, nothing is drawn.
+Display (approved): small **lightning-bolt symbols** on the radar map, about 12 px tall. Flashes in the last 10 min
+are solid black bolts with a white halo; flashes 10–30 min old are outlined bolts (white fill, black outline), so
+both read on any radar fill. A legend entry "Lightning · 30 min" appears only when there are flashes. Nearby
+flashes are merged so bolts don't overlap (one bolt per ~8 px cell, newest wins). Icons:
+`design/icons/markers/lightning-recent.svg`, `lightning-older.svg`.
 
 **Base map**: generated once at build time from public-domain US Census TIGER/Line cartographic files
 (state and county lines, primary roads, places) clipped to our ~110 × 120 mile box, saved as GeoJSON and
@@ -219,12 +222,11 @@ firmware/      Inkplate sketch
 
 Answered 2026-10-24: gateway at `192.168.1.135` (garage = channel 1; the station also reports wind, UV/solar
 and lightning); air quality from public data for now (PMS5003 later, likely via Home Assistant); Inkplate
-battery does **not** need to go to Home Assistant.
+battery does **not** need to go to Home Assistant. NWS `User-Agent` contact: the project's GitHub URL,
+`(InkplateWeather, https://github.com/aerogeek217/InkplateWeather)` (public, so it can live in the example config).
+GLM lightning overlay approved with bolt symbols (see *Lightning*); the station's own lightning sensor is not used.
 
-1. The NWS User-Agent contact. NWS has no API keys; it asks each client to identify itself with a contact
-   (email or URL) in the `User-Agent` header. Stays in local config, not in the repo.
-2. Approve (or adjust) the **GLM lightning overlay** on the radar map (see *Lightning*). The station's own
-   lightning sensor is not used.
+No open questions at the moment.
 
 ## Sources consulted
 

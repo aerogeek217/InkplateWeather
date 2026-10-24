@@ -25,6 +25,9 @@ MARKERS = {
     "map-home": ("0 0 14 14", '<rect x="1" y="1" width="12" height="12" fill="#000000"/>'),
     "map-city": ("0 0 10 10", '<circle cx="5" cy="5" r="4" fill="#000000"/>'),
     "alert-triangle": ("0 0 12 11", '<path d="M6 0 L12 11 H0 Z" fill="#000000"/><path d="M6 4 V7.5" stroke="#FFFFFF" stroke-width="1.6"/>'),
+    # Map lightning (added after icon set v1, approved 2026-10-24): same bolt as the storm icon.
+    "lightning-recent": ("16 18.5 22 31", '<path d="M26 21 H35 L28 31 H34 L22 47 L26 35 H19 Z" fill="#000000" stroke="#FFFFFF" stroke-width="2.5" stroke-linejoin="round" paint-order="stroke"/>'),
+    "lightning-older": ("16 18.5 22 31", '<path d="M26 21 H35 L28 31 H34 L22 47 L26 35 H19 Z" fill="#FFFFFF" stroke="#000000" stroke-width="2" stroke-linejoin="round"/>'),
 }
 
 FILLS = {

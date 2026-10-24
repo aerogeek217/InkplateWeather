@@ -11,7 +11,7 @@ The reference renders in `design/reference/` are the visual source of truth.
   rather than improvising.
 - **8 grays only** (`#000000 #242424 #494949 #6D6D6D #929292 #B6B6B6 #DBDBDB #FFFFFF`) in final output; fonts (Inter Tight)
   and icons are bundled. The renderer must work with no internet access except for data fetches.
-- **No secrets in git.** Wi-Fi credentials, the NWS contact, and HA tokens live in untracked files or environment
+- **No secrets in git.** Wi-Fi credentials and HA tokens live in untracked files or environment
   variables (`config/config.yaml` is gitignored; commit `config/config.example.yaml`).
 - **Line endings LF** (enforced by `.gitattributes`). Target platform: Linux arm64 container. Development also happens on
   Windows, so tests must not depend on the host OS.
@@ -150,7 +150,7 @@ Milestone: the live screen runs on real data for a few days; the user reviews er
 | 3.2 | C | `radar_mrms`: fetch latest `ReflectivityAtLowestAltitude` (or `MergedBaseReflectivityQC`) + `PrecipFlag` GRIB2 (gz) from `mrms.ncep.noaa.gov`, crop to extent, reproject to display pixels, classify into the 4 intensity grays and rain/ice/snow pattern masks | – | correct output on recorded files; < 5 s fetch+process on Pi 5 |
 | 3.3 | C | `radar_iem` fallback: KILX single site (`ridge::ILX-N0B-0`) or `nexrad-n0q` WMS GetMap for the extent; decode color ramp → intensity classes (no type) | – | works when MRMS is blocked in tests |
 | 3.4 | A | Radar partial: draw classified raster + patterns + base map + overlays (range ring, legend switching rain-only vs rain/ice/snow, callout) | 3.1–3.3, 2.5 | golden test against reference with recorded radar fixture |
-| 3.5 | C | **Only if the user approves the overlay:** `lightning_glm` background poller (GOES-East GLM L2 LCFA NetCDF from NOAA's open-data AWS bucket), rolling 30-min flash list clipped to the extent; radar partial draws `+` marks (≤ 10 min black, 10–30 min gray) and a legend entry | 3.4 | recorded GLM files produce the expected marks; poller survives gaps and restarts |
+| 3.5 | C | `lightning_glm` background poller (GOES-East GLM L2 LCFA NetCDF from NOAA's open-data AWS bucket), rolling 30-min flash list clipped to the extent; radar partial draws **bolt symbols** (`markers/lightning-recent.svg` for ≤ 10 min, `lightning-older.svg` for 10–30 min), merges flashes per ~8 px cell, and shows a legend entry only when flashes exist | 3.4 | recorded GLM files produce the expected bolts; poller survives gaps and restarts |
 
 ### Phase 4: polish
 
@@ -171,9 +171,9 @@ Milestone: the live screen runs on real data for a few days; the user reviews er
 
 ## Open decisions (need the user)
 
-1. **NWS contact** for the `User-Agent` header (email or URL). Needed for phase 2.2; use a placeholder until then.
-2. **Lightning overlay** on the radar map from NOAA GLM (ARCHITECTURE *Lightning*). Needs the user's design approval;
-   don't build task 3.5 until approved. The station's own lightning sensor must **not** be used.
+1. ~~NWS contact~~ Resolved: `User-Agent: (InkplateWeather, https://github.com/aerogeek217/InkplateWeather)`.
+2. ~~Lightning overlay~~ Approved: NOAA GLM, drawn as bolt symbols (task 3.5). The station's own lightning sensor must
+   **not** be used.
 3. **Storm motion** (phase 4.1) is the most uncertain piece; until then the callout uses forecast wording.
 4. Exact display extent / base map framing: default to the design's framing centered on Savoy.
 

@@ -11,7 +11,7 @@ decided. Your job is to build them faithfully, not to redesign.
 
 ## Repository
 
-`C:\Users\dimoc\Documents\Projects\code\inkplate_weather` (git, branch `main`, no remote yet).
+`C:\Users\dimoc\Documents\Projects\code\inkplate_weather` (git, branch `main`, remote `origin` = https://github.com/aerogeek217/InkplateWeather).
 
 Read these first, in order:
 1. `docs/BUILD_PLAN.md`: phases, tasks, dependencies, acceptance criteria, ground rules, open decisions. **This is your work list.**
@@ -44,12 +44,12 @@ to each.
   installing anything system-wide on the dev machine beyond project-local environments, or sending any request to the
   user's devices other than read-only GETs to the Ecowitt gateway (`http://192.168.1.135/get_livedata_info`).
 - **No secrets in git**: real config is `config/config.yaml` (gitignored) and firmware `config.h` (gitignored); commit only
-  `*.example.*` files. The NWS `User-Agent` contact is not provided yet, so use the placeholder
-  `(inkplate-weather, contact-not-set)` from config/env.
+  `*.example.*` files. The NWS `User-Agent` is `(InkplateWeather, https://github.com/aerogeek217/InkplateWeather)`;
+  it is public and can go in `config.example.yaml`.
 - **Design fidelity**: golden image tests compare fixture renders with `design/reference/*-eink.png` (threshold in the plan).
   If real constraints force a visual change, stop and ask; never silently restyle.
-- **Do not use the weather station's lightning data.** The lightning overlay from NOAA GLM (task 3.5) waits for the user's
-  design approval.
+- **Do not use the weather station's lightning data.** Lightning on the map comes from NOAA GLM (task 3.5, approved),
+  drawn with the bolt markers in `design/icons/markers/lightning-*.svg`.
 - 8 gray levels only; fonts (Inter Tight) and icons bundled; LF line endings; tests must pass on Windows (dev) and in the
   Linux arm64 container.
 - Small focused commits with clear messages, each ending with:

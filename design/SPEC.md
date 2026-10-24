@@ -75,7 +75,10 @@ share the remaining height (flex), with a 24 px minimum per row.
   - Dashed **arrival lines** labeled with black time tags ("3 PM / 4 PM / 5 PM"); in winter the same
     device shows **snow-line** positions ("SNOW 6 PM").
   - A bold rule marks the current snow line.
-- Top-left legend: "Radar · <site> <time>" + swatches (rain intensities; or Rain / Ice / Snow
+- **Lightning** (NOAA GLM, last 30 min): bolt symbols ~12 px tall: solid black with a white halo for ≤ 10 min,
+  outlined (white fill, black outline) for 10–30 min (`icons/markers/lightning-recent.svg`, `lightning-older.svg`).
+  Nearby flashes merge into one bolt. Added after the reference boards, so they don't show it.
+- Top-left legend: "Radar · <site> <time>" + swatches (+ "Lightning · 30 min" when flashes are shown) (rain intensities; or Rain / Ice / Snow
   when frozen precip is present).
 - Bottom-right callout: black card with the headline event ("Storms ~4 PM" / "Snow by 6 PM") +
   one-line detail, and below it a white "Next:" chip for the next notable hazard.
@@ -137,7 +140,8 @@ Inside temp + RH · Garage temp + RH · Pressure + trend arrow · Air quality (U
 | Present weather; wind/UV fallback | NWS observations, KCMI (Willard Airport); Open-Meteo |
 | Hourly + daily forecast, precip chance/type/amounts | NWS gridpoint forecast (Open-Meteo as fallback) |
 | Alerts | NWS alerts API for the county/zone |
-| Radar | NEXRAD composite (e.g. Iowa Environmental Mesonet tiles), site KILX |
+| Radar | NOAA MRMS (reflectivity + precip type); IEM NEXRAD (KILX) fallback |
+| Lightning (map) | NOAA GOES GLM, last 30 min (not the station sensor) |
 | Air quality, UV | Open-Meteo air-quality / forecast APIs |
 | Snow depth, season snowfall | NWS (climate / observations) |
 | Climate normals (average high/low) | NOAA normals for Champaign area |
@@ -146,9 +150,9 @@ Inside temp + RH · Garage temp + RH · Pressure + trend arrow · Air quality (U
 
 ## Icons
 
-`icons/` contains 57 SVGs: `conditions/` (20), `modifiers/` (4 composite examples),
+`icons/` contains 59 SVGs: `conditions/` (20), `modifiers/` (4 composite examples),
 `moon/` (8 phases), `wind/` (8 arrows named by the direction the wind comes **from**),
-`markers/` (precip type, pressure trend, sun marker, map symbols, alert triangle) and
+`markers/` (precip type, pressure trend, sun marker, map symbols, alert triangle, map lightning bolts) and
 `fills/` (radar / precip-bar fills). The renderer should map forecast weather codes
 (NWS icon codes or WMO codes) onto `conditions/` and add modifiers by rule (table above).
 
