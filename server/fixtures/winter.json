@@ -519,7 +519,7 @@
   "forecast.daily": [
    {
     "date": "2027-01-19",
-    "icon": "sleet-snow",
+    "icon": "wintry-mix",
     "text": "Sleet → snow",
     "high": 31,
     "low": 19,
@@ -567,7 +567,7 @@
    },
    {
     "date": "2027-01-23",
-    "icon": "freezing-drizzle",
+    "icon": "freezing-rain",
     "text": "Freezing drizzle",
     "high": 34,
     "low": 26,

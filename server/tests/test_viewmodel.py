@@ -147,9 +147,12 @@ async def test_forecast_rows():
     winter = (await build("winter"))[0].forecast
     assert [r.day for r in fall] == ["Today", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
     assert [(r.wind.dir_text, r.wind.speed, r.wind.bold) for r in fall[:2]] == [("S", "14", False), ("NW", "22", True)]
-    assert [r.icon.name for r in fall] == ["forecast/thunderstorm", "forecast/sunny-windy", "conditions/sunny",
-                                           "forecast/partly-cloudy", "conditions/cloudy", "forecast/rain",
-                                           "forecast/partly-cloudy"]
+    assert [r.icon.name for r in fall] == ["conditions/thunderstorm", "modifiers/sunny-wind", "conditions/sunny",
+                                           "conditions/partly-cloudy", "conditions/cloudy", "conditions/rain",
+                                           "conditions/partly-cloudy"]
+    assert [r.icon.name for r in winter] == ["conditions/wintry-mix", "conditions/snow", "conditions/sunny",
+                                             "conditions/cloudy", "conditions/freezing-rain", "conditions/wintry-mix",
+                                             "conditions/flurries"]
     assert [(r.precip_kind, r.precip_text) for r in winter] == [
         ("snow", "4 in"), ("snow", "1 in"), ("rain", "0%"), ("rain", "10%"), ("ice", "40%"), ("ice", "50%"),
         ("snow", "20%")]

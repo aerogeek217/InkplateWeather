@@ -3,11 +3,9 @@
 Icons are inlined (never fetched) so the renderer needs no file access for them. Names are paths under
 assets/icons without ".svg", e.g. "conditions/thunderstorm".
 
-`assets/icons` is a copy of `design/icons` plus a few variants drawn differently on the approved boards:
-  forecast/*      forecast-row icons as drawn on the boards (some differ from conditions/*, some are new)
-  callout/*       radar callout glyphs (white on black)
-  header/alert    alert-tag triangle (white on black, i.e. markers/alert-triangle inverted)
-  moon-small/*    16-px next-phase moons used in the moon strip
+`assets/icons` is a copy of the icon set in `design/icons`, which is canonical. Icons the boards needed but the
+set lacked were added to the set as proposals (see design/SPEC.md, Icons): modifiers/sunny-wind,
+markers/callout-storm, markers/callout-snow, markers/alert-triangle-inverse.
 """
 from __future__ import annotations
 
@@ -26,6 +24,7 @@ _VIEWBOX = re.compile(r'viewBox="([^"]+)"')
 # Composite icons that exist as drawn artwork: (base condition, modifiers) → file.
 COMPOSITES: dict[tuple[str, frozenset[str]], str] = {
     ("conditions/cloudy", frozenset({"wind"})): "modifiers/cloudy-wind",
+    ("conditions/sunny", frozenset({"wind"})): "modifiers/sunny-wind",
     ("conditions/sleet", frozenset({"wind"})): "modifiers/sleet-wind",
     ("conditions/clear-night", frozenset({"frost"})): "modifiers/clear-night-frost",
     ("conditions/thunderstorm", frozenset({"alert"})): "modifiers/storm-nws-alert",
@@ -94,9 +93,7 @@ def condition(code: str | None) -> str:
 
 
 def forecast(code: str | None) -> str:
-    """Forecast-row icon: the board's forecast/* variant when there is one, else conditions/*."""
-    if code and "/" not in code and exists(f"forecast/{code}"):
-        return f"forecast/{code}"
+    """Forecast-row icon (same approved set as the header)."""
     return condition(code)
 
 
@@ -141,6 +138,6 @@ def wind_arrow(dir_text: str) -> str:
 
 PRECIP_MARKERS = {"rain": ("markers/precip-rain", 8, 11), "snow": ("markers/precip-snow", 11, 11),
                   "ice": ("markers/precip-ice", 10, 10)}
-MOON_SMALL = {"full": ("moon-small/full", "Full moon"), "last": ("moon-small/last", "Last quarter"),
-              "new": ("moon-small/new", "New moon"), "first": ("moon-small/first", "First quarter")}
-CALLOUT = {"storm": ("callout/storm", 22, 30), "snow": ("callout/snow", 28, 28)}
+MOON_SMALL = {"full": ("moon/full", "Full moon"), "last": ("moon/last-quarter", "Last quarter"),
+              "new": ("moon/new", "New moon"), "first": ("moon/first-quarter", "First quarter")}
+CALLOUT = {"storm": ("markers/callout-storm", 22, 30), "snow": ("markers/callout-snow", 28, 28)}

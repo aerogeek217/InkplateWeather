@@ -435,7 +435,7 @@
    },
    {
     "date": "2026-10-25",
-    "icon": "sunny-windy",
+    "icon": "modifiers/sunny-wind",
     "text": "Windy · frost at night",
     "high": 52,
     "low": 34,
