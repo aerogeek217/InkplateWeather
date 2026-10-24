@@ -104,6 +104,8 @@ Inside temp + RH · Garage temp + RH · Pressure + trend arrow · Air quality (U
 - Bar fill by type: rain solid (darker = higher chance), snow dots, ice/sleet hatch. A small key appears
   **only when more than one type** is in the window.
 - Percent labels above bars ≥ 20 %; hour labels every 3 h.
+- **Dry period** (approved 2026-10-24): when every hour is under 10 %, the bars are replaced by one centred line,
+  "No rain expected in the next 12 h" ("No rain or snow expected …" when it stays ≤ 34 °F), 15/600 gray, same height.
 - **Gauge** (right, behind a divider): Ecowitt totals: Today, This week, October (month), 2026 (year).
   In winter, since the gauge is unheated and undercounts snow, the cells switch to liquid totals plus
   NWS **snow depth** and **season snowfall**; the heading notes "liquid in · snow via NWS".
