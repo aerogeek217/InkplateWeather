@@ -41,8 +41,10 @@ to each.
 ## Rules (non-negotiable)
 
 - **Branch and PR**: do all Phase 1 work on a branch named `phase-1` created from `main`. Pushing `phase-1` to `origin`
-  and opening a pull request into `main` (with `gh pr create`) are pre-approved. Never push to, merge into, or rewrite
-  `main`; the user merges after review.
+  and opening a pull request into `main` (with `gh pr create`) are pre-approved. If the GitHub CLI (`gh`) isn't installed
+  or signed in, don't install it; push the branch and report the link
+  https://github.com/aerogeek217/InkplateWeather/compare/main...phase-1 so the user can open the PR. Never push to,
+  merge into, or rewrite `main`; the user merges after review.
 - **Ask the user before**: any other push, deploying to either Raspberry Pi, flashing the Inkplate,
   installing anything system-wide on the dev machine beyond project-local environments, or sending any request to the
   user's devices other than read-only GETs to the Ecowitt gateway (`http://192.168.1.135/get_livedata_info`).
