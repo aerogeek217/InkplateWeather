@@ -38,7 +38,7 @@
 {% if ctx.notices or strip %}
 {% if r.site_time or ctx.notices %}
         <div style="position: absolute; left: 10px; top: {{ 44 if strip else 10 }}px; max-width: 510px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px">
-{% if r.site_time %}
+{% if r.site_time and not strip %}{# the ≤ 5 % battery strip covers the legend's place; keep the map overlays clear #}
 {{ legend("") }}
 {% endif %}
 {% if ctx.notices %}
