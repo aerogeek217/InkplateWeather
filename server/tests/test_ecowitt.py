@@ -131,7 +131,7 @@ def test_metric_gateway_is_converted():
 
 
 @pytest.mark.parametrize("value,unit,expected", [
-    (10, "°C", (50.0, "°F")), (50, "F", (50, "°F")), (283.15, "K", (50.0, "°F")),
+    (10, "°C", (50.0, "°F")), (50, "F", (50, "°F")), (5000, "K", None),
     (1013.25, "mbar", (29.92, "inHg")), (101.325, "kPa", (29.92, "inHg")),
     (10, "kn", (11.51, "mph")), (3.6, "km/h", (2.24, "mph")),
     (10, "mm/h", (0.394, "in/h")), (1, "in/Hr", (1, "in/h")), (500, "W/m²", (500, "W/m2")),

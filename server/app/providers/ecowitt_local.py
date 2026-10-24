@@ -58,7 +58,6 @@ def _same(v: float) -> float:
 
 _add(("f", "degf"), "°F", _same, 1)
 _add(("c", "degc"), "°F", lambda v: v * 9 / 5 + 32, 1)
-_add(("k",), "°F", lambda v: (v - 273.15) * 9 / 5 + 32, 1)
 _add(("%",), "%", _same, 1)
 _add(("mph", "mi/h"), "mph", _same, 2)
 _add(("m/s",), "mph", lambda v: v / 0.44704, 2)
