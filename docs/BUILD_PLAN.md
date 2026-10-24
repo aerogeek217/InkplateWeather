@@ -1,7 +1,8 @@
 # Build plan
 
 Status: **Phases 1 and 2 merged** (2026-10-24; Phase 2 merge commit eefc7de, deployed on the OMV Pi as 2c22f9c).
-**Phase 3 (radar) built on `phase-3`** (tasks 3.1–3.5; radar boards approved 2026-10-24); not deployed yet.
+**Phase 3 (radar) built on `phase-3`** (tasks 3.1–3.5; radar boards approved 2026-10-24); deployed on the OMV Pi as
+f504d4e (14:25 CDT, 2026-10-24).
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 
@@ -189,8 +190,9 @@ Phase 3 notes (2026-10-24):
 - Tests: recorded MRMS (2023-04-01 storm line, 2022-02-02 snow/rain) cropped to the extent with `tests/record_mrms.py`;
   `radar-storm` / `radar-winter` fixtures and goldens (approved renders; container 0 px, fall/winter 0.05 %).
   572 tests pass on Windows and in the container. Live render on the dev PC: resolve 3.1 s, MRMS frame ok.
-- To deploy: add the `mrms`, `iem`, `glm` providers and the `radar.frame` / `lightning.flashes` fields from
-  `config/config.example.yaml` to the Pi's live `config/config.yaml` (edit, don't overwrite), then rebuild.
+- Deployed with the user's approval as f504d4e (rebuild 81 s on the Pi 4). The Pi's live `config/config.yaml` got the
+  `mrms`, `iem`, `glm` providers and the `radar.frame` / `lightning.flashes` fields (backup: `config.phase2.yaml.bak`).
+  On the Pi: radar.frame ok from MRMS; radar boards match the canonical references (0.000 %, 0.001 %).
 
 ### Phase 4: polish
 
