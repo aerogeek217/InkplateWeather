@@ -174,6 +174,23 @@ Every field resolves to `ok`, `stale` or `missing`; the template shows each stat
 | `GET /health` | Container health check. |
 | `GET /fixtures/<name>.png` | Render a saved data fixture (fall, winter, alert, outage) to compare with `design/reference/`. |
 
+### `/display.png` contract (frozen 2026-10-24; firmware builds against this)
+
+Request: `GET /display.png?batt=<0–100>&mv=<millivolts>&reason=<timer|button|retry|boot>`. All parameters
+are optional; unknown values are ignored. The server passes them to the `device` provider.
+
+Response `200`:
+- `Content-Type: image/png`, exactly **1200 × 825**, 8-bit grayscale (`L`) or palette PNG whose pixels use only the
+  8 levels `0, 36, 73, 109, 146, 182, 219, 255` (multiples of 255/7, rounded). Typically 60–150 kB.
+- `X-Sleep-Seconds: <int>`: seconds until the next scheduled refresh (the next :00 or :30 in the display
+  timezone, plus ~20 s so the server sees the new half hour). The firmware sleeps this long; if the header is
+  missing or out of range (< 60 or > 3600) it falls back to its own RTC alignment or 1800 s.
+- `Date`: standard HTTP date (the firmware may use it to set its RTC).
+
+Any non-200 status, a timeout (20 s), or a body that doesn't decode is a failure: the firmware draws its local
+error screen and retries in 5 min, up to 3 times, before returning to the normal schedule.
+If rendering fails inside the server, it still returns `200` with the last good image plus an error strip.
+
 ## Container
 
 - Base image: `mcr.microsoft.com/playwright/python` (arm64) or `python:3.12-slim` + `playwright install --with-deps chromium`.
