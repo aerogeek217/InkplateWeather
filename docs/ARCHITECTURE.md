@@ -72,7 +72,7 @@ outdoor temperature from Ecowitt to NWS, lives in config, not code.
 
 | Provider | Offers | Notes |
 |---|---|---|
-| `ecowitt_local` | outdoor temp/RH/dew point/feels-like, **wind speed/gust/direction**, **UV & solar radiation**, indoor temp/RH + pressure (WH25 block), garage (channel 1), rain event/rate/day/week/month/year, **lightning** (distance, last strike, count) | Polls `http://192.168.1.135/get_livedata_info`. Sample response saved in `server/fixtures/ecowitt_get_livedata_info.sample.json`. Values come as strings with units (e.g. `"2.24 mph"`, `"72%"`); `common_list` uses hex IDs (0x02 outdoor temp, 0x07 RH, 0x03 dew point, 0x0A wind dir, 0x0B wind, 0x0C gust, 0x15 solar, 0x17 UV; rain 0x0D event, 0x0E rate, 0x10 day, 0x11 week, 0x12 month, 0x13 year). Channel → field mapping lives in config, so a newly paired sensor is a config change. |
+| `ecowitt_local` | outdoor temp/RH/dew point/feels-like, **wind speed/gust/direction**, **UV & solar radiation**, indoor temp/RH + pressure (WH25 block), garage (channel 1), rain event/rate/day/week/month/year (the gateway's `lightning` block is ignored) | Polls `http://192.168.1.135/get_livedata_info`. Sample response saved in `server/fixtures/ecowitt_get_livedata_info.sample.json`. Values come as strings with units (e.g. `"2.24 mph"`, `"72%"`); `common_list` uses hex IDs (0x02 outdoor temp, 0x07 RH, 0x03 dew point, 0x0A wind dir, 0x0B wind, 0x0C gust, 0x15 solar, 0x17 UV; rain 0x0D event, 0x0E rate, 0x10 day, 0x11 week, 0x12 month, 0x13 year). Channel → field mapping lives in config, so a newly paired sensor is a config change. |
 | `ecowitt_push` (later) | same | Alternative: the gateway's "customized upload" POSTs to the container. More robust; no polling. |
 | `nws_observations` | wind, pressure, present weather, visibility | Station `KCMI` (Willard Airport), `/stations/KCMI/observations/latest`. |
 | `nws_forecast` | hourly + daily forecast, precip probability/type/amounts, sky | `/points/{lat},{lon}` → `forecastHourly` + `forecastGridData` (snow and ice amounts, weather type). |
@@ -81,6 +81,7 @@ outdoor temperature from Ecowitt to NWS, lives in config, not code.
 | `acis` | daily normals, season snowfall, snow depth | RCC-ACIS for the Champaign-Urbana co-op station; cached for 12 h. |
 | `home_assistant` | **any HA entity** | Token + entity IDs in config. A generic escape hatch for your future AQ sensor or anything HA already knows. |
 | `radar_mrms` / `radar_iem` | radar frame | See *Radar*. |
+| `lightning_glm` | lightning flashes in the map extent (last 30 min) | NOAA GOES-East GLM Level 2 (`GLM-L2-LCFA`) NetCDF files on the public NOAA AWS bucket, ~20 s cadence. See *Lightning*. The station's own lightning sensor is **not** used (user decision). |
 | `astro` | sun/moon times, phase, next phases | Computed locally (`astral`/`skyfield`); never fails. |
 | `device` | battery %, voltage, last wake reason | From the Inkplate's own request. |
 
@@ -124,6 +125,23 @@ Recommendation: **MRMS as primary, IEM as fallback.** Avoid RainViewer: its free
 **Storm motion and arrival lines** ("Storms ~4 PM", the dashed 3/4/5 PM lines) need motion estimated from
 two or three recent frames (cross-correlation of the echo field). That's a **phase 2** feature. Phase 1 shows
 the current frame, legend and callout text from the forecast (e.g. "Storms likely 4–6 PM").
+
+## Lightning (proposed map overlay, needs a design addition)
+
+Public options checked 2026-10-24:
+
+| Option | Verdict |
+|---|---|
+| **NOAA GOES GLM** (Geostationary Lightning Mapper, GOES-East = GOES-19), Level 2 flashes, NetCDF every ~20 s on NOAA's open-data AWS bucket | **Recommended.** Free NOAA data, no key, covers all of Illinois. Total lightning (in-cloud + ground), roughly 8–10 km location accuracy, so good enough for "storms with lightning are here" but not exact strike points. GOES-19 GLM has been in Beta/provisional maturity, so expect occasional data gaps. |
+| Blitzortung.org | Not recommended. The site allows viewing for private use, but its raw data is limited to network participants or with explicit permission. |
+| Vaisala NLDN, Xweather, AccuWeather Lightning API | Commercial / paid. |
+
+Because GLM arrives as many small files, the container runs a **light background poller** that keeps a rolling
+30-minute list of flashes inside the map extent. The render-on-request path then just reads that list, so this is
+the one place where data is gathered ahead of time.
+
+Display idea (needs your approval as a design change): small `+` marks on the radar map, black for the last
+10 min and gray for 10–30 min, plus a legend entry "Lightning · 30 min". When there are no flashes, nothing is drawn.
 
 **Base map**: generated once at build time from public-domain US Census TIGER/Line cartographic files
 (state and county lines, primary roads, places) clipped to our ~110 × 120 mile box, saved as GeoJSON and
@@ -205,8 +223,8 @@ battery does **not** need to go to Home Assistant.
 
 1. The NWS User-Agent contact. NWS has no API keys; it asks each client to identify itself with a contact
    (email or URL) in the `User-Agent` header. Stays in local config, not in the repo.
-2. Should the station's **lightning** data (distance, strike count) appear on the display? The approved design
-   has no slot for it yet.
+2. Approve (or adjust) the **GLM lightning overlay** on the radar map (see *Lightning*). The station's own
+   lightning sensor is not used.
 
 ## Sources consulted
 
@@ -214,4 +232,7 @@ battery does **not** need to go to Home Assistant.
 - MRMS data directory: https://mrms.ncep.noaa.gov/data/2D/
 - NWS API documentation: https://www.weather.gov/documentation/services-web-api
 - RainViewer API transition (2026 free-tier limits): https://rainviewer.com/api/transition-faq.html
+- NOAA GOES-R GLM Level 2 dataset: https://catalog.data.gov/dataset/noaa-goes-r-series-geostationary-lightning-mapper-glm-level-2-lightning-detection-events-g
+- GOES-19 GLM Beta readme: https://noaasis.noaa.gov/pdf/ps-pvr/goes19/GLM/Beta/GOES-19_GLM_Beta_ReadMe.pdf
+- Blitzortung data terms: https://www.Blitzortung.org/contact.php
 - Ecowitt local API (community documentation; no official spec found): https://www.cumuluswiki.org/ and the `wittiot` Python library (https://pypi.org/project/wittiot)
