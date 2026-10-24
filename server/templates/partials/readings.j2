@@ -1,5 +1,7 @@
+{# Stale: value in #6D6D6D; its "as of" goes to the notes box (no room in a ~100 px cell). Missing: "No data" over a
+   short cause ("since 1:12 PM"), two 12 px lines in the height of the 24 px value line. #}
 {% macro slot_value(s, size, weight, sub_size) -%}
-{% if s.text %}<span style="font-size: {{ size }}px; font-weight: {{ weight }}; line-height: 1.1{% if s.status == 'stale' %}; color: #6D6D6D{% endif %}">{{ s.text }}{% if s.sub %} <span style="font-size: {{ sub_size }}px; font-weight: 400; color: #494949">{{ s.sub }}</span>{% endif %}{% if s.as_of %} <span style="font-size: 11px; font-weight: 400; color: #494949">{{ s.as_of }}</span>{% endif %}</span>{% else %}<span style="font-size: 12px; line-height: 1.2; color: #494949">{{ s.message or "" }}</span>{% endif %}
+{% if s.text %}<span style="font-size: {{ size }}px; font-weight: {{ weight }}; line-height: 1.1{% if s.status == 'stale' %}; color: #6D6D6D{% endif %}">{{ s.text }}{% if s.sub %} <span style="font-size: {{ sub_size }}px; font-weight: 400; color: #494949">{{ s.sub }}</span>{% endif %}</span>{% else %}<span style="display: flex; flex-direction: column; font-size: 12px; line-height: 1.1; white-space: nowrap"><span style="font-weight: 700">{{ s.message or "" }}</span>{% if s.sub %}<span style="color: #494949">{{ s.sub }}</span>{% endif %}</span>{% endif %}
 {%- endmacro %}
       <div style="display: grid; grid-template-columns: repeat(5, auto); column-gap: 0; border-top: 2px solid #000000; padding-top: 8px">
 {% for cell in ctx.readings %}

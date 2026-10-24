@@ -115,7 +115,8 @@ def test_status_live_shows_provenance_health_and_hides_secrets(live):
     assert hist["status"] == "missing"
     assert [(a["source"], a["outcome"], a["note"]) for a in hist["attempts"]] == [
         ("history", "missing", "insufficient_history"), ("backup", "error", "provider_error:ConnectionError")]
-    assert hist["message"] == "Temperature history unavailable."
+    assert hist["message"] == ("Temperature history unavailable: the station history hasn't recorded enough yet. "
+                               "Retrying next update.")
 
     provs = {p["name"]: p for p in data["providers"]}
     assert provs["station"]["served"] == "live" and provs["station"]["ttl"] == "5 min"

@@ -42,5 +42,11 @@
 {% if t.now %}
           <text x="{{ t.now[0] }}" y="{{ t.day_label_y | round(2) }}" text-anchor="middle" font-family="{{ font }}" font-size="11.5" font-weight="800" fill="#000000">NOW</text>
 {% endif %}
+{% if t.past_message and t.now %}
+          <text x="{{ ((30 + t.now[0]) / 2) | round(2) }}" y="{{ (t.axis_y / 2) | round(2) }}" dominant-baseline="central" text-anchor="middle" font-family="{{ font }}" font-size="11" fill="#494949">{{ t.past_message }}</text>
+{% endif %}
+{% if t.message %}
+          <text x="285" y="{{ (t.axis_y / 2) | round(2) }}" dominant-baseline="central" text-anchor="middle" font-family="{{ font }}" font-size="15" font-weight="600" fill="#494949">{{ t.message }}</text>
+{% endif %}
         </svg>
       </div>

@@ -46,6 +46,8 @@ class Header(BaseModel):
     battery_fill: float = 0  # width of the battery icon's fill bar (0–20 px)
     time_text: str  # "2:30 PM"
     notice: str | None = None  # header summary sentence when ≥ 2 sections are missing (phase 2.6)
+    battery_text: str | None = None  # "Battery low: charge soon" (≤ 15 %), beside the battery icon
+    battery_strip: str | None = None  # reminder strip across the top of the radar panel (≤ 5 %)
 
 
 class Callout(BaseModel):
@@ -87,6 +89,13 @@ class Current(BaseModel):
     feels: str | None  # "Feels 58° · Humidity 64%"
     wind: Wind | None
     normals: str | None  # "Average 63° / 42°"
+    # Stale parts are drawn in gray; `as_of` ("as of 1:12 PM") is one small line under the detail block for the
+    # station values (temperature, feels/humidity, wind). A stale forecast (H/L) is noted in ctx.notices instead.
+    high_low_stale: bool = False
+    feels_stale: bool = False
+    wind_stale: bool = False
+    normals_stale: bool = False
+    as_of: str | None = None
 
 
 class TrendChart(BaseModel):
@@ -105,6 +114,8 @@ class TrendChart(BaseModel):
     grid_label_dy: float = 2.57  # gridline label baseline below its line
     night_y: float = 62  # top of the night bars
     day_label_y: float = 78  # baseline of the day names and NOW
+    message: str | None = None  # nothing to draw: one centred line instead of the chart
+    past_message: str | None = None  # no history yet: small note in the past half (the forecast is still drawn)
 
 
 class PrecipBar(BaseModel):
@@ -151,6 +162,7 @@ class Sun(BaseModel):
     delta: str  # "−2 m/day"
     arc_end: tuple[float, float] | None  # sun position on the arc (None at night)
     aria_label: str = ""
+    message: str | None = None  # sun times unavailable: shown instead of the arc
 
 
 class MoonPhase(BaseModel):
@@ -168,6 +180,7 @@ class Moon(BaseModel):
     next: list[MoonPhase]
     aria_label: str = ""
     shadow_path: str = ""  # dark part of the 36 px phase drawing (viewBox -28 -28 56 56, r 25)
+    message: str | None = None  # moon data unavailable: shown instead of the phase
 
 
 class ForecastRow(BaseModel):
@@ -197,4 +210,8 @@ class DashboardContext(BaseModel):
     sun: Sun
     moon: Moon
     forecast: list[ForecastRow]  # 7 rows, today first
-    notices: list[str] = []  # extra plain-language notes (fallback used, battery strip …)
+    # Notes box (radar panel, under the legend): fallback used, stale/missing readings in full sentences,
+    # sections without a slot of their own (alerts). Phase 2.6.
+    notices: list[str] = []
+    # 2.6 addition (additive, optional): sentence shown in place of the 7-day list when the forecast is missing.
+    forecast_message: str | None = None

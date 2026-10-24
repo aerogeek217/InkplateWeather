@@ -15,4 +15,7 @@
           <span style="font-size: 23px; font-weight: 800; line-height: 1; padding-left: 16px">{{ row.high }}</span><span style="font-size: 23px; font-weight: 300; color: #6D6D6D; line-height: 1">{{ row.low }}</span>
         </div>
 {% endfor %}
+{% if not ctx.forecast and ctx.forecast_message %}
+        <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 24px; text-align: center; font-size: 17px; font-weight: 600; color: #494949">{{ ctx.forecast_message }}</div>
+{% endif %}
       </div>

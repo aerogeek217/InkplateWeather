@@ -41,7 +41,10 @@ from .textwidth import measure
 
 MINUS = "−"
 BOLD_WIND_MPH = 20
-BATTERY_LOW_PCT = 15
+BATTERY_LOW_PCT = 15  # header note
+BATTERY_STRIP_PCT = 5  # reminder strip
+MIN_SECTIONS_FOR_NOTICE = 2  # the day line becomes "Some data is unavailable: …"
+MAX_NOTICES = 5  # lines in the notes box
 
 # ------------------------------------------------------------------ small formatting helpers
 
@@ -164,42 +167,59 @@ class _Data:
         except (TypeError, ValueError):
             return None
 
-    def slot(self, field: str, text: str, sub: str | None = None) -> Slot:
+    def slot(self, field: str, text: str, sub: str | None = None, narrow: bool = False) -> Slot:
+        """A displayed value with its state. Missing: the full sentence, or for a `narrow` slot (readings and gauge
+        cells, ~100 px) "No data" as the message with a short cause ('since 1:12 PM') as `sub`; the full sentence
+        then goes to the notes box (`notices`)."""
         r = self.resolved.get(field)
-        if r is None:
-            return Slot(status=Status.missing, message=messages.MISSING.format(label=_label(field)))
-        if not r.reading.usable or not text:
-            return Slot(status=Status.missing, message=messages.explain(r, self.tz, self.source_types))
+        if r is None or not r.reading.usable or not text:
+            if narrow:
+                return Slot(status=Status.missing, message=messages.NO_DATA, sub=messages.short(r, self.tz) or None)
+            msg = messages.explain(r, self.tz, self.source_types) if r is not None else None
+            return Slot(status=Status.missing, message=msg or messages.MISSING.format(label=messages.label_of(field)))
         return Slot(text=text, sub=sub, status=r.reading.status, as_of=messages.as_of(r, self.tz))
 
+    def missing(self, field: str) -> bool:
+        """Configured but without a usable value (a field nobody configured doesn't count as missing)."""
+        r = self.resolved.get(field)
+        return r is not None and not r.reading.usable
 
-def _label(field: str) -> str:
-    from . import fields
+    def stale(self, field: str) -> bool:
+        r = self.resolved.get(field)
+        return r is not None and r.reading.usable and r.reading.status is Status.stale
 
-    f = fields.FIELDS.get(field)
-    return f.label if f else field
+    def observed(self, field: str) -> datetime | None:
+        r = self.resolved.get(field)
+        return r.reading.observed_at if r is not None and r.reading.usable else None
 
 
 # ------------------------------------------------------------------ sections
 
 
 def _alert(d: _Data, now: datetime, tz: ZoneInfo, budget: float) -> Alert | None:
-    """Header takeover for the most severe active alert: 'until 9 AM Wed · 3–5 in snow' ('until 9 PM' today);
-    the impact is dropped if the line would not fit the header."""
+    """Header takeover for the most severe active alert: 'until 9 AM Wed · 3–5 in snow' ('until 9 PM' today).
+
+    Fitting order (user decision 2026-10-24): full tag + full detail; abbreviated tag (messages.ALERT_ABBREVIATIONS)
+    + full detail; abbreviated tag + "until …" only; abbreviated tag alone; never overflow (the tag loses words).
+    """
     a = summary.most_severe(d.records("alerts.active"))
     if a is None:
         return None
     event = str(a.get("event") or "Weather alert")
+    short_event = messages.abbreviate_event(event)
     until = None
     ends = _dt(a.get("ends"), tz)
     if ends and ends > now:
         until = f"until {short_clock(ends)}" + ("" if ends.date() == now.date() else f" {ends:%a}")
     impact = str(a["impact"]) if a.get("impact") else None
-    for parts in ([until, impact], [until], [impact]):
-        detail = " · ".join(p for p in parts if p)
-        if summary.alert_width(event, detail) <= budget:
-            return Alert(event=event, detail=detail)
-    return Alert(event=event, detail="")
+    full = " · ".join(p for p in (until, impact) if p)
+    for ev, detail in ((event, full), (short_event, full), (short_event, until or ""), (short_event, "")):
+        if summary.alert_width(ev, detail) <= budget:
+            return Alert(event=ev, detail=detail)
+    words = short_event.split()
+    while len(words) > 1 and summary.alert_width(" ".join(words) + "…", "") > budget:
+        words.pop()
+    return Alert(event=" ".join(words) + "…", detail="")
 
 
 def _current_code(d: _Data) -> tuple[str, bool]:
@@ -210,14 +230,31 @@ def _current_code(d: _Data) -> tuple[str, bool]:
     return str(v or ""), False
 
 
-def _header(d: _Data, now: datetime, device: DeviceInfo, cfg: AppConfig | None, inp: summary.Inputs) -> Header:
+BATTERY_TEXT_GAP = 10  # header.j2: between "12%" and "Battery low: charge soon"
+BATTERY_TEXT_SIZE, BATTERY_TEXT_WEIGHT = 16, 600
+
+
+def battery_notes(pct: int | None) -> tuple[str | None, str | None]:
+    """(header text, reminder strip) for the display's battery level."""
+    if pct is None or pct > BATTERY_LOW_PCT:
+        return None, None
+    strip = messages.BATTERY_STRIP.format(pct=pct) if pct <= BATTERY_STRIP_PCT else None
+    return messages.BATTERY_LOW, strip
+
+
+def _header(d: _Data, now: datetime, device: DeviceInfo, cfg: AppConfig | None, inp: summary.Inputs,
+            sections: list[str]) -> Header:
     tz = ZoneInfo(d.tz)
     code, windy = _current_code(d)
     city = cfg.location.name if cfg else ""
     date_text = f"{now:%A} {now.day} {now:%B}"
     batt = device.battery_pct
     time_text = clock(now, d.tz)
-    alert = _alert(d, now, tz, summary.header_budget(city, date_text, batt, time_text, gap=18))
+    battery_text, battery_strip = battery_notes(batt)
+    # The day line (or alert, or notice) yields the room the battery note takes.
+    extra = BATTERY_TEXT_GAP + measure(battery_text, BATTERY_TEXT_SIZE, BATTERY_TEXT_WEIGHT) if battery_text else 0
+    budget = summary.header_budget(city, date_text, batt, time_text) - extra
+    alert = _alert(d, now, tz, summary.header_budget(city, date_text, batt, time_text, gap=18) - extra)
     name = icons.condition(code)
     mods = icons.header_modifiers(name, d.num("wind.gust"), d.num("outdoor.temperature"), bool(alert), windy)
     label = "Now: " + (code.split("/")[-1].replace("-", " ") if code else "unknown")
@@ -226,8 +263,11 @@ def _header(d: _Data, now: datetime, device: DeviceInfo, cfg: AppConfig | None, 
     if "frost" in mods:
         label += ", frost"
     day_line = d.get("summary.day_line")  # fixtures carry their own text; live text is generated to fit
-    if not day_line:
-        day_line = summary.day_line(inp, summary.header_budget(city, date_text, batt, time_text))
+    if not day_line or not summary.fits(str(day_line), budget):
+        day_line = summary.day_line(inp, budget)
+    notice = None
+    if len(sections) >= MIN_SECTIONS_FOR_NOTICE:
+        notice = messages.sections_missing(sections, lambda t: summary.fits(t, budget))
     nxt = next_refresh(now, (cfg.server.refresh_minutes if cfg else 30))
     return Header(
         icon=Icon(name=name, modifiers=mods, label=label),
@@ -240,7 +280,18 @@ def _header(d: _Data, now: datetime, device: DeviceInfo, cfg: AppConfig | None, 
         battery_low=batt is not None and batt <= BATTERY_LOW_PCT,
         battery_fill=round(20 * max(0, min(100, batt)) / 100, 1) if batt is not None else 0,
         time_text=time_text,
+        notice=notice,
+        battery_text=battery_text,
+        battery_strip=battery_strip,
     )
+
+
+def radar_configured(d: _Data) -> bool:
+    """A radar source is set up: radar.frame is configured and some source was tried for real. Phase 2 has none
+    (the field is absent from the config, or a fixture doesn't carry it); then the panel says radar comes later and
+    the header doesn't count it as missing."""
+    r = d.resolved.get("radar.frame")
+    return r is not None and any(a.note != "no_such_key" for a in r.tried)
 
 
 def _radar(d: _Data, tz: ZoneInfo, inp: summary.Inputs) -> Radar:
@@ -254,7 +305,8 @@ def _radar(d: _Data, tz: ZoneInfo, inp: summary.Inputs) -> Radar:
         co = Callout(kind=callout.get("kind", "rain"), headline=callout["headline"], detail=callout.get("detail", ""))
     if not isinstance(frame, dict):
         r = d.resolved.get("radar.frame")
-        msg = messages.explain(r, d.tz, d.source_types) if r else messages.MISSING.format(label="Radar")
+        msg = (messages.explain(r, d.tz, d.source_types) or messages.MISSING.format(label="Radar")
+               if radar_configured(d) else messages.RADAR_LATER)
         return Radar(site_time="", callout=co, next_chip=f"Next: {hazard}" if hazard else None,
                      status=Status.missing, message=msg)
     t = _dt(frame.get("time"), tz)
@@ -274,24 +326,29 @@ def _readings(d: _Data) -> list[ReadingCell]:
     def temp_rh(prefix: str) -> Slot:
         t = d.num(f"{prefix}.temperature")
         rh = d.num(f"{prefix}.humidity")
-        return d.slot(f"{prefix}.temperature", deg1(t), pct(rh) if rh is not None else None)
+        return d.slot(f"{prefix}.temperature", deg1(t), pct(rh) if rh is not None else None, narrow=True)
 
     p = d.num("pressure.sea_level")
     trend = d.num("pressure.trend_3h")
     arrow = ""
-    if trend is not None:
+    if trend is not None and p is not None:
         arrow = " ↓" if trend <= -0.02 else " ↑" if trend >= 0.02 else " →"
     aqi = d.num("air.aqi")
     uv = d.num("uv.index")
     return [
         ReadingCell(label="Inside", slot=temp_rh("indoor")),
         ReadingCell(label="Garage", slot=temp_rh("garage")),
-        ReadingCell(label="Pressure" + arrow, slot=d.slot("pressure.sea_level", f"{p:.2f}" if p is not None else "")),
+        ReadingCell(label="Pressure" + arrow,
+                    slot=d.slot("pressure.sea_level", f"{p:.2f}" if p is not None else "", narrow=True)),
         ReadingCell(label="Air quality", slot=d.slot("air.aqi", str(_round(aqi)) if aqi is not None else "",
-                                                       aqi_category(aqi) if aqi is not None else None)),
+                                                       aqi_category(aqi) if aqi is not None else None, narrow=True)),
         ReadingCell(label="UV index", slot=d.slot("uv.index", str(_round(uv)) if uv is not None else "",
-                                                    uv_category(uv) if uv is not None else None)),
+                                                    uv_category(uv) if uv is not None else None, narrow=True)),
     ]
+
+
+READING_FIELDS = ["indoor.temperature", "garage.temperature", "pressure.sea_level", "air.aqi", "uv.index"]
+STATION_NOW_FIELDS = ["outdoor.temperature", "outdoor.feels_like", "outdoor.humidity", "wind.speed"]
 
 
 CALM_MPH = 1  # below this the wind reads "Calm"
@@ -324,7 +381,19 @@ def _current(d: _Data, inp: summary.Inputs) -> Current:
         feels_parts.append(f"Humidity {pct(rh)}")
     speed = d.num("wind.speed")
     nh, nl = d.num("normals.high"), d.num("normals.low")
+    feels_stale = ((feels is not None and d.stale("outdoor.feels_like"))
+                   or (rh is not None and d.stale("outdoor.humidity")))
+    wind_stale = speed is not None and d.stale("wind.speed")
+    temp_stale = t is not None and d.stale("outdoor.temperature")
+    shown = [f for f, s in (("outdoor.temperature", temp_stale), ("outdoor.feels_like", feels_stale),
+                            ("outdoor.humidity", feels_stale), ("wind.speed", wind_stale)) if s and d.stale(f)]
+    oldest = min((t_ for f in shown if (t_ := d.observed(f)) is not None), default=None)
     return Current(
+        high_low_stale=d.stale("forecast.daily"),
+        feels_stale=feels_stale,
+        wind_stale=wind_stale,
+        normals_stale=d.stale("normals.high") or d.stale("normals.low"),
+        as_of=messages.AS_OF.format(time=clock(oldest, d.tz)) if oldest else None,
         temp=d.slot("outdoor.temperature", deg(t)),
         high=f"H {deg(today['high'])}" if today.get("high") is not None else None,
         low=f"L {deg(today['low'])}" if today.get("low") is not None else None,
@@ -505,7 +574,7 @@ def _trend(d: _Data, now: datetime, tz: ZoneInfo, sun: dict | None) -> TrendChar
         t_now = past[-1][1]
     if t_now is None or not (past or fut):
         return TrendChart(aria_label="Temperature trend unavailable", axis_y=TREND_AXIS, grid_label_dy=GRID_LABEL_DY,
-                          night_y=NIGHT_Y, day_label_y=DAY_LABEL_Y)
+                          night_y=NIGHT_Y, day_label_y=DAY_LABEL_Y, message=messages.NO_TREND)
 
     values = [v for _, v in past] + [v for _, v in fut] + [t_now]
     lo, span = _trend_scale(values)
@@ -600,6 +669,7 @@ def _trend(d: _Data, now: datetime, tz: ZoneInfo, sun: dict | None) -> TrendChar
         grid_label_dy=GRID_LABEL_DY,
         night_y=NIGHT_Y,
         day_label_y=DAY_LABEL_Y,
+        past_message=messages.NO_HISTORY if not past else None,
     )
 
 
@@ -636,7 +706,7 @@ def _precip(d: _Data, now: datetime, tz: ZoneInfo) -> PrecipChart:
     rows = sorted(((_dt(h["t"], tz), h) for h in hourly), key=lambda r: r[0])
     rows = [(t, h) for t, h in rows if t > now][:PRECIP_HOURS]
     if not rows:
-        return PrecipChart(title="Chance of precip", right_text="unavailable")
+        return PrecipChart(title="Chance of precip", right_text="", empty_text=messages.NO_HOURLY)
 
     def kind(h: dict) -> str:
         k = h.get("precip_type") or "rain"
@@ -735,13 +805,20 @@ def winter_gauge(depth: float | None, season: float | None, now: datetime) -> bo
     return now.month in SNOW_SEASON_MONTHS and season is not None and season > 0
 
 
+def gauge_fields(d: _Data, now: datetime) -> list[str]:
+    """Fields behind the four gauge cells (normal or winter set)."""
+    if winter_gauge(d.num("snow.depth"), d.num("snow.season"), now):
+        return ["rain.today", "rain.month", "snow.depth", "snow.season"]
+    return ["rain.today", "rain.week", "rain.month", "rain.year"]
+
+
 def _gauge(d: _Data, now: datetime) -> Gauge:
     depth, season = d.num("snow.depth"), d.num("snow.season")
     winter = winter_gauge(depth, season, now)
     month = f"{now:%B}"
 
     def cell(field: str, text: str, label: str) -> GaugeCell:
-        return GaugeCell(value=d.slot(field, text), label=label)
+        return GaugeCell(value=d.slot(field, text, narrow=True), label=label)
 
     if winter:
         return Gauge(title="Gauge", note="liquid in · snow via NWS", note_size=11, cells=[
@@ -890,21 +967,110 @@ def build(resolved: Mapping[str, Resolved], now: datetime, device: DeviceInfo | 
     inp = summary.Inputs.build(now, tz, d.records("forecast.hourly"), daily, _current_code(d)[0],
                                d.records("alerts.active"), d.num("outdoor.temperature"))
     sun_raw = d.get("astro.sun")
-    sun = _sun(d, now, tz) or Sun(rise="", set="", day_length="", delta="", arc_end=None)
-    moon = _moon(d, tz) or Moon(illumination="", phase_name="", terminator_rx=0, waxing=True, rise_set="", next=[])
+    sun = _sun(d, now, tz) or Sun(rise="", set="", day_length="", delta="", arc_end=None,
+                                  message=_section_message(d, "astro.sun"))
+    moon = _moon(d, tz) or Moon(illumination="", phase_name="", terminator_rx=0, waxing=True, rise_set="", next=[],
+                                message=_section_message(d, "astro.moon"))
+    forecast = _forecast(daily, now)
+    readings = _readings(d)
+    gauge = _gauge(d, now)
+    sections = missing_sections(d, readings, gauge, sun, moon, forecast)
     return DashboardContext(
         now=now,
         tz=tz_name,
         width=cfg.server.width if cfg else 1200,
         height=cfg.server.height if cfg else 825,
-        header=_header(d, now, device, cfg, inp),
+        header=_header(d, now, device, cfg, inp, sections),
         radar=_radar(d, tz, inp),
-        readings=_readings(d),
+        readings=readings,
         current=_current(d, inp),
         trend=_trend(d, now, tz, sun_raw if isinstance(sun_raw, dict) else None),
         precip=_precip(d, now, tz),
-        gauge=_gauge(d, now),
+        gauge=gauge,
         sun=sun,
         moon=moon,
-        forecast=_forecast(daily, now),
+        forecast=forecast,
+        forecast_message=None if forecast else _section_message(d, "forecast.daily"),
+        notices=_notices(d, now, cfg)[:MAX_NOTICES],
     )
+
+
+# ------------------------------------------------------------------ error states (phase 2.6)
+
+
+def _section_message(d: _Data, field: str) -> str:
+    """Sentence for a section that has nothing to draw."""
+    r = d.resolved.get(field)
+    return (messages.explain(r, d.tz, d.source_types) if r is not None else None) or \
+        messages.MISSING.format(label=messages.label_of(field))
+
+
+def missing_sections(d: _Data, readings: list[ReadingCell], gauge: Gauge, sun: Sun, moon: Moon,
+                     forecast: list[ForecastRow]) -> list[str]:
+    """Sections that can't show their main content, most important first (messages.SECTION_NAMES)."""
+    out = []
+    if d.missing("alerts.active"):
+        out.append("alerts")
+    if radar_configured(d) and not isinstance(d.get("radar.frame"), dict):
+        out.append("radar")
+    if d.missing("forecast.daily") or (d.resolved.get("forecast.daily") is not None and not forecast):
+        out.append("forecast")
+    if d.missing("forecast.hourly"):
+        out.append("hourly")
+    if d.missing("outdoor.temperature"):
+        out.append("current")
+    if sum(c.slot.status is Status.missing for c in readings) >= 2:
+        out.append("readings")
+    if all(c.value.status is Status.missing for c in gauge.cells):
+        out.append("gauge")
+    if sun.message or moon.message:
+        out.append("sun_moon")
+    return out
+
+
+def _primary_failed(d: _Data, r: Resolved, cfg: AppConfig | None) -> tuple[bool, str | None]:
+    """(note it, primary source) for a value that came from a fallback source.
+
+    Live: the first source tried failed (error, too old, no value), so the second one won. A source that simply
+    doesn't provide the value (no_such_key) is a config matter, not an outage: not noted. Fixtures serve every field
+    from one provider; a fixture reading attributed to another source names the configured first source.
+    """
+    winner = r.reading.source
+    first = r.tried[0]
+    if first.source != winner and first.outcome is not Status.ok:
+        return first.note != "no_such_key", first.source
+    srcs = cfg.fields.get(r.field) if cfg else None
+    if srcs and srcs[0].from_ != winner and messages.source_type(srcs[0].from_, d.source_types) != "fixture":
+        return True, srcs[0].from_
+    return True, None
+
+
+def _fallback_notes(d: _Data, cfg: AppConfig | None) -> list[str]:
+    notes: dict[tuple[str, str, str | None], None] = {}
+    for field, what in messages.FALLBACK_GROUPS.items():
+        r = d.resolved.get(field)
+        if r is None or not r.reading.usable or not r.fallback_used:
+            continue
+        show, primary = _primary_failed(d, r, cfg)
+        if show:
+            notes[(what, r.reading.source, primary)] = None
+    return [messages.fallback_note(what, winner, primary, d.source_types) for what, winner, primary in notes]
+
+
+def _notices(d: _Data, now: datetime, cfg: AppConfig | None) -> list[str]:
+    """Notes box, most important first: alerts that couldn't be checked, missing and stale readings (full sentences
+    for the cells' short forms), a stale forecast, then fallbacks used."""
+    out = []
+    if d.missing("alerts.active"):
+        out.append(_section_message(d, "alerts.active"))
+    if d.missing("forecast.hourly") and not d.missing("forecast.daily"):
+        out.append(_section_message(d, "forecast.hourly"))
+    cells = [d.resolved[f] for f in READING_FIELDS + gauge_fields(d, now) if f in d.resolved]
+    out += messages.missing_notes([r for r in cells if not r.reading.usable], d.tz, d.source_types)
+    out += messages.stale_notes(cells, d.tz)
+    times = {clock(t, d.tz): t for f in ("forecast.daily", "forecast.hourly")
+             if d.stale(f) and (t := d.observed(f)) is not None}
+    if times:
+        out.append(messages.STALE_SECTION.format(what="Forecast", time=min(times.items(), key=lambda x: x[1])[0]))
+    out += _fallback_notes(d, cfg)
+    return list(dict.fromkeys(out))

@@ -127,12 +127,12 @@ async def test_calm_renders_as_calm():
 
 async def test_alert_takeover_most_severe_and_fitted():
     h = (await build("alert")).header
-    # The Severe Thunderstorm Warning outranks the Wind Advisory listed first. Its tag is long, so the impact
-    # ("60 mph gusts, 1 in hail") is dropped rather than letting the header overflow.
-    assert (h.alert.event, h.alert.detail) == ("Severe Thunderstorm Warning", "until 3:15 PM")
+    # The Severe Thunderstorm Warning outranks the Wind Advisory listed first. Its tag is long, so it is
+    # abbreviated (2.6, approved 2026-10-24) and the impact ("60 mph gusts, 1 in hail") still fits.
+    assert (h.alert.event, h.alert.detail) == ("Svr T-storm Warning", "until 3:15 PM · 60 mph gusts, 1 in hail")
     assert h.day_line  # generated but hidden by the alert
     html = render_html(await build("alert"))
-    assert "Severe Thunderstorm Warning" in html and h.day_line not in html
+    assert "Svr T-storm Warning" in html and h.day_line not in html
 
 
 async def test_alert_detail_formats():
@@ -308,7 +308,8 @@ def test_everything_missing():
                 for f in CFG.fields}
     ctx = viewmodel.build(resolved, now, DeviceInfo(), CFG)
     assert ctx.header.day_line is None and ctx.radar.callout is None and ctx.radar.next_chip is None
-    assert ctx.precip.right_text == "unavailable" and ctx.forecast == []
+    assert ctx.precip.empty_text == messages.NO_HOURLY and ctx.forecast == []
+    assert ctx.forecast_message == "Forecast unavailable." and ctx.header.notice  # details: tests/test_errors.py
 
 
 # ------------------------------------------------------------------ renders for review
