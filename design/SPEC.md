@@ -61,7 +61,8 @@ share the remaining height (flex), with a 24 px minimum per row.
 - Left: **current-conditions icon** (34 px, no label) → city ("Savoy, IL", 22/800) → date (22/300, gray).
 - Right: **day line** (17/600), a one-sentence summary such as "Storms around 4 PM, then colder and windy."
   When an **NWS alert** is active, it replaces the day line: black tag with ⚠ + event name, then
-  "until <time> · <key impact>".
+  "until <time> · <key impact>". Long event names are abbreviated only when the impact wouldn't fit otherwise
+  ("Svr T-storm Warning"; table in `messages.py`), and the impact is dropped only as a last resort (approved 2026-10-24).
 - Then a 1 px divider, battery icon + %, time (22/700). ("Next update" was removed 2026-10-24 to give the day line room.)
 
 ### Radar (530 × 567, left column)
