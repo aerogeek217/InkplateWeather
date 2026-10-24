@@ -1,7 +1,7 @@
 # Build plan
 
-Status: **Phase 1 built, awaiting review** on branch `phase-1` (2026-10-24). Open items: container golden baseline
-(see Phase 1 notes), first arm64 render on the Pi, flashing the Inkplate.
+Status: **Phase 1 built, awaiting review** on branch `phase-1` (2026-10-24). Open items: first arm64 render on the Pi,
+flashing the Inkplate, approval of icon set v1.1.
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 
@@ -134,9 +134,9 @@ Milestone: the Inkplate shows the fall reference board served from the Pi (after
 
 Phase 1 notes (2026-10-24):
 - Golden diffs on Windows (Playwright Chromium): fall 0.050 %, winter 0.095 % (sub-pixel chart/arc geometry only).
-- In the Linux container (Chromium 156 headless shell) fall 3.86 %, winter 4.04 %: text anti-aliasing and glyph
-  spacing only (layout and shapes match). Per the baseline rule the threshold is unchanged; regenerating the
-  references inside the container awaits the user's approval.
+- In the Linux container against the old Edge references: fall 3.86 %, winter 4.04 % (text anti-aliasing only).
+  With the user's approval the references were regenerated inside the container (canonical) plus a Windows
+  baseline in `design/reference/windows/`; both platforms now measure fall 0.050 %, winter 0.095 %.
 - 1.6: arm64 image builds (buildx) but Chromium can't run under QEMU emulation, so the first arm64 render happens on the Pi.
 - 1.7: compiles for both Inkplate 10 variants (default Soldered `Inkplate10V2`); not flashed (user step).
 - `/display.png` also returns `X-Sleep-Seconds` (seconds to the next :00/:30) so the firmware can align its sleep.

@@ -164,6 +164,16 @@ storm, partly cloudy; freezing drizzle; wintry mix; small moon phases), the rend
 sheet: `source/icons-proposed.html`): `modifiers/sunny-wind`, `markers/callout-storm`, `markers/callout-snow`,
 `markers/alert-triangle-inverse`.
 
+## Reference renders
+
+Regenerated 2026-10-24 with the user's approval:
+- `source/dashboard.html` and `dashboard-winter.html` now use the icon set (forecast-row icons, moon strip, alert
+  triangle with its dot). Don't regenerate them from the `.dc.html` exports, which still carry the old drawings.
+- `reference/*.png` are canonical and rendered inside the server container (Linux Chromium), which is what the Pi
+  draws. `reference/windows/` holds the same boards rendered by Edge on Windows for dev-machine tests, because
+  Windows rasterizes text slightly differently (about 4 % of pixels on text edges).
+- Fonts come from the bundled `server/assets/fonts`; see `tools/render_reference.py` for the commands.
+
 ## Known gaps to resolve during the build
 
 - Radar map geometry on the boards is hand-drawn. The real build needs a base map

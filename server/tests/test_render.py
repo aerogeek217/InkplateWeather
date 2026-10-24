@@ -1,6 +1,7 @@
 """Renderer, quantizer and HTTP endpoints. Tests marked `render` need a Playwright Chromium."""
 import io
 import os
+import sys
 import time
 from datetime import datetime
 
@@ -14,6 +15,15 @@ from app.render.quantize import LEVELS, LUT, quantize
 GOLDEN = {"fall": "dashboard-eink.png", "winter": "dashboard-winter-eink.png"}
 MAX_DIFF_FRACTION = 0.005  # < 0.5 % of 1200 × 825 pixels
 TIMINGS: dict[str, float] = {}
+
+
+def reference_dir():
+    """Canonical baseline is Linux Chromium (the container); Windows text rasterizes differently, so Windows
+    dev runs compare with design/reference/windows/ (same boards, rendered on Windows)."""
+    base = REPO_DIR / "design" / "reference"
+    if sys.platform == "win32" and (base / "windows").is_dir():
+        return base / "windows"
+    return base
 
 
 # ------------------------------------------------------------------ no browser needed
@@ -82,7 +92,7 @@ def _timed_get(client, url):
 @pytest.mark.render
 @pytest.mark.parametrize("name", ["fall", "winter"])
 def test_golden(name, client, needs_chromium, out_dir):
-    ref_path = REPO_DIR / "design" / "reference" / GOLDEN[name]
+    ref_path = reference_dir() / GOLDEN[name]
     r, ms = _timed_get(client, f"/fixtures/{name}.png")
     TIMINGS.setdefault("cold_ms", ms)
     assert r.status_code == 200 and r.headers["content-type"] == "image/png"
@@ -101,7 +111,7 @@ def test_golden(name, client, needs_chromium, out_dir):
     base = ref.point(lambda v: 128 + v // 2).convert("RGB")
     base.paste((255, 0, 0), mask=diff)
     base.save(out_dir / f"{name}-diff.png")
-    line = f"{name}: {changed} px differ ({fraction:.3%}); warm render {warm:.0f} ms\n"
+    line = f"{name}: {changed} px differ ({fraction:.3%}) vs {ref_path.parent.name}/; warm render {warm:.0f} ms\n"
     (out_dir / f"{name}-golden.txt").write_text(line, encoding="utf-8")
     print(line.strip())
     assert fraction < MAX_DIFF_FRACTION, line
