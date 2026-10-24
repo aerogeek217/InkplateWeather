@@ -73,7 +73,11 @@ def transform_svg(block: str, ty) -> str:
 def replace_svg(s: str, opening: str, new_opening: str, ty) -> str:
     start = s.index(opening)
     end = s.index("</svg>", start) + len("</svg>")
-    return s[:start] + new_opening + transform_svg(s[start + len(opening):end], ty) + s[end:]
+    body = s[start + len(opening):end]
+    # Pattern tiles in <defs> are in their own coordinates; leave them alone.
+    parts = re.split(r"(<defs>.*?</defs>)", body, flags=re.S)
+    body = "".join(p if p.startswith("<defs>") else transform_svg(p, ty) for p in parts)
+    return s[:start] + new_opening + body + s[end:]
 
 
 def reflow(s: str, winter: bool) -> str:
