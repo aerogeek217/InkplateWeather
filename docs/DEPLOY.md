@@ -62,6 +62,9 @@ rejects `--load`, write a tarball directly instead:
 `docker buildx build --platform linux/arm64 -t inkplate-weather:arm64 -o type=docker,dest=inkplate-weather-arm64.tar server`
 (then `docker load -i inkplate-weather-arm64.tar` on the Pi).
 
+Don't judge the arm64 image by running it on the PC: under QEMU emulation `/health` works but Chromium segfaults
+("Failed to parse the contents of /proc/self/maps"), so `/display.png` fails there. Test renders on the Pi itself.
+
 Compose uses the existing `inkplate-weather:latest` image and only builds if that image is missing (or with `--build`).
 
 ## 3. Configure and run on the OMV Pi
