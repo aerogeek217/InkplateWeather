@@ -8,9 +8,9 @@ pressure), the NWS forecast and alerts, air quality, and sun and moon informatio
 
 - **Design: approved** (2026-10-24). See [`design/SPEC.md`](design/SPEC.md) and the renders in
   [`design/reference/`](design/reference/).
-- Architecture: not decided yet. The working plan is a containerized service on a Raspberry Pi that
-  gathers data and renders the screen to an image; the Inkplate wakes every 30 min (or on button press),
-  downloads the image, displays it and goes back to sleep.
+- Architecture: **draft** in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). A Python + headless-Chromium
+  container on the OpenMediaVault Pi renders the screen on request; data sources are pluggable via config.
+  The Inkplate wakes every 30 min (or on button press), downloads the image, displays it and goes back to sleep.
 
 ## Repository layout
 
