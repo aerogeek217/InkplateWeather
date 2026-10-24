@@ -1,7 +1,7 @@
 # Build plan
 
-Status: **Phase 1 built and deployed, awaiting review** on branch `phase-1` (2026-10-24). Open items: confirm the
-Inkplate shows the board, approval of icon set v1.1.
+Status: **Phase 1 complete, milestone reached; awaiting review** on branch `phase-1` (2026-10-24). The Inkplate
+shows the fall board served from the OMV Pi. Open items: PR review and merge, approval of icon set v1.1.
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 
@@ -131,6 +131,7 @@ Parallel workstreams are marked **[A] server/render**, **[B] data providers**, *
 | 1.7 ✅ | D | Inkplate firmware: Wi-Fi, read battery, `GET /display.png?batt=&mv=&reason=`, draw, deep sleep aligned to :00/:30, wake button, error screen + 5-min retry ×3 | 1.5 (endpoint contract only) | compiles with Arduino CLI for Inkplate 10; documented flashing steps; **user flashes it** |
 
 Milestone: the Inkplate shows the fall reference board served from the Pi (after the user approves deployment).
+**Reached 2026-10-24.**
 
 Phase 1 notes (2026-10-24):
 - Golden diffs on Windows (Playwright Chromium): fall 0.050 %, winter 0.095 % (sub-pixel chart/arc geometry only).
