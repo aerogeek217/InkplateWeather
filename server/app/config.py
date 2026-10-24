@@ -61,7 +61,12 @@ class SourceCfg(BaseModel):
     model_config = ConfigDict(extra="allow", populate_by_name=True)
     from_: str = Field(alias="from")
     key: str | None = None  # provider-native key; defaults to the field name
+    entity: str | None = None  # alias for key, for Home Assistant entity ids (sensor.pms5003_aqi)
     max_age: Duration | None = None  # older readings are "stale"; None = never stale
+
+    def model_post_init(self, _ctx: Any) -> None:
+        if self.key is None and self.entity is not None:
+            self.key = self.entity
 
     @property
     def options(self) -> dict[str, Any]:

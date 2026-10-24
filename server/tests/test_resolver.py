@@ -121,3 +121,9 @@ def test_example_config_loads():
     assert cfg.providers["ecowitt"].type == "ecowitt_local"
     assert [s.from_ for s in cfg.fields["outdoor.temperature"]] == ["ecowitt", "nws_obs", "om"]
     assert cfg.fields["outdoor.temperature"][0].key == "0x02"
+
+
+def test_entity_is_an_alias_for_key():
+    s = SourceCfg.model_validate({"from": "ha", "entity": "sensor.pms5003_aqi", "max_age": "20m"})
+    assert s.key == "sensor.pms5003_aqi"
+    assert SourceCfg.model_validate({"from": "ha", "key": "a", "entity": "b"}).key == "a"
