@@ -92,8 +92,8 @@ def sleep_seconds(now: datetime, refresh_minutes: int = 30) -> int:
 
 
 def history_sample_minutes(cfg: AppConfig) -> float:
-    """`server.history_sample_minutes` (once config.py has it), else the history provider's `sample_minutes`."""
-    v = getattr(cfg.server, "history_sample_minutes", None)
+    """`server.history_sample_minutes` when set in the config, else the history provider's `sample_minutes`."""
+    v = cfg.server.history_sample_minutes if "history_sample_minutes" in cfg.server.model_fields_set else None
     if v is None:
         v = next((p.options["sample_minutes"] for p in cfg.providers.values()
                   if p.type == "history" and "sample_minutes" in p.options), None)
