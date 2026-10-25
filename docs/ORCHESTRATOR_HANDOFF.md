@@ -3,6 +3,12 @@
 Written 2026-10-24 (end of the Phase 3 session) for a fresh session. Tell it:
 "Read docs/ORCHESTRATOR_HANDOFF.md and proceed." (Earlier versions are in git history: Phase 1 5cb8fab, Phase 2 a4593b5.)
 
+
+**Update 2026-10-25:** Phase 4 (4.1–4.4) is done and merged into `main` (35c1eb7), deployed on the Pi as
+7a90f2b, and firmware v1 is flashed. See `docs/BUILD_PLAN.md` *Phase 4 notes*. Still open: watch the first real storm
+(lightning bolts, MRMS ice, storm motion live), the untested setup portal and OTA path, the never-exercised IEM
+fallback, and the housekeeping list below. The phase sections below describe the start of Phase 4.
+
 ---
 
 You are the orchestrator for **Inkplate weather**, a wall-mounted e-paper weather display. You coordinate the build:

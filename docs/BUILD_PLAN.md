@@ -1,8 +1,7 @@
 # Build plan
 
-Status: **Phases 1 and 2 merged** (2026-10-24; Phase 2 merge commit eefc7de, deployed on the OMV Pi as 2c22f9c).
-**Phase 3 (radar) built on `phase-3`** (tasks 3.1–3.5; radar boards approved 2026-10-24); deployed on the OMV Pi as
-f504d4e (14:25 CDT, 2026-10-24). **Phase 4 (polish, 4.1–4.4) built on `phase-4`** (2026-10-25), deployed as 7a90f2b; firmware v1 flashed.
+Status: **Phases 1–4 merged into `main`** (Phase 2 eefc7de, Phase 3 d8fdfcc, Phase 4 35c1eb7 on 2026-10-25).
+Deployed on the OMV Pi as 7a90f2b (= the Phase 4 code); Inkplate firmware v1 (OTA-capable) flashed 2026-10-25.
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 
