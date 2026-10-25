@@ -122,9 +122,9 @@ Recommendation: **MRMS as primary, IEM as fallback.** Avoid RainViewer: its free
 | **IEM tiles / WMS** (`mesonet.agron.iastate.edu`): `ridge::ILX-N0B-0` (KILX single site) or `nexrad-n0q` mosaic; WMS GetMap with a bounding box | Colored PNG | Very simple; one request for our exact box | Colored image → must be mapped back to dBZ via the known color ramp; no precip type (IEM's HRRR `REFP` layer gives *modeled* type) |
 | NWS ArcGIS `radar_base_reflectivity` MapServer export | Colored PNG for a bounding box | Official, one request | Same color-decoding issue; no type |
 
-**Storm motion and arrival lines** ("Storms ~4 PM", the dashed 3/4/5 PM lines) need motion estimated from
-two or three recent frames (cross-correlation of the echo field). That's a **phase 2** feature. Phase 1 shows
-the current frame, legend and callout text from the forecast (e.g. "Storms likely 4–6 PM").
+**Storm motion and arrival lines** ("Storms ~4 PM", the dashed 3/4/5 PM lines) are estimated from three recent
+frames (cross-correlation of the echo field); built in phase 4, see *Storm motion* below. Without a trustworthy
+motion the panel shows the current frame and the callout uses forecast wording (e.g. "Storms ~4 PM · 3–8 PM · 80%").
 
 As built (Phase 3, 2026-10-24):
 - `radar_mrms` fetches `ReflectivityAtLowestAltitude` + `PrecipFlag` (`mrms.ncep.noaa.gov/2D/…latest.grib2.gz`),
@@ -139,6 +139,31 @@ As built (Phase 3, 2026-10-24):
   (dBZ = index / 2 − 32.5), plus its world file and JSON time. Intensity only. It shows ~30 % more echo than MRMS
   (strongest return of overlapping radars).
 - Frames are plain JSON (masks as base64 PNG), so the cache keeps a last-good frame.
+
+### Storm motion (phase 4.1, as built 2026-10-25)
+
+`app/motion.py`, fed by `radar_mrms` (the IEM fallback has none):
+- With ≥ 400 echo pixels in view, the provider reads the product's directory listing (`/2D/<product>/`, ~190 kB,
+  cached 90 s) and fetches the files nearest 30 and 15 min before the latest (~0.7 MB each, decoded grids kept in
+  memory). A snow line also needs the matching PrecipFlag files. All motion work uses a window 80 map units
+  (~14 mi) wider than the panel. Any failure only drops the overlays.
+- **Motion**: one translation for the whole echo field, the peak of the FFT cross-correlation of dBZ − 15 (clipped
+  at 35, mean removed) with a parabolic sub-cell fit. The 30- and 15-min pairs must agree (±8 mph or 35 %, ±35°)
+  with normalized peaks ≥ 0.35, speed 3–80 mph; otherwise nothing is drawn. Fast-growing lines fail this on
+  purpose (the recorded 2023-04-01 squall line: 35 vs 54 mph).
+- **Arrival lines**: perpendicular to the motion through the 20 dBZ leading edge (the edge in an 8 mi band around
+  home when storms are heading for it, else the field's 95th percentile) at the next whole hours up to 3 h ahead,
+  ≥ 45 units apart (every 30 min above ~32 mph). Tags on the fall board's row (y = −175) or column (x = −172).
+  The arrow (70 units) sits on the storms just behind the edge, clear of home, legend, callout and tags.
+- **Arrival at home**: from that band's edge; "storm" when ≥ 45 dBZ is in the band, else "rain". The callout says
+  "Storms ~3 PM" (nearest half hour) · "7 mi west · ENE 15 mph" · forecast amount, when within 3 h; a winter storm
+  in the forecast keeps forecast wording.
+- **Snow line** (types legend): snow cells next to other precipitation, principal direction → a polyline (20-unit
+  bins, median, smoothed). Its own displacement across the line between frames (median, both pairs agreeing within
+  4.5 mph / 60 %) gives future positions every 1–3 h on local-clock multiples ("SNOW 6 PM", "SNOW 9 PM", ≤ 6 h) and
+  the time it reaches home ("Snow by 5 PM", rounded up; within 12 h).
+- The frame carries `motion`, `arrival` and `overlays` (JSON); `radarmap` draws only lines still in the future.
+  Cost on the dev PC: ~50 ms per analysis plus the decodes.
 
 ## Lightning (map overlay, approved 2026-10-24)
 

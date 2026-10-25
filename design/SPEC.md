@@ -195,6 +195,12 @@ server renders of the `radar-storm` / `radar-winter` fixtures (real Census base 
 (`server/tools/render_fixture_refs.py`). Map extent: the board's framing, 5.6 units per mile (~77 × 81 mi).
 Extreme echoes come from ≥ 50 dBZ; ice/sleet is liquid precipitation over a ≤ 0 °C surface.
 
+Storm motion (phase 4.1, built 2026-10-25; renders awaiting approval): the arrival lines, time tags, motion arrow,
+bold snow line with its "snow line" label and the "SNOW 6 PM" lines are drawn from radar with the boards' styles
+(`server/app/radarmap.py`), only when the motion estimate is trustworthy. The callout's headline is then timed by
+radar ("Storms ~3 PM", nearest half hour; "Snow by 5 PM") with the fall board's detail ("7 mi west · ENE 15 mph ·
+~0.5 in"). Test boards: `radar-motion` and `radar-snowline` fixtures (`server/tests/build_radar_fixtures.py`).
+
 ## Error states (approved 2026-10-24)
 
 All wording lives in `server/app/messages.py`.
