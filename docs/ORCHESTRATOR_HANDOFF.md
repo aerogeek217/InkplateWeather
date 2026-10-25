@@ -60,10 +60,9 @@ keep the plan and repo consistent. Design and architecture are decided; build th
   alert tag only; on the winter test board two trend labels sit on the line; town labels near the panel edge (Clinton,
   Mattoon) can sit close to the border or the "Next:" chip.
 - The user's station wind/solar/UV array dropped out around 13:30 but was reporting again by 13:40.
-- Housekeeping the user may ask for: delete `.claude/worktrees/*` and the `worker-a` / `worktree-agent-*` branches;
-  `C:\Users\dimoc\AppData\Local\Arduino15\inventory.yaml` and `C:\Users\dimoc\AppData\Local\arduino\` (left by a
-  worker); old local Docker images (`inkplate-weather:a2-reflow`, `a5`, `arm64`, `phase3`); optionally install `gh`
-  (not installed — give compare links for PRs instead).
+- Housekeeping done 2026-10-25: worker worktrees/branches, stray Arduino files in AppData and old Docker images
+  removed; the only local image is `inkplate-weather:latest` (Phase 4). Still optional: install `gh` (not
+  installed — give compare links for PRs instead).
 - **Usage:** the account's weekly all-models limit was near its cap on 2026-10-24. Prefer doing small things yourself
   and keep workflows small.
 
