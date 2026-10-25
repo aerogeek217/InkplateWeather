@@ -10,6 +10,9 @@ Thumbs.db
 config/config.yaml
 firmware/**/config.h
 
+# Config backups written by scripts/backup-config.sh (they contain secrets)
+backups/
+
 # Runtime and test output
 cache/
 server/cache/
