@@ -29,6 +29,8 @@ CALLOUT_RAIN_IN = 0.25
 CALLOUT_ICE_IN = 0.05
 CALLOUT_ICE_POP = 50
 CALLOUT_DETAIL_PARTS = 3  # "Sleet now · heaviest 7–11 PM · 3–5 in": at most three pieces
+RADAR_STORM_HOURS = 3  # radar-timed arrivals (app.motion) trusted this far ahead
+RADAR_SNOW_HOURS = 12
 TREND_DEG = 8  # tomorrow's high this much above/below today's → "warmer" / "colder"
 WINDY_MPH = 20  # sustained
 WINDY_GUST_MPH = 30
@@ -515,9 +517,57 @@ def most_severe(alerts: list[dict]) -> dict | None:
     return max(enumerate(alerts), key=lambda ia: (SEVERITY_RANK.get(str(ia[1].get("severity")), 0), -ia[0]))[1]
 
 
-def callout(inp: Inputs) -> dict | None:
-    """{kind: storm|snow|rain|ice|alert, headline, detail} for a notable event in the next 12 h, else None."""
+def clock_time(t: datetime) -> str:
+    """'4 PM', '3:30 PM', 'noon'."""
+    return clock_hour(t) if t.minute == 0 else f"{t.hour % 12 or 12}:{t.minute:02d} {'AM' if t.hour < 12 else 'PM'}"
+
+
+def _round_up_to(t: datetime, minutes: int, now: datetime, nearest: bool) -> datetime:
+    """t on the clock's `minutes` grid (nearest, or the next one), never before now."""
+    base = t.replace(minute=0, second=0, microsecond=0)
+    steps = (t - base).total_seconds() / 60 / minutes
+    out = base + timedelta(minutes=minutes * (round(steps) if nearest else math.ceil(steps)))
+    while out <= now:
+        out += timedelta(minutes=minutes)
+    return out
+
+
+def radar_callout(inp: Inputs, arrival: dict | None, ev: Event | None) -> dict | None:
+    """The callout timed by radar (app.motion): storms reaching home ("Storms ~4 PM", "22 mi west · ENE 15 mph ·
+    ~0.5 in", like the fall board) or the snow line reaching it ("Snow by 6 PM" + the forecast's detail)."""
+    if not isinstance(arrival, dict):
+        return None
+    t = _dt(arrival.get("t"), inp.now.tzinfo)  # type: ignore[arg-type]
+    kind = arrival.get("kind")
+    horizon = RADAR_SNOW_HOURS if kind == "snow" else RADAR_STORM_HOURS
+    if t is None or not (inp.now < t <= inp.now + timedelta(hours=horizon)):
+        return None
+    where = f"{arrival.get('dist_mi')} mi {arrival.get('from')}" if arrival.get("dist_mi") is not None else None
+    motion = f"{arrival.get('heading')} {arrival.get('mph')} mph" if arrival.get("mph") else None
+    if kind == "snow":
+        headline = f"Snow by {clock_time(_round_up_to(t, 60, inp.now, nearest=False))}"
+        if ev is not None and ev.kind in ("snow", "ice"):
+            detail = _callout_detail(ev, inp)
+        else:
+            detail = " · ".join(x for x in (f"snow line {where}" if where else None, motion) if x)
+        return {"kind": "snow", "headline": headline, "detail": detail}
+    if ev is not None and ev.kind in ("snow", "ice"):
+        return None  # a winter storm: the snow line and the forecast tell it better than echo motion
+    storm = kind == "storm" or (ev is not None and ev.kind == "storm")
+    headline = f"{'Storms' if storm else 'Rain'} ~{clock_time(_round_up_to(t, 30, inp.now, nearest=True))}"
+    parts = [x for x in (where, motion) if x]
+    if ev is not None and ev.rain >= 0.1:
+        parts.append(rain_amount(ev.rain))
+    return {"kind": "storm" if storm else "rain", "headline": headline, "detail": " · ".join(parts)}
+
+
+def callout(inp: Inputs, arrival: dict | None = None) -> dict | None:
+    """{kind: storm|snow|rain|ice|alert, headline, detail}: radar-timed arrival (`arrival` from the radar frame),
+    else a notable forecast event in the next 12 h, else the most severe alert; None when there's nothing."""
     ev = find_event(inp, CALLOUT_HOURS)
+    rc = radar_callout(inp, arrival, ev)
+    if rc is not None:
+        return rc
     if ev is not None and _notable(ev):
         return {"kind": "snow" if ev.kind == "snow" else ev.kind, "headline": _headline(ev, inp),
                 "detail": _callout_detail(ev, inp)}

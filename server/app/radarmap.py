@@ -12,12 +12,14 @@ The base map comes from `assets/basemap/basemap.geojson` (`tools/build_basemap.p
 from __future__ import annotations
 
 import json
+import math
 from datetime import datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 from xml.sax.saxutils import escape
 
 from .mapgeo import HALF_H, HALF_W, RING_MILES, UNITS_PER_MILE, Extent
+from .textwidth import measure
 
 BASEMAP = Path(__file__).resolve().parents[1] / "assets" / "basemap" / "basemap.geojson"
 FONT = "Inter Tight, Arial, sans-serif"
@@ -147,24 +149,104 @@ def _bolt(x: float, y: float, recent: bool) -> str:
             f'{style} stroke-linejoin="round"></path>')
 
 
+# Storm-motion overlays (app.motion), styled like the boards: dashed arrival / snow lines with black time tags,
+# a bold current snow line, the motion arrow with its speed.
+TAG_SIZE, TAG_WEIGHT, TAG_PAD, TAG_H = 10, 800, 12, 14
+
+
+def _tag_text(t: datetime) -> str:
+    """'3 PM', '3:30 PM' (tags keep '12 PM' rather than 'noon': same shape as the others)."""
+    m = f":{t.minute:02d}" if t.minute else ""
+    return f"{t.hour % 12 or 12}{m} {'AM' if t.hour < 12 else 'PM'}"
+
+
+def _tag(x: float, y: float, text: str) -> str:
+    w = round(measure(text, TAG_SIZE, TAG_WEIGHT) + TAG_PAD)
+    return (f'<g transform="translate({_f(x)},{_f(y)})"><rect x="{_f(-w / 2)}" y="-8" width="{w}" height="{TAG_H}" '
+            f'fill="#000000"></rect><text y="3" fill="#FFFFFF">{escape(text)}</text></g>')
+
+
+def _future(items: list[dict], now: datetime | None) -> list[tuple[datetime, dict]]:
+    out = []
+    for it in items or []:
+        try:
+            t = datetime.fromisoformat(it["t"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if now is None or t > now:
+            out.append((t, it))
+    return out
+
+
+def _points(pts) -> str:
+    return "M" + " L".join(f"{_f(x)},{_f(y)}" for x, y in pts)
+
+
+def motion_layers(frame: dict | None, now: datetime | None) -> dict[str, str]:
+    """SVG fragments for the frame's motion overlays (lines that are already in the past are left out):
+    `snow_line` (under the winter roads), `lines` (dashed lines + tags), `arrow`, `labels` (for the halo group)."""
+    ov = (frame or {}).get("overlays") or {}
+    out = {"snow_line": "", "lines": "", "arrow": "", "labels": ""}
+    paths, tags = [], []
+    for t, a in _future(ov.get("arrivals"), now):
+        paths.append(f'<path d="M{_f(a["x1"])},{_f(a["y1"])} L{_f(a["x2"])},{_f(a["y2"])}"></path>')
+        tags.append(_tag(*a["tag"], _tag_text(t)))
+    width = "1.3"
+    snow = ov.get("snow_line")
+    if snow:
+        width = "1.4"
+        out["snow_line"] = (f'<path d="{_points(snow)}" fill="none" stroke="#000000" stroke-width="2" '
+                            'stroke-linejoin="round"></path>')
+        if ov.get("snow_label"):
+            x, y = ov["snow_label"]
+            out["labels"] = f'<text x="{_f(x)}" y="{_f(y)}" text-anchor="middle" font-weight="800">snow line</text>'
+        for t, s in _future(ov.get("snow_lines"), now):
+            paths.append(f'<path d="{_points(s["points"])}"></path>')
+            tags.append(_tag(*s["tag"], f"SNOW {_tag_text(t)}"))
+    if paths:
+        out["lines"] = (f'<g fill="none" stroke="#000000" stroke-width="{width}" stroke-dasharray="6 4">'
+                        + "".join(paths) + "</g>"
+                        f'<g font-family="{FONT}" font-size="{TAG_SIZE}" font-weight="{TAG_WEIGHT}" '
+                        'text-anchor="middle">' + "".join(tags) + "</g>")
+    ar = ov.get("arrow")
+    if ar:
+        x1, y1, x2, y2 = ar["x1"], ar["y1"], ar["x2"], ar["y2"]
+        d = math.hypot(x2 - x1, y2 - y1) or 1.0
+        ux, uy = (x2 - x1) / d, (y2 - y1) / d
+        bx, by = x2 - 14 * ux, y2 - 14 * uy  # head: 14 long, 15 wide (fall board)
+        sx, sy = x2 - 11 * ux, y2 - 11 * uy
+        out["arrow"] = (f'<path d="M{_f(x1)},{_f(y1)} L{_f(sx)},{_f(sy)}" fill="none" stroke="#000000" '
+                        'stroke-width="3.2" stroke-linecap="round"></path>'
+                        f'<path d="M{_f(x2)},{_f(y2)} L{_f(bx - 7.5 * uy)},{_f(by + 7.5 * ux)} '
+                        f'L{_f(bx + 7.5 * uy)},{_f(by - 7.5 * ux)} Z" fill="#000000"></path>')
+        anchor = "" if ar.get("anchor", "start") == "start" else f' text-anchor="{ar["anchor"]}"'
+        out["labels"] += f'<text x="{_f(ar["lx"])}" y="{_f(ar["ly"])}"{anchor}>{escape(ar["label"])}</text>'
+    return out
+
+
 def layers(frame: dict | None, home_name: str, home_xy: tuple[float, float] = (0.0, 0.0),
-           marks: list[tuple[float, float, bool]] | None = None, path: Path = BASEMAP) -> str:
-    """The SVG inside the radar panel's <svg>: base map, echoes (if any), lightning bolts, overlays."""
+           marks: list[tuple[float, float, bool]] | None = None, path: Path = BASEMAP,
+           now: datetime | None = None) -> str:
+    """The SVG inside the radar panel's <svg>: base map, echoes (if any), motion overlays, lightning bolts."""
     base = _base(path)
     typed = bool(frame) and frame.get("legend") == "types"
     r = RING_MILES * UNITS_PER_MILE
     hx, hy = home_xy
     home_stroke = ' stroke="#FFFFFF" stroke-width="2"' if typed else ""
+    mo = motion_layers(frame, now)
     return "\n".join(x for x in (
         f"<defs>{PATTERNS}</defs>" if typed else "",
         base["under"],
         "" if typed else base["roads"],
         echoes(frame) if frame else "",
+        mo["snow_line"],
         base["roads_over"] if typed else "",
+        mo["lines"],
         f'<circle cx="{_f(hx)}" cy="{_f(hy)}" r="{_f(r)}" fill="none" stroke="#6D6D6D" stroke-width="1"></circle>',
+        mo["arrow"],
         "".join(_bolt(*m) for m in marks or ()),
         f'<g font-family="{FONT}" font-size="11.5" font-weight="600" fill="#000000" stroke="#FFFFFF" '
-        f'stroke-width="4" paint-order="stroke">{base["places"]}'
+        f'stroke-width="4" paint-order="stroke">{mo["labels"]}{base["places"]}'
         f'<text x="{_f(hx + 102)}" y="{_f(hy - 100)}" font-weight="400" fill="#494949">{RING_MILES} mi</text></g>',
         f'<rect x="{_f(hx - 6)}" y="{_f(hy - 6)}" width="12" height="12" fill="#000000"{home_stroke}></rect>',
         f'<text x="{_f(hx + 12)}" y="{_f(hy + 15)}" font-family="{FONT}" font-size="11.5" font-weight="800" '
