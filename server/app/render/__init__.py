@@ -5,7 +5,7 @@ from functools import lru_cache
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
 
-from .. import icons
+from .. import icons, mapgeo, radarmap
 from ..context import DashboardContext
 from ..paths import TEMPLATES_DIR
 
@@ -32,6 +32,10 @@ def environment() -> Environment:
         precip_markers=icons.PRECIP_MARKERS,
         moon_small=icons.MOON_SMALL,
         callout_icons=icons.CALLOUT,
+        radar_w=mapgeo.WIDTH_PX,
+        radar_h=mapgeo.HEIGHT_PX,
+        radar_viewbox=mapgeo.VIEWBOX,
+        radar_view=radarmap.VIEW,
     )
     return env
 

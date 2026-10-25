@@ -155,11 +155,12 @@ async def test_alert_detail_formats():
 async def test_fixture_text_wins_over_generated():
     fall = await build("fall")
     assert fall.header.day_line == "Storms around 4 PM, then colder and windy."
-    assert fall.radar.callout.detail == "22 mi west · ENE 15 mph · ~0.5 in"  # radar-based text from the fixture
+    assert fall.radar.callout.detail == "7 mi west · ENE 15 mph"  # radar-based text from the fixture
     assert fall.radar.next_chip == "Next: frost possible Sunday night (34°)"
     gen = await build("fall", summary__day_line=None, radar__callout=None, summary__next_hazard=None)
     assert gen.header.day_line == "Storms around 4 PM, then colder and windy."  # same sentence, generated
-    assert (gen.radar.callout.headline, gen.radar.callout.detail) == ("Storms ~4 PM", "3–8 PM · 80%")
+    # generated from the radar's arrival: the fixture's text is that same text
+    assert (gen.radar.callout.headline, gen.radar.callout.detail) == ("Storms ~3 PM", "7 mi west · ENE 15 mph")
     assert gen.radar.next_chip == "Next: frost possible Sunday night (34°)"
 
 
@@ -172,7 +173,7 @@ async def test_generated_text_on_live_data():
     assert frost.radar.next_chip == "Next: freeze likely tonight (31°)"
     winter = await build("live-winter-2027-01-19")
     assert winter.header.alert.detail == "until 9 AM Wed · 3–5 in snow"
-    assert (winter.radar.callout.kind, winter.radar.callout.headline) == ("snow", "Snow by 6 PM")
+    assert (winter.radar.callout.kind, winter.radar.callout.headline) == ("snow", "Snow by 5 PM")  # the radar's arrival
 
 
 async def test_day_line_fits_the_header():

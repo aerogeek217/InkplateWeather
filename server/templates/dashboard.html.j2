@@ -10,11 +10,11 @@ a{color:#494949}a:hover{color:#000000}
 </style>
 </head>
 <body>
-<div style="width: {{ ctx.width }}px; height: {{ ctx.height }}px; box-sizing: border-box; padding: 66px 68px; background: #FFFFFF; color: #000000; font-family: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; gap: 11px; overflow: hidden">
+<div style="width: {{ ctx.width }}px; height: {{ ctx.height }}px; box-sizing: border-box; padding: 51px 53px 66px 68px; background: #FFFFFF; color: #000000; font-family: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; gap: 11px; overflow: hidden">
 
 {% include "partials/header.j2" %}
 
-  <main style="flex: 1; min-height: 0; display: grid; grid-template-columns: 536px 504px; column-gap: 24px">
+  <main style="flex: 1; min-height: 0; display: grid; grid-template-columns: {{ radar_w }}px 504px; column-gap: 24px">
 
     <section style="display: flex; flex-direction: column; gap: 12px; min-height: 0">
 {% include "partials/radar.j2" %}

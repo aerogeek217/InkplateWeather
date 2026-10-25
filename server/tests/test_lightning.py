@@ -140,7 +140,7 @@ def test_bolts_merge_per_cell_newest_wins():
     svg = radarmap.layers(None, "SAVOY", marks=marks)
     assert svg.count(radarmap.BOLT_PATH) == 2
     assert svg.index('fill="#FFFFFF" stroke="#000000" stroke-width="2"') < svg.index('fill="#000000" stroke="#FFFFFF"')
-    assert svg.index("r=\"140\"") < svg.index(radarmap.BOLT_PATH) < svg.index(">SAVOY<")
+    assert svg.index("r=\"112\"") < svg.index(radarmap.BOLT_PATH) < svg.index(">SAVOY<")
 
 
 async def test_radar_panel_shows_bolts_and_the_legend_entry():

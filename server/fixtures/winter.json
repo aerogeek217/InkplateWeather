@@ -644,21 +644,30 @@
   },
   "radar.frame": {
    "value": {
-    "site": "KILX",
+    "site": "MRMS",
     "time": "2027-01-19T15:25:00-06:00",
     "types": [
-     "snow",
      "ice",
-     "rain"
+     "rain",
+     "snow"
     ],
     "artwork": "radar/winter.svg",
-    "aria_label": "Radar map: a winter storm covering the area — snow to the north, a band of sleet and freezing rain over Savoy, rain to the south; the snow line moves south past Savoy by 6 PM"
+    "aria_label": "Radar map around Savoy: rain, ice or sleet, and snow in view",
+    "legend": "types",
+    "arrival": {
+     "t": "2027-01-19T16:09:30.330107-06:00",
+     "kind": "snow",
+     "dist_mi": 3,
+     "from": "northwest",
+     "heading": "SE",
+     "mph": 4
+    }
    },
    "observed_at": "2027-01-19T15:25:00-06:00"
   },
   "radar.callout": {
    "kind": "snow",
-   "headline": "Snow by 6 PM",
+   "headline": "Snow by 5 PM",
    "detail": "Sleet now · heaviest 7–11 PM · 3–5 in"
   },
   "summary.day_line": "Sleet changing to snow by 6 PM; 3–5 in by morning.",

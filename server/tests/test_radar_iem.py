@@ -38,7 +38,7 @@ def mock(router, png=None, wld=None, meta=None):
 
 
 def union(frame) -> Image.Image:
-    out = Image.new("1", (536, 570))
+    out = Image.new("1", (551, 585))
     for layer in frame["layers"]:
         out = ImageChops.logical_or(out, Image.open(io.BytesIO(base64.b64decode(layer["png"]))).convert("1"))
     return out

@@ -29,7 +29,7 @@ import shapefile  # pyshp
 
 SERVER = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SERVER))
-from app.mapgeo import HALF_H, HALF_W, Extent  # noqa: E402
+from app.mapgeo import X_MAX, X_MIN, Y_MAX, Y_MIN, Extent  # noqa: E402
 
 CACHE = SERVER / "tools" / ".cache"
 OUT = SERVER / "assets" / "basemap" / "basemap.geojson"
@@ -42,7 +42,8 @@ TOLERANCE = 0.4  # Douglas–Peucker, map units
 MIN_LAKE_M2 = 2e6
 HOME_STATE = "17"  # Illinois; its outline is the dashed state line
 
-# Labeled towns (as on the approved board): name, state FIPS, dot radius (0 = label only), label dx, dy, anchor.
+# Labeled towns (the approved board's, plus the v3 additions): name, state FIPS, dot radius (0 = label only),
+# label dx, dy, anchor.
 PLACES = [
     ("Champaign", "17", 0, 4, -6, "start"),
     ("Rantoul", "17", 3.2, 6, 4, "start"),
@@ -52,7 +53,13 @@ PLACES = [
     ("Clinton", "17", 3.2, 5, -8, "start"),
     ("Bloomington", "17", 3.6, 7, 4, "start"),
     ("Tuscola", "17", 3.2, 7, 4, "start"),
-    ("Mattoon", "17", 3.6, 7, -5, "start"),  # at the bottom edge: label above
+    ("Mattoon", "17", 3.6, -7, 4, "end"),  # left of the dot, clear of Charleston
+    # layout v3 (wider, extending west)
+    ("Decatur", "17", 3.6, 7, 4, "start"),
+    ("Taylorville", "17", 3.2, 6, 4, "start"),
+    ("Shelbyville", "17", 3.2, 6, 4, "start"),
+    ("Charleston", "17", 3.2, 6, 4, "start"),
+    ("Paris", "17", 3.2, -6, 4, "end"),
 ]
 
 
@@ -77,7 +84,7 @@ def reader(url: str) -> shapefile.Reader:
 # --- geometry in map units ------------------------------------------------------------------------------------
 
 Pt = tuple[float, float]
-X0, Y0, X1, Y1 = -HALF_W - MARGIN, -HALF_H - MARGIN, HALF_W + MARGIN, HALF_H + MARGIN
+X0, Y0, X1, Y1 = X_MIN - MARGIN, Y_MIN - MARGIN, X_MAX + MARGIN, Y_MAX + MARGIN
 
 
 def parts(shape) -> list[list[tuple[float, float]]]:
