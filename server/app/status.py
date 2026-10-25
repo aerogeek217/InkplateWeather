@@ -15,7 +15,7 @@ from urllib.parse import urlsplit, urlunsplit
 from zoneinfo import ZoneInfo
 
 from . import fields as field_registry
-from . import messages
+from . import firmware, messages
 from .config import AppConfig
 from .paths import REPO_DIR, SERVER_DIR
 from .resolver import Resolved
@@ -252,6 +252,7 @@ def build(state, cfg: AppConfig, now: datetime, resolved: Mapping[str, Resolved]
             "voltage_mv": last["device"].voltage_mv,
             "wake_reason": last["device"].wake_reason,
         },
+        "firmware": firmware.status_entry(getattr(state, "cache_dir", None), last.get("fw") if last else None),
         "counts": counts,
         "fields": entries,
         "providers": provider_entries(state, cfg, real_now, resolved, fixture),

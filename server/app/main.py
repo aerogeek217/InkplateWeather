@@ -22,7 +22,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Res
 from fastapi.staticfiles import StaticFiles
 from pydantic import ValidationError
 
-from . import collector, config, history, messages, status, viewmodel
+from . import collector, config, firmware, history, messages, status, viewmodel
 from .cache import ProviderCache
 from .cache import cache_dir as cache_dir
 from .config import AppConfig
@@ -234,6 +234,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Inkplate weather", lifespan=lifespan)
 app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
+app.include_router(firmware.router)  # GET /firmware/inkplate_weather-<n>.bin (over-the-air updates)
 
 
 def _cfg(request: Request) -> AppConfig:
@@ -386,14 +387,16 @@ async def health() -> JSONResponse:
 
 @app.get("/display.png")
 async def display(request: Request, batt: str | None = Query(None), mv: str | None = Query(None),
-                  reason: str | None = Query(None)) -> Response:
+                  reason: str | None = Query(None), fw: str | None = Query(None)) -> Response:
     cfg = _cfg(request)
     device = DeviceInfo(battery_pct=_int(batt, 0, 100), voltage_mv=_int(mv, 0, 10000),
                         wake_reason=reason if reason in WAKE_REASONS else None)
     real_now = datetime.now(ZoneInfo(cfg.location.tz))
-    request.app.state.last_request = {"at": real_now, "device": device}
+    fw_version = firmware.parse_version(fw)
+    request.app.state.last_request = {"at": real_now, "device": device, "fw": fw_version}
     headers = {"X-Sleep-Seconds": str(sleep_seconds(real_now, cfg.server.refresh_minutes)),
-               "Cache-Control": "no-store"}
+               "Cache-Control": "no-store",
+               **firmware.update_headers(cache_dir(cfg), fw_version)}
     try:
         dctx = await build_context(cfg, cfg.server.fixture, device, request.app.state)
         png = await render_png(request.app.state.renderer, dctx)

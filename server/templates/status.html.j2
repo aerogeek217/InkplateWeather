@@ -49,6 +49,8 @@
   {% else %}
   <span>No display request since the server started.</span>
   {% endif %}
+  <span>Firmware: display {{ "v" ~ s.firmware.reported if s.firmware.reported is not none else "not reported" }},
+    {% if s.firmware.available is not none %}v{{ s.firmware.available }} available{% if s.firmware.update_pending %} (update pending){% endif %}{% else %}none published{% endif %}</span>
   <span>Fields: {% for k, n in s.counts|dictsort %}<span class="{{ k }}">{{ n }} {{ k }}</span>{% if not loop.last %}, {% endif %}{% endfor %}</span>
 </p>
 <p class="meta"><a href="/status.json">JSON</a> · <a href="/preview">Preview</a> · <a href="/admin/reload">Reload config</a></p>
