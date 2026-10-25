@@ -1,4 +1,4 @@
-"""Radar panel SVG: base map + classified echoes + overlays, in the panel's map units (viewBox −214.4 −228 428.8 456).
+"""Radar panel SVG: base map + classified echoes + overlays, in the panel's map units (`mapgeo.VIEWBOX`).
 
 Drawing order and styles follow the approved boards (SPEC *Radar*):
 
@@ -18,12 +18,12 @@ from functools import lru_cache
 from pathlib import Path
 from xml.sax.saxutils import escape
 
-from .mapgeo import HALF_H, HALF_W, RING_MILES, UNITS_PER_MILE, Extent
+from .mapgeo import RING_MILES, UNITS_PER_MILE, X_MAX, X_MIN, Y_MAX, Y_MIN, Extent, inside
 from .textwidth import measure
 
 BASEMAP = Path(__file__).resolve().parents[1] / "assets" / "basemap" / "basemap.geojson"
 FONT = "Inter Tight, Arial, sans-serif"
-VIEW = f'x="{-HALF_W:g}" y="{-HALF_H:g}" width="{2 * HALF_W:g}" height="{2 * HALF_H:g}"'
+VIEW = f'x="{X_MIN:g}" y="{Y_MIN:g}" width="{X_MAX - X_MIN:g}" height="{Y_MAX - Y_MIN:g}"'
 
 FILLS = {
     "rain-light": "#DBDBDB", "rain-moderate": "#929292", "rain-heavy": "#494949", "rain-extreme": "#000000",
@@ -132,9 +132,9 @@ def bolts(flashes: list[dict], now: datetime, ext: Extent) -> list[tuple[float, 
         except (KeyError, TypeError, ValueError):
             continue
         age = now - t
-        if not (timedelta(minutes=-1) <= age <= WINDOW) or abs(x) > HALF_W or abs(y) > HALF_H:
+        if not (timedelta(minutes=-1) <= age <= WINDOW) or not inside(x, y):
             continue
-        key = (int((x + HALF_W) // BOLT_CELL), int((y + HALF_H) // BOLT_CELL))
+        key = (int((x - X_MIN) // BOLT_CELL), int((y - Y_MIN) // BOLT_CELL))
         if key not in cells or t > cells[key][0]:
             cells[key] = (t, x, y)
     marks = [(x, y, now - t <= RECENT, t) for t, x, y in cells.values()]
@@ -247,7 +247,9 @@ def layers(frame: dict | None, home_name: str, home_xy: tuple[float, float] = (0
         "".join(_bolt(*m) for m in marks or ()),
         f'<g font-family="{FONT}" font-size="11.5" font-weight="600" fill="#000000" stroke="#FFFFFF" '
         f'stroke-width="4" paint-order="stroke">{mo["labels"]}{base["places"]}'
-        f'<text x="{_f(hx + 102)}" y="{_f(hy - 100)}" font-weight="400" fill="#494949">{RING_MILES} mi</text></g>',
+        f'<text x="{_f(hx + 0.707 * r + 6)}" y="{_f(hy - 0.707 * r)}" font-weight="400" fill="#494949">'
+        f'{RING_MILES} mi</text>'
+        '</g>',
         f'<rect x="{_f(hx - 6)}" y="{_f(hy - 6)}" width="12" height="12" fill="#000000"{home_stroke}></rect>',
         f'<text x="{_f(hx + 12)}" y="{_f(hy + 15)}" font-family="{FONT}" font-size="11.5" font-weight="800" '
         f'fill="#000000" stroke="#FFFFFF" stroke-width="4" paint-order="stroke">{escape(home_name)}</text>',

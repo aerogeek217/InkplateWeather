@@ -23,15 +23,17 @@ def grid(name: str) -> grib2.Grid:
 
 def test_extent_matches_the_approved_board():
     assert (EXT.lat, EXT.lon) == (40.0617, -88.2517)
-    # 25 mi ring r = 140 units; the panel is 536 × 570 px at 1.25 px per unit
-    assert mapgeo.RING_MILES * mapgeo.UNITS_PER_MILE == 140
-    assert (2 * mapgeo.HALF_W * mapgeo.PX_PER_UNIT, 2 * mapgeo.HALF_H * mapgeo.PX_PER_UNIT) == (536, 570)
+    # 25 mi ring r = 112 units; the panel is 551 × 585 px at 1.25 px per unit
+    assert mapgeo.RING_MILES * mapgeo.UNITS_PER_MILE == pytest.approx(112)
+    assert ((mapgeo.X_MAX - mapgeo.X_MIN) * mapgeo.PX_PER_UNIT,
+            (mapgeo.Y_MAX - mapgeo.Y_MIN) * mapgeo.PX_PER_UNIT) == pytest.approx((551, 585))
     w, s, e, n = EXT.bbox()
-    assert round((e - w) * 69.093 * 0.765, 0) == 77  # ≈ 77 × 81 mi
-    assert round((n - s) * 69.093, 0) == 81
+    mi_lon = 69.093 * math.cos(math.radians(EXT.lat))
+    assert round((EXT.lon - w) * mi_lon) == 60 and round((e - EXT.lon) * mi_lon) == 38  # home west of center
+    assert round((n - s) * 69.093) == 104  # ≈ 98 × 104 mi
     assert EXT.project(EXT.lon, EXT.lat) == (0, 0)
     x, y = EXT.project(-87.63, 40.124)  # Danville: east and a little north
-    assert 180 < x < 195 and -40 < y < -20
+    assert 140 < x < 155 and -32 < y < -16
     lon, lat = EXT.unproject(*EXT.project(-88.9, 39.6))
     assert lon == pytest.approx(-88.9) and lat == pytest.approx(39.6)
 
@@ -43,12 +45,13 @@ def test_basemap_towns_sit_where_the_board_drew_them():
     assert layers == {"water", "county", "state", "interstate", "place"}
     board = {"Rantoul": (2, -100), "Paxton": (11, -146), "Danville": (185, -10), "Monticello": (-100, -22),
              "Clinton": (-204, -34), "Bloomington": (-207, -185), "Tuscola": (0, 123), "Mattoon": (-34, 235)}
+    k = mapgeo.UNITS_PER_MILE / 5.6  # the v2 board was drawn at 5.6 units per mile
     for f in bm["features"]:
         p = f["properties"]
         if p["layer"] == "place" and p["name"] in board:
             x, y = EXT.project(*f["geometry"]["coordinates"])
             bx, by = board[p["name"]]
-            assert abs(x - bx) < 35 and abs(y - by) < 35, p["name"]  # the board was drawn by hand (≤ 6 mi off)
+            assert abs(x - k * bx) < 28 and abs(y - k * by) < 28, p["name"]  # drawn by hand (≤ 6 mi off)
     refs = {f["properties"]["ref"] for f in bm["features"] if f["properties"]["layer"] == "interstate"}
     assert {"I-57", "I-74", "I-72"} <= refs
 
@@ -62,7 +65,10 @@ def test_live_reflectivity_header_and_values():
     assert (g.ref, g.e, g.d) == (-9990.0, 0, 1)
     sub = g.crop(*EXT.bbox())
     assert {sub.value(i, j) for j in range(sub.nj) for i in range(sub.ni)} == {-99.0}  # no echo: a quiet day
-    w, s, e, n = EXT.bbox()
+    # recorded 2026-10-24 for the v2 extent: it covers about ±42 mi around home, not the v3 view's west side
+    w, s = EXT.unproject(-180, 190)
+    e, n = EXT.unproject(180, -190)
+    sub = g.crop(w, s, e, n)
     assert sub.lon1 <= w and sub.lat1 >= n
     assert sub.lonlat(sub.ni - 1, sub.nj - 1)[0] >= e and sub.lonlat(sub.ni - 1, sub.nj - 1)[1] <= s
 
@@ -119,16 +125,16 @@ def test_dbz_encoding():
 def test_uniform_intensity(dbz, cls):
     legend, masks = radar.classify(EXT, raster(lambda lon, lat: dbz))
     assert legend == "intensity" and [n for n, _ in masks] == [cls]
-    assert masks[0][1].histogram()[255] == 536 * 570
+    assert masks[0][1].histogram()[255] == 551 * 585
 
 
 def test_echo_lands_on_home():
-    """A 3 × 3 km block of 45 dBZ centered on home is drawn around the panel center (268, 285)."""
+    """A 3 × 3 km block of 45 dBZ centered on home is drawn around home's pixel (338, 292.5)."""
     def fn(lon, lat):
         return 45 if abs(lon - EXT.lon) < 0.015 and abs(lat - EXT.lat) < 0.015 else None
     _, masks = radar.classify(EXT, raster(fn))
     box = dict(masks)["rain-heavy"].getbbox()
-    assert abs((box[0] + box[2]) / 2 - 268) <= 1.5 and abs((box[1] + box[3]) / 2 - 285) <= 1.5
+    assert abs((box[0] + box[2]) / 2 - 338) <= 1.5 and abs((box[1] + box[3]) / 2 - 292.5) <= 1.5
     assert 6 <= box[2] - box[0] <= 16  # 3 cells of ~4.3 px, edges eased by the bilinear resampling
 
 
@@ -149,7 +155,7 @@ def test_frame_dict():
     assert f["site"] == "MRMS" and f["time"] == "2026-10-24T19:00:00+00:00" and f["legend"] == "intensity"
     assert f["types"] == ["rain"] and [x["fill"] for x in f["layers"]] == ["rain-light"]
     m = mask(f["layers"][0]["png"])
-    assert m.size == (536, 570) and m.getbbox()[1] >= 280  # south half only
+    assert m.size == (551, 585) and m.getbbox()[1] >= 290  # south of home only
     assert f["aria_label"] == "Radar map around Savoy: rain in view"
     json.dumps(f)  # persisted by the cache
     empty = radar.frame(EXT, raster(lambda lon, lat: None), None, site="MRMS", time=datetime.now(UTC), home="Savoy")
@@ -160,16 +166,16 @@ def test_frame_dict():
 
 def test_layers_without_echoes_draw_the_map():
     svg = radarmap.layers(None, "SAVOY")
-    assert svg.startswith('<rect x="-214.4" y="-228" width="428.8" height="456" fill="#FFFFFF">')
+    assert svg.startswith('<rect x="-270.4" y="-234" width="440.8" height="468" fill="#FFFFFF">')
     assert 'stroke="#DBDBDB"' in svg and 'stroke-dasharray="8 4"' in svg and 'stroke-width="3.5"' in svg
-    assert '<circle cx="0" cy="0" r="140"' in svg and ">25 mi<" in svg and ">SAVOY<" in svg and ">Rantoul<" in svg
+    assert '<circle cx="0" cy="0" r="112"' in svg and ">25 mi<" in svg and ">SAVOY<" in svg and ">Rantoul<" in svg
     assert "<mask" not in svg
 
 
 def test_layers_order_follows_the_legend():
     rain = {"legend": "intensity", "layers": [{"fill": "rain-heavy", "png": "AAAA"}]}
     svg = radarmap.layers(rain, "SAVOY")
-    assert svg.index('stroke-width="3.5"') < svg.index('<mask id="rdM0"') < svg.index('r="140"')
+    assert svg.index('stroke-width="3.5"') < svg.index('<mask id="rdM0"') < svg.index('r="112"')
     assert 'fill="#494949" mask="url(#rdM0)"' in svg and "<defs>" not in svg
     snow = {"legend": "types", "layers": [{"fill": "snow", "png": "AAAA"}, {"fill": "ice", "png": "AAAA"}]}
     svg = radarmap.layers(snow, "SAVOY")

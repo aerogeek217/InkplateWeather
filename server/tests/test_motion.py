@@ -19,7 +19,7 @@ from conftest import TESTS_DIR
 
 from app import motion, radarmap, summary
 from app.config import AppConfig, LocationCfg, ProviderCfg
-from app.mapgeo import HALF_H, HALF_W, UNITS_PER_MILE
+from app.mapgeo import UNITS_PER_MILE, X_MAX, X_MIN, Y_MAX, Y_MIN
 from app.paths import FIXTURES_DIR
 from app.providers import base, radar_mrms
 from app.providers.base import RequestContext
@@ -51,11 +51,18 @@ def storm_set():
     return latest, [shifted(latest, lat, 15.0, 67.5, m) for m in (30, 15)], lat
 
 
-def winter_set():
+def winter_set(real: bool = False):
+    """The real 09:00 UTC snow line and two older frames: by default the same field moved back along 4 mph toward
+    SE (the real 08:30 and 08:46 frames, with `real`, show the line nearly stationary)."""
+    from build_radar_fixtures import shifted
+
     names = [(f"SeamlessHSR_00.00_20220202-0{t}.grib2", f"PrecipFlag_00.00_20220202-0{t}.grib2")
              for t in ("83000", "84600", "90000")]
-    frames = [frame(*n) for n in names]
-    return frames[-1], frames[:-1], radar_mrms.lattice(EXT, grid(names[-1][0]))
+    lat = radar_mrms.lattice(EXT, grid(names[-1][0]))
+    latest = frame(*names[-1])
+    if real:
+        return latest, [frame(*n) for n in names[:-1]], lat
+    return latest, [shifted(latest, lat, 4.0, 135.0, m) for m in (30, 14)], lat
 
 
 # ------------------------------------------------------------------ motion estimate
@@ -112,7 +119,7 @@ def test_storm_overlays_follow_the_motion():
         ["15:00", "16:00", "17:00"]
     for a in lines:  # perpendicular to the motion, inside the panel, tags on the top row
         assert abs((a["x2"] - a["x1"]) * ux + (a["y2"] - a["y1"]) * uy) < 1.5
-        assert all(abs(v) <= HALF_W + 0.1 for v in (a["x1"], a["x2"]))
+        assert all(X_MIN - 0.1 <= v <= X_MAX + 0.1 for v in (a["x1"], a["x2"]))
         assert a["tag"][1] == motion.TAG_Y
     gaps = [lines[i + 1]["x1"] - lines[i]["x1"] for i in range(2)]
     assert gaps[0] == pytest.approx(gaps[1], abs=1)  # one hour apart = the same distance
@@ -136,7 +143,7 @@ def test_times_follow_the_local_clock():
 
 
 def test_clip_segment():
-    assert motion.clip_segment(-1000, 0, 1000, 0) == pytest.approx((-HALF_W, 0, HALF_W, 0))
+    assert motion.clip_segment(-1000, 0, 1000, 0) == pytest.approx((X_MIN, 0, X_MAX, 0))
     assert motion.clip_segment(-1000, 500, 1000, 500) is None
 
 
@@ -158,6 +165,13 @@ def test_snow_line_and_its_motion():
     assert mid[0][1] > line[:, 1].mean() - 5 and mid[1][0] > mid[0][0] - 5 and mid[1][1] > mid[0][1]
     arr = res["arrival"]
     assert arr["kind"] == "snow" and arr["from"] == "northwest" and 1 <= arr["mph"] <= 6
+
+
+def test_a_stationary_snow_line_gets_no_projection():
+    """The real 08:30 / 08:46 / 09:00 UTC frames, compared over the same window: the line barely moved."""
+    latest, older, lat = winter_set(real=True)
+    res = motion.analyze(latest, older, lat, HOME, "types", TZ)
+    assert len(res["snow_line"]) >= 10 and res["snow_lines"] == [] and res["arrival"] is None
 
 
 def test_no_snow_line_without_types():
@@ -209,8 +223,8 @@ async def test_provider_adds_the_snow_line(provider):
         out = await provider.fetch(RequestContext(now=datetime(2022, 2, 2, 9, 2, tzinfo=UTC)))
     f = out["radar.frame"].value
     assert f["legend"] == "types"
-    assert f["overlays"]["snow_line"] and len(f["overlays"]["snow_lines"]) == 2
-    assert f["arrival"]["kind"] == "snow"
+    assert f["overlays"]["snow_line"] and f["overlays"]["snow_lines"] == []  # the recorded line is stationary
+    assert f["arrival"] is None
     json.dumps(f)  # still plain JSON for the cache
 
 
@@ -303,4 +317,4 @@ def test_fixture_boards_get_the_radar_callout():
     f = _fixture_frame("radar-motion")
     co = summary.callout(_inputs("radar-motion"), f["arrival"])
     assert co["headline"] == "Storms ~3 PM" and co["detail"].startswith("7 mi west · ENE 15 mph")
-    assert abs(f["arrival"]["dist_mi"] * UNITS_PER_MILE) <= 2 * HALF_H
+    assert abs(f["arrival"]["dist_mi"] * UNITS_PER_MILE) <= Y_MAX - Y_MIN

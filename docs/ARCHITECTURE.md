@@ -129,7 +129,7 @@ motion the panel shows the current frame and the callout uses forecast wording (
 As built (Phase 3, 2026-10-24):
 - `radar_mrms` fetches `ReflectivityAtLowestAltitude` + `PrecipFlag` (`mrms.ncep.noaa.gov/2D/…latest.grib2.gz`),
   decodes them with `app/grib2.py` (template 3.0 + 5.41 PNG packing only) and crops to the extent.
-  `app/radar.py` reprojects onto the 536 × 570 px panel (one affine transform: the map is equirectangular around
+  `app/radar.py` reprojects onto the 551 × 585 px panel (one affine transform: the map is equirectangular around
   home), dBZ bilinearly and type by nearest cell, then classifies into 1-bit masks the partial fills with the
   design's grays/patterns: light ≥ 15, moderate ≥ 30, heavy ≥ 40, extreme ≥ 50 dBZ; with ≥ 100 px of snow/ice in
   view the legend switches to Rain / Ice / Snow (snow from 10 dBZ, heavy snow ≥ 25).
@@ -190,7 +190,8 @@ flashes are merged so bolts don't overlap (one bolt per ~8 px cell, newest wins)
 
 **Base map**: generated once at build time from public-domain US Census TIGER/Line cartographic files
 (`server/tools/build_basemap.py`: county lines, the home state line, interstates, lakes ≥ 2 km², the board's towns)
-clipped to the approved board's framing (centered on home, 5.6 map units per mile, ~77 × 81 mi; `app/mapgeo.py`),
+clipped to the display extent (layout v3: home 60 mi from the west edge and 38 mi from the east, ±52 mi north–south,
+4.48 map units per mile, ~98 × 104 mi; `app/mapgeo.py`),
 saved as GeoJSON (`server/assets/basemap/`, committed) and drawn in the radar panel's SVG (`app/radarmap.py`).
 
 ## Error handling (plain language)

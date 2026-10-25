@@ -33,7 +33,7 @@ from datetime import datetime, timedelta, tzinfo
 import numpy as np
 
 from . import radar
-from .mapgeo import HALF_H, HALF_W, UNITS_PER_MILE, Extent
+from .mapgeo import UNITS_PER_MILE, X_MAX, X_MIN, Y_MAX, Y_MIN, Extent, inside
 
 ECHO_DBZ = 15.0  # correlation field: dBZ above this, clipped at +35
 CLIP_DB = 35.0
@@ -54,8 +54,8 @@ SNOW_HORIZON_H = 12.0
 MAX_LINES = 3
 LINE_GAP = 45.0  # map units between arrival lines (tags must not touch)
 FAST_LINE_GAP = 180.0  # map units per hour (≈ 32 mph) above which the lines come every 30 min
-TAG_Y = -175.0  # tags of near-vertical lines sit on this row (fall board), clear of the legend
-TAG_X = -172.0  # tags of near-horizontal lines sit on this column (winter board)
+TAG_Y = Y_MIN + 53  # tags of near-vertical lines sit on this row (fall board), clear of the legend
+TAG_X = X_MIN + 42  # tags of near-horizontal lines sit on this column (winter board)
 ARROW_LEN = 70.0
 TAG_CLEAR_X, TAG_CLEAR_Y = 40.0, 22.0  # the arrow and its label keep this far from time tags
 
@@ -207,7 +207,7 @@ def _agree(a: Motion, b: Motion) -> bool:
 
 def clip_segment(x1: float, y1: float, x2: float, y2: float, inset: float = 0.0):
     """Liang–Barsky clip to the panel (minus `inset`); None when the segment misses it."""
-    xmin, xmax, ymin, ymax = -HALF_W + inset, HALF_W - inset, -HALF_H + inset, HALF_H - inset
+    xmin, xmax, ymin, ymax = X_MIN + inset, X_MAX - inset, Y_MIN + inset, Y_MAX - inset
     dx, dy = x2 - x1, y2 - y1
     t0, t1 = 0.0, 1.0
     for p, q in ((-dx, x1 - xmin), (dx, xmax - x1), (-dy, y1 - ymin), (dy, ymax - y1)):
@@ -225,8 +225,8 @@ def clip_segment(x1: float, y1: float, x2: float, y2: float, inset: float = 0.0)
     return x1 + t0 * dx, y1 + t0 * dy, x1 + t1 * dx, y1 + t1 * dy
 
 
-def _inside(x: float, y: float, inset: float = 0.0) -> bool:
-    return abs(x) <= HALF_W - inset and abs(y) <= HALF_H - inset
+def _in_view(lat: Lattice):
+    return (lat.x >= X_MIN) & (lat.x <= X_MAX) & (lat.y >= Y_MIN) & (lat.y <= Y_MAX)
 
 
 def _r(v: float) -> float:
@@ -315,30 +315,30 @@ def _line_tag(seg, ux: float, uy: float) -> tuple[float, float] | None:
         if (y1 - TAG_Y) * (y2 - TAG_Y) <= 0 and y1 != y2:
             t = (TAG_Y - y1) / (y2 - y1)
             x = x1 + t * (x2 - x1)
-            if abs(x) <= HALF_W - 24:
+            if inside(x, 0, 24):
                 return x, TAG_Y
     elif (x1 - TAG_X) * (x2 - TAG_X) <= 0 and x1 != x2:
         t = (TAG_X - x1) / (x2 - x1)
         y = y1 + t * (y2 - y1)
-        if abs(y) <= HALF_H - 12:
+        if inside(0, y, 12):
             return TAG_X, y
     # otherwise a point 15 % along the visible part, kept inside the panel
     x, y = x1 + 0.15 * (x2 - x1), y1 + 0.15 * (y2 - y1)
-    return (x, y) if _inside(x, y, 20) else None
+    return (x, y) if inside(x, y, 20) else None
 
 
 def _blocked(x: float, y: float) -> bool:
     """Places the arrow must avoid: the legend (top left), the callout (bottom right), the panel edge."""
-    return (not _inside(x, y, 20)) or (x < 60 and y < -170) or (x > -10 and y > 110)
+    return (not inside(x, y, 20)) or (x < X_MIN + 274 and y < Y_MIN + 58) or (x > X_MAX - 224 and y > Y_MAX - 118)
 
 
 def _arrow(z, lat: Lattice, m: Motion, home, tags: list[tuple[float, float]], ux, uy) -> dict | None:
     """The motion arrow on the storms themselves, a little behind their leading edge (fall board), clear of home,
     the legend, the callout, the time tags and the panel edge."""
     hx, hy = home
-    core = (z >= STRONG_DBZ) & (np.abs(lat.x) <= HALF_W) & (np.abs(lat.y) <= HALF_H)
+    core = (z >= STRONG_DBZ) & _in_view(lat)
     if core.sum() < MIN_STRONG_CELLS:
-        core = (z >= RAIN_DBZ) & (np.abs(lat.x) <= HALF_W) & (np.abs(lat.y) <= HALF_H)
+        core = (z >= RAIN_DBZ) & _in_view(lat)
     if not core.any():
         return None
     cx, cy = lat.x[core], lat.y[core]
@@ -394,7 +394,8 @@ def snow_overlays(latest: Frame, older: list[Frame], lat: Lattice, home: tuple[f
     b = _boundary(latest)
     if b is None:
         return out
-    inview = b & (np.abs(lat.x) <= HALF_W) & (np.abs(lat.y) <= HALF_H)
+    view = _in_view(lat)
+    inview = b & view
     if inview.sum() < SNOW_MIN_CELLS:
         return out
     px, py = lat.x[inview], lat.y[inview]
@@ -426,7 +427,7 @@ def snow_overlays(latest: Frame, older: list[Frame], lat: Lattice, home: tuple[f
     line = [(mx + dx * tv + nx * uv, my + dy * tv + ny * uv) for (tv, _), uv in zip(verts, smooth, strict=True)]
 
     def poly(points) -> list[list[float]]:
-        return [[_r(x), _r(y)] for x, y in points if _inside(x, y)]
+        return [[_r(x), _r(y)] for x, y in points if inside(x, y)]
 
     cur = poly(line)
     if len(cur) < 2:
@@ -441,6 +442,7 @@ def snow_overlays(latest: Frame, older: list[Frame], lat: Lattice, home: tuple[f
         hours = (latest.t - f.t).total_seconds() / 3600
         if ob is None or hours <= 0:
             continue
+        ob = ob & view  # the same window as the latest line, or the medians compare different stretches of it
         ox, oy = lat.x[ob], lat.y[ob]
         ot = (ox - mx) * dx + (oy - my) * dy
         keep = (ot >= t.min()) & (ot <= t.max())
@@ -466,9 +468,11 @@ def snow_overlays(latest: Frame, older: list[Frame], lat: Lattice, home: tuple[f
         pts = poly((x + nx * k, y + ny * k) for x, y in line)
         if len(pts) < 2:
             continue
-        tag = min(pts, key=lambda p: abs(p[0] - TAG_X)) if abs(dx) >= abs(dy) else min(pts, key=lambda p: p[1])
-        if not _inside(tag[0], tag[1], 16):
-            tag = pts[len(pts) // 2]
+        # the whole tag (≤ 80 units wide) inside the panel, off the legend and the callout
+        clear = [p for p in pts if inside(p[0], 0, 40) and not _blocked(*p)] or pts
+        tag = min(clear, key=lambda p: abs(p[0] - TAG_X)) if abs(dx) >= abs(dy) else min(clear, key=lambda p: p[1])
+        if not inside(tag[0], tag[1], 16):
+            tag = clear[len(clear) // 2]
         out["snow_lines"].append({"t": _iso(h), "points": pts, "tag": [tag[0], tag[1]]})
     # arrival at home: home on the far side of the line, the line advancing toward it
     hx, hy = home

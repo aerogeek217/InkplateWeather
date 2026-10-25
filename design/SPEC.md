@@ -42,11 +42,11 @@ in `reference/` are the source of truth for exact visual appearance.
 ## Layout (px)
 
 ```
-padding 66 top/bottom, 68 left/right (about 5.5 mm more than v1 for the frame; reflowed 2026-10-24, trimmed 3 px the same day)
+padding 51 top, 53 right, 66 bottom, 68 left (v1 was 34/36; +35 px on 2026-10-24, −3 px the same day, −15 px top/right in v3)
 ┌ header (44, 3px black rule under) ─────────────────────────────────────────────┐
 ├ 11 gap ────────────────────────────────────────────────────────────────────────┤
-│ LEFT 536                              │24│ RIGHT 504                            │
-│ radar 536 × 570                       │  │ current temp block                   │
+│ LEFT 551                              │24│ RIGHT 504                            │
+│ radar 551 × 585                       │  │ current temp block                   │
 │                                       │  │ temperature trend (72 h)             │
 │                                       │  │ chance of precip (300) │ gauge       │
 │                                       │  │ sun (236) │ moon                     │
@@ -67,7 +67,9 @@ share the remaining height (flex), with a 24 px minimum per row.
   ("Svr T-storm Warning"; table in `messages.py`), and the impact is dropped only as a last resort (approved 2026-10-24).
 - Then a 1 px divider, battery icon + %, time (22/700). ("Next update" was removed 2026-10-24 to give the day line room.)
 
-### Radar (536 × 570, left column)
+### Radar (551 × 585, left column)
+- Extent (v3, 2026-10-25): home 60 mi from the west edge and 38 mi from the east, 52 mi to the north and south edges
+  (~98 × 104 mi, 4.48 map units per mile; `server/app/mapgeo.py`), so storms moving east show earlier.
 - Base map: county lines `#DBDBDB`, state line dashed `#929292`, interstates `#B6B6B6` 3.5 px,
   city dots + labels with a white halo, home marked by a black square + "SAVOY".
 - Echo fills (same coding as the icon sheet `fills/`): light `#DBDBDB`, moderate `#929292`,
@@ -172,6 +174,14 @@ storm, partly cloudy; freezing drizzle; wintry mix; small moon phases), the rend
 
 ## Reference renders
 
+Layout v3, approved 2026-10-25 (`tools/layout_v3.py` records the exact edits): 15 px off the top and right margins
+(the 6 mm reflow had added 35 px per side, the readability pass took back 3); the radar column and panel gain the
+15 px (551 × 585). The radar view is 20 % farther out and shifted west (see *Radar*), the base map was rebuilt with
+Decatur, Taylorville, Shelbyville, Charleston and Paris added, and the boards' hand-drawn radar is replaced by the
+generated one: the fall board shows the `radar-motion` fixture's radar, the winter board `radar-snowline`'s (the
+server fixtures share that art, `server/fixtures/radar/*.svg`), with the radar-timed callouts ("Storms ~3 PM ·
+7 mi west · ENE 15 mph"; "Snow by 5 PM"). Font sizes unchanged. All six goldens regenerated (container + Windows).
+
 Readability pass, approved 2026-10-24 (`tools/readability_v2.py` records the exact edits): margin −3 px per side,
 small text raised (see Typography), moon next-phase strip as a 2 × 2 grid, winter gauge labels "Snow depth" /
 "Season snow" with the note "in · snow via NWS", right-column gaps 7.
@@ -199,7 +209,8 @@ Storm motion (phase 4.1, renders approved 2026-10-25): the arrival lines, time t
 bold snow line with its "snow line" label and the "SNOW 6 PM" lines are drawn from radar with the boards' styles
 (`server/app/radarmap.py`), only when the motion estimate is trustworthy. The callout's headline is then timed by
 radar ("Storms ~3 PM", nearest half hour; "Snow by 5 PM") with the fall board's detail ("7 mi west · ENE 15 mph ·
-~0.5 in"). Test boards: `radar-motion` and `radar-snowline` fixtures (`server/tests/build_radar_fixtures.py`);
+~0.5 in"). Test boards: `radar-motion` and `radar-snowline` fixtures (`server/tests/build_radar_fixtures.py`; since v3
+both use synthetic motion on real echoes: measured over one window, the recorded snow line was nearly stationary);
 their goldens `reference/radar-motion-eink.png`, `radar-snowline-eink.png` (+ `windows/`).
 
 ## Error states (approved 2026-10-24)
@@ -221,8 +232,8 @@ All wording lives in `server/app/messages.py`.
 
 ## Known gaps to resolve during the build
 
-- Radar map geometry on the boards is hand-drawn. The real build needs a base map
-  (simplified county/road vectors) plus radar tiles reprojected to the same extent.
+- ~~Radar map geometry on the boards is hand-drawn~~: generated base map and radar since Phase 3; the boards
+  carry the generated radar since layout v3.
 - Chart label placement (lows/highs) must avoid collisions with real data.
 - A test fixture set (fall, winter storm, alert, missing data) should reproduce the reference boards.
 - ~~Behavior when a source is stale or unavailable~~: designed and approved, see *Error states*.

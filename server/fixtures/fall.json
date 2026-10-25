@@ -540,20 +540,29 @@
   },
   "radar.frame": {
    "value": {
-    "site": "KILX",
+    "site": "MRMS",
     "time": "2026-10-24T14:25:00-05:00",
     "types": [
      "rain"
     ],
     "artwork": "radar/fall.svg",
-    "aria_label": "Radar map: a line of storms west of Savoy moving east-northeast, with dashed lines showing its position at 3, 4 and 5 PM"
+    "aria_label": "Radar map around Savoy: rain in view",
+    "legend": "intensity",
+    "arrival": {
+     "t": "2026-10-24T14:54:51.792274-05:00",
+     "kind": "storm",
+     "dist_mi": 7,
+     "from": "west",
+     "heading": "ENE",
+     "mph": 15
+    }
    },
    "observed_at": "2026-10-24T14:25:00-05:00"
   },
   "radar.callout": {
    "kind": "storm",
-   "headline": "Storms ~4 PM",
-   "detail": "22 mi west · ENE 15 mph · ~0.5 in"
+   "headline": "Storms ~3 PM",
+   "detail": "7 mi west · ENE 15 mph"
   },
   "summary.day_line": "Storms around 4 PM, then colder and windy.",
   "summary.next_hazard": "frost possible Sunday night (34°)"

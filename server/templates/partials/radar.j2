@@ -21,23 +21,23 @@
 {% endif %}
         </div>
 {% endmacro %}
-      <div style="position: relative; width: 536px; height: 570px; flex-shrink: 0">
-        <svg width="536" height="570" viewBox="-214.4 -228 428.8 456" role="img" aria-label="{{ r.aria_label }}" style="display: block; outline: 1px solid #000000">
+      <div style="position: relative; width: {{ radar_w }}px; height: {{ radar_h }}px; flex-shrink: 0">
+        <svg width="{{ radar_w }}" height="{{ radar_h }}" viewBox="{{ radar_viewbox }}" role="img" aria-label="{{ r.aria_label }}" style="display: block; outline: 1px solid #000000">
 {% if r.svg_layers %}
 {{ r.svg_layers | safe }}
 {% else %}
-          <rect x="-214.4" y="-228" width="428.8" height="456" fill="#FFFFFF"></rect>
+          <rect {{ radar_view | safe }} fill="#FFFFFF"></rect>
 {% endif %}
         </svg>
 {% if r.message %}
         <div style="position: absolute; left: 60px; right: 60px; top: 250px; text-align: center; font-size: 17px; font-weight: 600; color: #494949">{{ r.message }}</div>
 {% endif %}
 {% if strip %}
-        <div role="alert" style="position: absolute; left: 0; top: 0; width: 536px; box-sizing: border-box; padding: 8px 12px; background: #000000; color: #FFFFFF; font-size: 15px; font-weight: 600">{{ strip }}</div>
+        <div role="alert" style="position: absolute; left: 0; top: 0; width: {{ radar_w }}px; box-sizing: border-box; padding: 8px 12px; background: #000000; color: #FFFFFF; font-size: 15px; font-weight: 600">{{ strip }}</div>
 {% endif %}
 {% if ctx.notices or strip %}
 {% if r.site_time or ctx.notices %}
-        <div style="position: absolute; left: 10px; top: {{ 44 if strip else 10 }}px; max-width: 516px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px">
+        <div style="position: absolute; left: 10px; top: {{ 44 if strip else 10 }}px; max-width: {{ radar_w - 20 }}px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px">
 {% if r.site_time and not strip %}{# the ≤ 5 % battery strip covers the legend's place; keep the map overlays clear #}
 {{ legend("") }}
 {% endif %}

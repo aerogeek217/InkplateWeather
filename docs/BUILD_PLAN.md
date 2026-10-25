@@ -179,7 +179,8 @@ clipped), "gusts" shown when equal to the wind speed.
 | 3.5 ✅ | C | `lightning_glm` background poller (GOES-East GLM L2 LCFA NetCDF from NOAA's open-data AWS bucket), rolling 30-min flash list clipped to the extent; radar partial draws **bolt symbols** (`markers/lightning-recent.svg` for ≤ 10 min, `lightning-older.svg` for 10–30 min), merges flashes per ~8 px cell, and shows a legend entry only when flashes exist | 3.4 | recorded GLM files produce the expected bolts; poller survives gaps and restarts |
 
 Phase 3 notes (2026-10-24):
-- Extent: the approved board's framing (open decision 4's default), ~77 × 81 mi at 5.6 units per mile; the base map
+- Extent: the approved board's framing (open decision 4's default), ~77 × 81 mi at 5.6 units per mile (layout v3
+  widened it, see Phase 4 notes); the base map
   (`server/tools/build_basemap.py`, TIGER 2023) puts the board's towns within ~6 mi of where they were hand-drawn.
 - MRMS GRIB2 is PNG-packed, so `app/grib2.py` + Pillow decode it (no eccodes). PrecipFlag has no ice class: ice/sleet
   = liquid echoes over a ≤ 0 °C surface (MRMS `Model_SurfaceTemp`, fetched hourly only while it's raining in view).
@@ -222,6 +223,16 @@ to the Inkplate on COM3 with the user's approval at 09:23 CDT; its first request
   (`fw=` param → `X-Firmware-Update` header → `/firmware/<file>.bin`, MD5-checked, battery ≥ 40 %, retry ≤ 6 h).
   Partition scheme now `no_fs` (2 × 2 MB app slots), so the **next flash must be over USB**. Untested on hardware.
 - Tests: 641 pass on Windows; in the container 636 pass, 5 skip (the backup-script tests: `scripts/` isn't in the image).
+
+Layout v3 (2026-10-25, on `layout-v3`; approved by the user, not yet deployed): margins 51/53/66/68 (15 px off the top
+and right), radar 551 × 585 with the view 20 % farther out and home 60 mi from the west edge / 38 mi from the east
+(`app/mapgeo.py` X_MIN/X_MAX/Y_MIN/Y_MAX replace the centered HALF_W/HALF_H); base map rebuilt with five more towns;
+MRMS and IEM test recordings re-recorded from the archives for the wider extent. Snow-line motion now compares the
+same in-view window in every frame (older frames had used cells beyond the view, so the speed depended on the crop);
+the recorded 2022-02-02 line is then nearly stationary, so `radar-snowline` uses synthetic 4 mph SE motion. Snow-line
+time tags must fit inside the panel, off the legend and callout. The fall/winter boards (design and fixtures) carry
+the generated radar of `radar-motion` / `radar-snowline` (`design/tools/layout_v3.py`). Tests: 642 pass on Windows
+and in the container.
 
 ## Testing strategy
 
