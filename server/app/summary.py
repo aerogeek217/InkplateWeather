@@ -183,11 +183,15 @@ def hour_range(a: datetime, b: datetime) -> str:
 
 
 def snow_range(total: float) -> str:
-    """'0.4 in', '1–2 in', '3–5 in' (expected snowfall as a range, like the reference boards)."""
+    """'0.4 in', '1–2 in', '3–5 in', '6–10 in' (expected snowfall as a range around the forecast total, like the
+    reference boards and NWS wording)."""
     if total < 1:
         return f"{total:.1f} in"
-    lo, hi = max(1, math.floor(total * 0.75)), math.ceil(total * 1.25)
-    return f"{lo} in" if lo == hi else f"{lo}–{hi} in"
+    n = round_half_up(total)
+    if n <= 2:
+        return "1–2 in"
+    spread = 1 if n <= 6 else 2  # NWS-style two-inch ranges, four inches for big storms
+    return f"{n - spread}–{n + spread} in"
 
 
 def rain_amount(total: float) -> str:
@@ -408,8 +412,9 @@ def _dry_candidates(inp: Inputs) -> list[str]:
     hi, lo = _num(today.get("high")), _num(today.get("low"))
     evening = inp.now.hour >= EVENING_HOUR or hi is None
     lead = None
+    today_text = _sentence_text(today.get("text"))
     if not evening and hi is not None:
-        text = str(today.get("text") or "").strip()
+        text = today_text
         windy = _windy(inp, inp.now, inp.now.replace(hour=20, minute=0), (0,))
         if windy and "wind" not in text.lower() and "breez" not in text.lower():
             text = f"{text} and windy" if text else "Windy"
@@ -431,10 +436,13 @@ def _dry_candidates(inp: Inputs) -> list[str]:
         t0 = datetime.combine(inp.now.date() + timedelta(days=1), datetime.min.time(), tzinfo=inp.now.tzinfo)
         if _windy(inp, t0 + timedelta(hours=8), t0 + timedelta(hours=20), (1,)):
             words.append("windy")
+        t_text = _sentence_text(tomorrow.get("text"))
         if words:
             tail = f"{_and(words)} tomorrow, {deg(t_hi)}"
-        elif tomorrow.get("text"):
-            tail = f"{_lower(str(tomorrow['text']).strip())} tomorrow, {deg(t_hi)}"
+        elif t_text and not evening and t_text.lower() == today_text.lower():
+            tail = f"again tomorrow, {deg(t_hi)}"  # "Partly sunny, high 75°; again tomorrow, 77°."
+        elif t_text:
+            tail = f"{_lower(t_text)} tomorrow, {deg(t_hi)}"
         else:
             tail = f"tomorrow {deg(t_hi)}"
     out = []
@@ -445,6 +453,11 @@ def _dry_candidates(inp: Inputs) -> list[str]:
     elif tail:
         out.append(f"{_cap(tail)}.")
     return out
+
+
+def _sentence_text(text: Any) -> str:
+    """The 7-day list's short text, made to read in a sentence ("Snow → blowing snow" → "Snow then blowing snow")."""
+    return str(text or "").strip().replace(" → ", " then ")
 
 
 def _detail_candidates(inp: Inputs) -> list[str]:
@@ -654,7 +667,9 @@ def hazards(inp: Inputs) -> list[Hazard]:
         day_hrs = [h for h in hrs if h.t.date() == day]
         d = inp.day(off)
         rain = sum(h.rain for h in day_hrs)
-        snow = max(sum(h.snow for h in day_hrs), _num(d.get("snow_in")) or 0)
+        snow = sum(h.snow for h in day_hrs)
+        if off > 0 or not day_hrs:  # today's daily total includes snow that has already fallen
+            snow = max(snow, _num(d.get("snow_in")) or 0)
         name = "today" if off == 0 else f"{day:%A}"
         at = min((h.t for h in day_hrs if h.pop >= PRECIP_POP), default=None) or \
             datetime.combine(day, datetime.min.time(), tzinfo=tz) + timedelta(hours=12)
