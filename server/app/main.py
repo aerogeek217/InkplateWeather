@@ -37,6 +37,31 @@ from .resolver import Resolved
 
 log = logging.getLogger("inkplate")
 
+LOG_FORMAT = "%(asctime)s %(levelname)-7s %(name)s: %(message)s"
+
+
+def configure_logging() -> None:
+    """Timestamped log lines for `docker compose logs`, including our own INFO lines.
+
+    Uvicorn configures only its own loggers (no timestamps); ours would otherwise go to Python's last-resort
+    handler, which drops everything below WARNING. Idempotent, and it leaves handlers someone else set up alone
+    (a test runner, an embedding app).
+    """
+    fmt = logging.Formatter(LOG_FORMAT)
+    for name in ("uvicorn.error", "uvicorn.access"):
+        for h in logging.getLogger(name).handlers:
+            h.setFormatter(fmt)
+    root = logging.getLogger()
+    if not root.handlers:
+        h = logging.StreamHandler()  # stderr, unbuffered
+        h.setFormatter(fmt)
+        root.addHandler(h)
+    for name in ("inkplate", "app"):
+        lg = logging.getLogger(name)
+        if lg.level == logging.NOTSET:
+            lg.setLevel(logging.INFO)
+
+
 SLEEP_MARGIN_S = 20
 SLEEP_MIN_S, SLEEP_MAX_S = 60, 3600
 WAKE_REASONS = {"timer", "button", "retry", "boot"}
@@ -186,6 +211,7 @@ def _stop_sampler(state) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    configure_logging()
     st = app.state
     path = config_path()
     _apply_config(st, config.load(path), path)
