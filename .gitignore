@@ -23,6 +23,8 @@ server/tests/_out/
 
 # Project-local tool installs and download caches
 .tools/
+firmware/dist/
+firmware/inkplate_weather/build/
 server/tools/.cache/
 
 # Agent worktrees
