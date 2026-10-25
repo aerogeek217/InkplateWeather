@@ -2,7 +2,7 @@
 
 Status: **Phases 1 and 2 merged** (2026-10-24; Phase 2 merge commit eefc7de, deployed on the OMV Pi as 2c22f9c).
 **Phase 3 (radar) built on `phase-3`** (tasks 3.1–3.5; radar boards approved 2026-10-24); deployed on the OMV Pi as
-f504d4e (14:25 CDT, 2026-10-24).
+f504d4e (14:25 CDT, 2026-10-24). **Phase 4 (polish, 4.1–4.4) built on `phase-4`** (2026-10-25), awaiting review.
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 
@@ -198,10 +198,28 @@ Phase 3 notes (2026-10-24):
 
 | # | WS | Task |
 |---|---|---|
-| 4.1 | C | Storm motion from 2–3 recent frames (cross-correlation), arrival-time lines and "arrives ~4 PM" callout; snow-line motion in winter |
-| 4.2 | A | Day-line generation improvements; optional lightning slot (if the user approves a design change) |
-| 4.3 | E | Deployment guide for OMV compose plugin; backup of `config/`; log rotation |
-| 4.4 | D | Optional: captive-portal Wi-Fi setup, OTA updates |
+| 4.1 ✅ | C | Storm motion from 2–3 recent frames (cross-correlation), arrival-time lines and "arrives ~4 PM" callout; snow-line motion in winter |
+| 4.2 ✅ | A | Day-line generation improvements; optional lightning slot (if the user approves a design change) |
+| 4.3 ✅ | E | Deployment guide for OMV compose plugin; backup of `config/`; log rotation |
+| 4.4 ✅ | D | Optional: captive-portal Wi-Fi setup, OTA updates |
+
+Phase 4 notes (2026-10-25, built on `phase-4`; not deployed, not flashed):
+- 4.1 `app/motion.py` (ARCHITECTURE *Storm motion*): FFT cross-correlation of the frames ~30 and ~15 min older
+  (fetched from the MRMS listing only with echoes in view); both pairs must agree or nothing is drawn. Arrival lines
+  + tags + arrow (fall board), bold snow line + "SNOW 6 PM" lines (winter board), radar-timed callout
+  ("Storms ~3 PM · 7 mi west · ENE 15 mph"; "Snow by 5 PM"). Recorded motion frames in `tests/data/recorded/mrms/motion/`
+  (`record_mrms.py --margin 80`). The recorded 2023-04-01 squall line grew too fast (pairs 35 vs 54 mph), so the
+  `radar-motion` fixture uses its real echoes with synthetic 15 mph ENE motion; `radar-snowline` is all real frames.
+  **Their renders await the user's approval before becoming goldens.** IEM fallback frames carry no motion.
+- 4.2 Day line: "again tomorrow" instead of repeating the sky; "Snow then blowing snow" (no arrow in sentences);
+  NWS-style snow ranges ("4–6 in"); the "Next:" chip no longer counts today's already-fallen snow. Lightning slot not
+  built (it would be a design change; not requested).
+- 4.3 `docs/DEPLOY.md` rewritten (OMV compose plugin, rollback, backups, disk use); `scripts/backup-config.sh`
+  (mode-600 archives, pruned); timestamped logs. Nothing in the cache grows without bound; Docker rotates logs.
+- 4.4 Firmware: NVS settings + captive portal (WPA2 SoftAP, password on screen; hold the button ~5 s), pull OTA
+  (`fw=` param → `X-Firmware-Update` header → `/firmware/<file>.bin`, MD5-checked, battery ≥ 40 %, retry ≤ 6 h).
+  Partition scheme now `no_fs` (2 × 2 MB app slots), so the **next flash must be over USB**. Untested on hardware.
+- Tests: 639 pass on Windows; in the container 634 pass, 5 skip (the backup-script tests: `scripts/` isn't in the image).
 
 ## Testing strategy
 
@@ -220,7 +238,7 @@ Phase 3 notes (2026-10-24):
 1. ~~NWS contact~~ Resolved: `User-Agent: (InkplateWeather, https://github.com/aerogeek217/InkplateWeather)`.
 2. ~~Lightning overlay~~ Approved: NOAA GLM, drawn as bolt symbols (task 3.5). The station's own lightning sensor must
    **not** be used.
-3. **Storm motion** (phase 4.1) is the most uncertain piece; until then the callout uses forecast wording.
+3. ~~Storm motion~~ Built in 4.1; the callout falls back to forecast wording whenever motion isn't trustworthy.
 4. Exact display extent / base map framing: default to the design's framing centered on Savoy.
 
 ## Environment facts
