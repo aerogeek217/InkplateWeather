@@ -53,7 +53,7 @@ PLACES = [
     ("Clinton", "17", 3.2, 5, -8, "start"),
     ("Bloomington", "17", 3.6, 7, 4, "start"),
     ("Tuscola", "17", 3.2, 7, 4, "start"),
-    ("Mattoon", "17", 3.6, 7, 4, "start"),
+    ("Mattoon", "17", 3.6, -7, 4, "end"),  # left of the dot, clear of Charleston
     # layout v3 (wider, extending west)
     ("Decatur", "17", 3.6, 7, 4, "start"),
     ("Taylorville", "17", 3.2, 6, 4, "start"),
