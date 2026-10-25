@@ -210,7 +210,7 @@ Phase 4 notes (2026-10-25, built on `phase-4`; not deployed, not flashed):
   ("Storms ~3 PM · 7 mi west · ENE 15 mph"; "Snow by 5 PM"). Recorded motion frames in `tests/data/recorded/mrms/motion/`
   (`record_mrms.py --margin 80`). The recorded 2023-04-01 squall line grew too fast (pairs 35 vs 54 mph), so the
   `radar-motion` fixture uses its real echoes with synthetic 15 mph ENE motion; `radar-snowline` is all real frames.
-  **Their renders await the user's approval before becoming goldens.** IEM fallback frames carry no motion.
+  The user approved both renders; they are goldens (container + Windows). IEM fallback frames carry no motion.
 - 4.2 Day line: "again tomorrow" instead of repeating the sky; "Snow then blowing snow" (no arrow in sentences);
   NWS-style snow ranges ("4–6 in"); the "Next:" chip no longer counts today's already-fallen snow. Lightning slot not
   built (it would be a design change; not requested).
@@ -219,7 +219,7 @@ Phase 4 notes (2026-10-25, built on `phase-4`; not deployed, not flashed):
 - 4.4 Firmware: NVS settings + captive portal (WPA2 SoftAP, password on screen; hold the button ~5 s), pull OTA
   (`fw=` param → `X-Firmware-Update` header → `/firmware/<file>.bin`, MD5-checked, battery ≥ 40 %, retry ≤ 6 h).
   Partition scheme now `no_fs` (2 × 2 MB app slots), so the **next flash must be over USB**. Untested on hardware.
-- Tests: 639 pass on Windows; in the container 634 pass, 5 skip (the backup-script tests: `scripts/` isn't in the image).
+- Tests: 641 pass on Windows; in the container 636 pass, 5 skip (the backup-script tests: `scripts/` isn't in the image).
 
 ## Testing strategy
 

@@ -23,7 +23,7 @@ from app.render import render_html  # noqa: E402
 from app.render.browser import Renderer  # noqa: E402
 from app.render.quantize import quantize_png  # noqa: E402
 
-FIXTURES = ["radar-storm", "radar-winter"]
+FIXTURES = ["radar-storm", "radar-winter", "radar-motion", "radar-snowline"]
 
 
 async def run(out: Path, names: list[str]) -> None:
