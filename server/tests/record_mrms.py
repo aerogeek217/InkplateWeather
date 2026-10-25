@@ -1,11 +1,12 @@
 """Record MRMS GRIB2 files for tests: download, crop to the radar extent (plus a margin), save as small GRIB2.
 
-    .venv/Scripts/python.exe tests/record_mrms.py <url-or-path> [...] [--out tests/data/recorded/mrms]
+    .venv/Scripts/python.exe tests/record_mrms.py <url-or-path> [...] [--out tests/data/recorded/mrms] [--margin 20]
 
 Sources: the live feed (https://mrms.ncep.noaa.gov/2D/<product>/MRMS_<product>.latest.grib2.gz) or the Iowa State
 archive (https://mtarchive.geol.iastate.edu/YYYY/MM/DD/mrms/ncep/<product>/<product>_00.00_YYYYMMDD-HHMMSS.grib2.gz;
 it keeps SeamlessHSR and PrecipFlag but not ReflectivityAtLowestAltitude). The output keeps the real values and
-header; only the grid window shrinks, so the provider decodes it exactly like a full CONUS file.
+header; only the grid window shrinks, so the provider decodes it exactly like a full CONUS file. Storm-motion
+recordings (`mrms/motion/`) use `--margin 80`, the provider's motion window.
 """
 from __future__ import annotations
 
@@ -32,9 +33,9 @@ def load(src: str) -> bytes:
     return gzip.decompress(data) if data[:2] == b"\x1f\x8b" else data
 
 
-def record(src: str, out: Path) -> Path:
+def record(src: str, out: Path, margin: float = MARGIN) -> Path:
     grid = grib2.decode(load(src))
-    sub = grid.crop(*radarmap.extent().bbox(MARGIN))
+    sub = grid.crop(*radarmap.extent().bbox(margin))
     name = (src.rsplit("/", 1)[-1] if src.startswith("http") else Path(src).name).removesuffix(".gz")
     name = name.removesuffix(".grib2")
     path = out / f"{name}.grib2"
@@ -47,9 +48,10 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("src", nargs="+")
     ap.add_argument("--out", type=Path, default=OUT)
+    ap.add_argument("--margin", type=float, default=MARGIN, help="map units of grid kept around the viewBox")
     args = ap.parse_args()
     for s in args.src:
-        p = record(s, args.out)
+        p = record(s, args.out, args.margin)
         print(f"{p} ({p.stat().st_size} bytes)")
 
 
