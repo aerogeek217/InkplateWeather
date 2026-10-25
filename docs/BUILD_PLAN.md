@@ -2,7 +2,7 @@
 
 Status: **Phases 1 and 2 merged** (2026-10-24; Phase 2 merge commit eefc7de, deployed on the OMV Pi as 2c22f9c).
 **Phase 3 (radar) built on `phase-3`** (tasks 3.1–3.5; radar boards approved 2026-10-24); deployed on the OMV Pi as
-f504d4e (14:25 CDT, 2026-10-24). **Phase 4 (polish, 4.1–4.4) built on `phase-4`** (2026-10-25), awaiting review.
+f504d4e (14:25 CDT, 2026-10-24). **Phase 4 (polish, 4.1–4.4) built on `phase-4`** (2026-10-25), deployed as 7a90f2b; firmware not flashed yet.
 Read first: [`design/SPEC.md`](../design/SPEC.md) (what to build) and [`ARCHITECTURE.md`](ARCHITECTURE.md) (how).
 The reference renders in `design/reference/` are the visual source of truth.
 
@@ -203,7 +203,9 @@ Phase 3 notes (2026-10-24):
 | 4.3 ✅ | E | Deployment guide for OMV compose plugin; backup of `config/`; log rotation |
 | 4.4 ✅ | D | Optional: captive-portal Wi-Fi setup, OTA updates |
 
-Phase 4 notes (2026-10-25, built on `phase-4`; not deployed, not flashed):
+Phase 4 notes (2026-10-25, built on `phase-4`; deployed to the OMV Pi as 7a90f2b at 09:16 CDT with the user's
+approval, rebuild 85 s, config backed up by `scripts/backup-config.sh`, previous image tagged `:previous`; on the Pi
+the motion boards match the goldens (0.000 %, 0.001 %); firmware not flashed):
 - 4.1 `app/motion.py` (ARCHITECTURE *Storm motion*): FFT cross-correlation of the frames ~30 and ~15 min older
   (fetched from the MRMS listing only with echoes in view); both pairs must agree or nothing is drawn. Arrival lines
   + tags + arrow (fall board), bold snow line + "SNOW 6 PM" lines (winter board), radar-timed callout
