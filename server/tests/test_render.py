@@ -13,7 +13,8 @@ from app.providers.fixture import fixture_now
 from app.render.quantize import LEVELS, LUT, quantize
 
 GOLDEN = {"fall": "dashboard-eink.png", "winter": "dashboard-winter-eink.png",
-          "radar-storm": "radar-storm-eink.png", "radar-winter": "radar-winter-eink.png"}  # radar: approved renders
+          "radar-storm": "radar-storm-eink.png", "radar-winter": "radar-winter-eink.png",  # radar: approved renders
+          "radar-motion": "radar-motion-eink.png", "radar-snowline": "radar-snowline-eink.png"}  # storm motion (4.1)
 MAX_DIFF_FRACTION = 0.005  # < 0.5 % of 1200 × 825 pixels
 TIMINGS: dict[str, float] = {}
 

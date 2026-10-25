@@ -5,6 +5,7 @@
 #include <WiFi.h>
 
 #include "timekeeping.h"
+#include "version.h"
 
 // Contract says 60-150 kB; anything far beyond that is not our PNG.
 static const size_t MAX_PNG_BYTES = 1024 * 1024;
@@ -51,6 +52,7 @@ void fetchDisplay(const char *host, uint16_t port, const char *path, int battery
     }
     uri += "reason=";
     uri += reason;
+    uri += "&fw=" + String(FW_VERSION);
     Serial.printf("[fetch] GET http://%s:%u%s\n", host, port, uri.c_str());
 
     WiFiClient client;
@@ -59,7 +61,7 @@ void fetchDisplay(const char *host, uint16_t port, const char *path, int battery
     http.setReuse(false);
     http.setConnectTimeout(CONNECT_TIMEOUT_MS);
     http.setTimeout((uint16_t)(timeoutMs > CONNECT_TIMEOUT_MS + 1000 ? timeoutMs - CONNECT_TIMEOUT_MS : 1000));
-    const char *headerKeys[] = {"X-Sleep-Seconds", "Date", "Content-Type"};
+    const char *headerKeys[] = {"X-Sleep-Seconds", "Date", "Content-Type", "X-Firmware-Update"};
     http.collectHeaders(headerKeys, sizeof(headerKeys) / sizeof(headerKeys[0]));
 
     if (!http.begin(client, host, port, uri))
@@ -95,6 +97,14 @@ void fetchDisplay(const char *host, uint16_t port, const char *path, int battery
             r.sleepSeconds = s;
         else
             Serial.printf("[fetch] ignoring out-of-range X-Sleep-Seconds: '%s'\n", sleepHeader.c_str());
+    }
+
+    String fwHeader = http.header("X-Firmware-Update");
+    if (fwHeader.length())
+    {
+        long v = fwHeader.toInt();
+        if (v > 0 && v < 1000000)
+            r.fwUpdate = v;
     }
 
     if (r.httpCode != HTTP_CODE_OK)

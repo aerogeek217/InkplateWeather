@@ -41,7 +41,7 @@ def budget(name: str) -> float:
     # Real NWS responses recorded for Savoy at 11:45 AM on 2026-10-24 (a dry, warm week).
     ("live-2026-10-24", "Partly sunny, high 72°; mostly sunny tomorrow, 75°."),
     # The crafted winter storm parsed by the real NWS provider.
-    ("live-winter-2027-01-19", "Sleet changing to snow by 6 PM; 3–7 in by morning."),
+    ("live-winter-2027-01-19", "Sleet changing to snow by 6 PM; 4–6 in by morning."),
     ("frost", "Clear tonight, low 31°; sunny tomorrow, 55°."),
     ("alert", "Storms until 8 PM; ~0.9 in, then colder."),
 ])
@@ -70,6 +70,36 @@ def test_day_line_fit_picks_the_most_complete_phrasing():
     assert summary.day_line(inp, WIDE).endswith("then colder and windy.")
     assert summary.day_line(inp, 300) == "Sleet changing to snow by 6 PM."
     assert summary.day_line(inp, 100) is None  # nothing fits: no day line rather than an overflow
+
+
+def test_dry_day_line_wording():
+    now = datetime(2026, 10, 25, 9, 30, tzinfo=TZ)
+    daily = [{"date": "2026-10-25", "text": "Partly sunny", "high": 75, "low": 49},
+             {"date": "2026-10-26", "text": "Partly sunny", "high": 77, "low": 50}]
+    hours = [{"t": (now.replace(minute=0) + timedelta(hours=i)).isoformat(), "temp": 70, "pop": 2}
+             for i in range(0, 30)]
+    inp = summary.Inputs.build(now, TZ, hours, daily, "partly-cloudy")
+    assert summary.day_line(inp, WIDE) == "Partly sunny, high 75°; again tomorrow, 77°."
+    inp = summary.Inputs.build(now.replace(hour=19), TZ, hours, daily, "partly-cloudy-night")
+    assert summary.day_line(inp, WIDE).endswith("; partly sunny tomorrow, 77°.")  # no "again" after a night lead
+    daily[0]["text"] = "Snow → blowing snow"  # the 7-day list's short text reads as a sentence here
+    inp = summary.Inputs.build(now, TZ, hours, daily, "snow")
+    assert summary.day_line(inp, WIDE).startswith("Snow then blowing snow, high 75°;")
+
+
+def test_snow_chip_counts_only_snow_still_to_come():
+    # 3:30 AM, snow ending at 7 AM: the day's NWS total (mostly fallen overnight) must not raise a "snow today" chip.
+    now = datetime(2027, 1, 20, 3, 30, tzinfo=TZ)
+    hours = [{"t": (now.replace(minute=0) + timedelta(hours=i)).isoformat(), "temp": 20,
+              "pop": 70 if i < 4 else 5, "precip_type": "snow", "snow_in": 0.2 if i < 4 else 0}
+             for i in range(0, 48)]
+    daily = [{"date": "2027-01-20", "high": 22, "low": 10, "snow_in": 1.8},
+             {"date": "2027-01-21", "high": 24, "low": 9, "snow_in": 0}]
+    inp = summary.Inputs.build(now, TZ, hours, daily, "snow")
+    assert not [z for z in summary.hazards(inp) if z.kind == "snow"]
+    daily[1]["snow_in"] = 2.5  # tomorrow's total still counts
+    assert [z.text for z in summary.hazards(summary.Inputs.build(now, TZ, hours, daily, "snow"))
+            if z.kind == "snow"] == ["snow Thursday (2–4 in)"]
 
 
 def test_day_line_falls_back_to_nws_wording():
@@ -110,7 +140,7 @@ def test_callouts():
     assert summary.callout(inputs("alert")) == {
         "kind": "storm", "headline": "Storms now", "detail": "until 8 PM · 80% · ~0.9 in"}
     assert summary.callout(inputs("live-winter-2027-01-19")) == {
-        "kind": "snow", "headline": "Snow by 6 PM", "detail": "Sleet now · heaviest 6 PM–midnight · 3–7 in"}
+        "kind": "snow", "headline": "Snow by 6 PM", "detail": "Sleet now · heaviest 6 PM–midnight · 4–6 in"}
     assert summary.callout(inputs("live-2026-10-24")) is None
     assert summary.callout(inputs("frost")) is None
 
@@ -167,7 +197,8 @@ def test_formatting():
     assert summary.hour_range(t + timedelta(hours=3), t + timedelta(hours=7)) == "10 PM–2 AM"
     assert summary.hour_range(t - timedelta(hours=1), t + timedelta(hours=5)) == "6 PM–midnight"
     assert [summary.clock_hour(t.replace(hour=h)) for h in (0, 9, 12, 16)] == ["midnight", "9 AM", "noon", "4 PM"]
-    assert [summary.snow_range(x) for x in (0.4, 1.0, 4.0, 4.78)] == ["0.4 in", "1–2 in", "3–5 in", "3–6 in"]
+    assert [summary.snow_range(x) for x in (0.4, 1.0, 2.4, 4.0, 4.78, 6.4, 8.2)] == [
+        "0.4 in", "1–2 in", "1–2 in", "3–5 in", "4–6 in", "5–7 in", "6–10 in"]
     now = datetime(2026, 10, 24, 14, 30, tzinfo=TZ)
     assert summary.when(now.replace(hour=22), now) == "tonight"
     assert summary.when(now + timedelta(days=1, hours=13), now) == "Sunday night"  # 3:30 AM Monday

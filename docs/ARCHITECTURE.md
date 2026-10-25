@@ -122,9 +122,9 @@ Recommendation: **MRMS as primary, IEM as fallback.** Avoid RainViewer: its free
 | **IEM tiles / WMS** (`mesonet.agron.iastate.edu`): `ridge::ILX-N0B-0` (KILX single site) or `nexrad-n0q` mosaic; WMS GetMap with a bounding box | Colored PNG | Very simple; one request for our exact box | Colored image → must be mapped back to dBZ via the known color ramp; no precip type (IEM's HRRR `REFP` layer gives *modeled* type) |
 | NWS ArcGIS `radar_base_reflectivity` MapServer export | Colored PNG for a bounding box | Official, one request | Same color-decoding issue; no type |
 
-**Storm motion and arrival lines** ("Storms ~4 PM", the dashed 3/4/5 PM lines) need motion estimated from
-two or three recent frames (cross-correlation of the echo field). That's a **phase 2** feature. Phase 1 shows
-the current frame, legend and callout text from the forecast (e.g. "Storms likely 4–6 PM").
+**Storm motion and arrival lines** ("Storms ~4 PM", the dashed 3/4/5 PM lines) are estimated from three recent
+frames (cross-correlation of the echo field); built in phase 4, see *Storm motion* below. Without a trustworthy
+motion the panel shows the current frame and the callout uses forecast wording (e.g. "Storms ~4 PM · 3–8 PM · 80%").
 
 As built (Phase 3, 2026-10-24):
 - `radar_mrms` fetches `ReflectivityAtLowestAltitude` + `PrecipFlag` (`mrms.ncep.noaa.gov/2D/…latest.grib2.gz`),
@@ -139,6 +139,31 @@ As built (Phase 3, 2026-10-24):
   (dBZ = index / 2 − 32.5), plus its world file and JSON time. Intensity only. It shows ~30 % more echo than MRMS
   (strongest return of overlapping radars).
 - Frames are plain JSON (masks as base64 PNG), so the cache keeps a last-good frame.
+
+### Storm motion (phase 4.1, as built 2026-10-25)
+
+`app/motion.py`, fed by `radar_mrms` (the IEM fallback has none):
+- With ≥ 400 echo pixels in view, the provider reads the product's directory listing (`/2D/<product>/`, ~190 kB,
+  cached 90 s) and fetches the files nearest 30 and 15 min before the latest (~0.7 MB each, decoded grids kept in
+  memory). A snow line also needs the matching PrecipFlag files. All motion work uses a window 80 map units
+  (~14 mi) wider than the panel. Any failure only drops the overlays.
+- **Motion**: one translation for the whole echo field, the peak of the FFT cross-correlation of dBZ − 15 (clipped
+  at 35, mean removed) with a parabolic sub-cell fit. The 30- and 15-min pairs must agree (±8 mph or 35 %, ±35°)
+  with normalized peaks ≥ 0.35, speed 3–80 mph; otherwise nothing is drawn. Fast-growing lines fail this on
+  purpose (the recorded 2023-04-01 squall line: 35 vs 54 mph).
+- **Arrival lines**: perpendicular to the motion through the 20 dBZ leading edge (the edge in an 8 mi band around
+  home when storms are heading for it, else the field's 95th percentile) at the next whole hours up to 3 h ahead,
+  ≥ 45 units apart (every 30 min above ~32 mph). Tags on the fall board's row (y = −175) or column (x = −172).
+  The arrow (70 units) sits on the storms just behind the edge, clear of home, legend, callout and tags.
+- **Arrival at home**: from that band's edge; "storm" when ≥ 45 dBZ is in the band, else "rain". The callout says
+  "Storms ~3 PM" (nearest half hour) · "7 mi west · ENE 15 mph" · forecast amount, when within 3 h; a winter storm
+  in the forecast keeps forecast wording.
+- **Snow line** (types legend): snow cells next to other precipitation, principal direction → a polyline (20-unit
+  bins, median, smoothed). Its own displacement across the line between frames (median, both pairs agreeing within
+  4.5 mph / 60 %) gives future positions every 1–3 h on local-clock multiples ("SNOW 6 PM", "SNOW 9 PM", ≤ 6 h) and
+  the time it reaches home ("Snow by 5 PM", rounded up; within 12 h).
+- The frame carries `motion`, `arrival` and `overlays` (JSON); `radarmap` draws only lines still in the future.
+  Cost on the dev PC: ~50 ms per analysis plus the decodes.
 
 ## Lightning (map overlay, approved 2026-10-24)
 
@@ -186,7 +211,8 @@ Every field resolves to `ok`, `stale` or `missing`; the template shows each stat
 
 | Endpoint | Purpose |
 |---|---|
-| `GET /display.png?batt=&mv=&reason=` | Render now and return the 8-gray PNG (Inkplate). |
+| `GET /display.png?batt=&mv=&reason=&fw=` | Render now and return the 8-gray PNG (Inkplate). |
+| `GET /firmware/inkplate_weather-<n>.bin` | A published firmware build for over-the-air updates (with `x-MD5`). |
 | `GET /preview` | Same page as live HTML in a browser (debugging/design tweaks). |
 | `GET /status` | Per-field winner, ages, errors; provider health. |
 | `GET /health` | Container health check. |
@@ -194,8 +220,10 @@ Every field resolves to `ok`, `stale` or `missing`; the template shows each stat
 
 ### `/display.png` contract (frozen 2026-10-24; firmware builds against this)
 
-Request: `GET /display.png?batt=<0–100>&mv=<millivolts>&reason=<timer|button|retry|boot>`. All parameters
-are optional; unknown values are ignored. The server passes them to the `device` provider.
+Request: `GET /display.png?batt=<0–100>&mv=<millivolts>&reason=<timer|button|retry|boot>&fw=<build>`. All parameters
+are optional; unknown values are ignored. The server passes the first three to the `device` provider.
+`fw` (added 2026-10-25, additive) is the firmware build number, a positive integer; the server uses it only to decide
+whether to announce an update (below) and to show it on `/status`.
 
 Response `200`:
 - `Content-Type: image/png`, exactly **1200 × 825**, 8-bit grayscale (`L`) or palette PNG whose pixels use only the
@@ -204,6 +232,15 @@ Response `200`:
   timezone, plus ~20 s so the server sees the new half hour). The firmware sleeps this long; if the header is
   missing or out of range (< 60 or > 3600) it falls back to its own RTC alignment or 1800 s.
 - `Date`: standard HTTP date (the firmware may use it to set its RTC).
+- `X-Firmware-Update: <n>` (added 2026-10-25, additive; only when present): a firmware build number **greater than**
+  the request's `fw` is available. Absent when `fw` is missing or invalid, when it is current, or when no build is
+  published. Firmware without OTA support ignores it. The device then fetches
+  `GET /firmware/inkplate_weather-<n>.bin` (`200`, `application/octet-stream`, `Content-Length`, and
+  `x-MD5: <32 hex>`, which the ESP32 updater verifies; `404` if that build isn't published).
+
+Builds are files in `<cache dir>/firmware/` (`INKPLATE_CACHE_DIR`, else `server.cache_dir`; on the Pi `~/inkplate-weather/cache/firmware/`):
+`inkplate_weather-<n>.bin`, optionally with a `manifest.json` (`version`, `file`, `md5`, ...) written by
+`firmware/build.ps1 -Export`. Without a manifest the highest-numbered file is offered. Code: `server/app/firmware.py`.
 
 Any non-200 status, a timeout (20 s), or a body that doesn't decode is a failure: the firmware draws its local
 error screen and retries in 5 min, up to 3 times, before returning to the normal schedule.
@@ -228,7 +265,18 @@ If rendering fails inside the server, it still returns `200` with the last good 
   full refresh; deep sleep.
 - If Wi-Fi or the server fails: draw a local text screen ("Can't reach the weather server at 192.168.1.20.
   Will retry at 3:30 PM."), keep the previous image otherwise, retry sooner (5 min) up to 3 times.
-- Server address and Wi-Fi are set in a small config header (or captive-portal setup, later).
+- Wi-Fi and server address: stored in NVS (ESP32 `Preferences`), with `config.h` values compiled in as the defaults
+  used while NVS is empty. A **captive-portal setup** (SoftAP `Inkplate-Weather-XXXX`, WPA2 with a password printed on
+  the e-paper, DNS catch-all, one-page form with a network scan) opens when no SSID is configured, when the wake
+  button is held about 5 s, and is suggested on the error screen after 3 consecutive failed retry cycles with Wi-Fi as
+  the cause (the radio is never left on for that). It closes after 10 minutes. Built-in ESP32 libraries only.
+- **OTA updates are pulled** (the device sleeps, so push-OTA doesn't fit): the firmware reports `fw=<FW_VERSION>`
+  (`version.h`) on every `/display.png` request; when the reply has `X-Firmware-Update: <n>` and the battery is at
+  least 40 % (or no battery is detected), it draws the picture first, then downloads
+  `/firmware/inkplate_weather-<n>.bin` with `HTTPUpdate` (MD5-checked) and restarts. A failed attempt is retried no
+  sooner than 6 hours later (timestamp in NVS). No automatic rollback.
+- Partition table: `no_fs` (two 2 MB app slots + `otadata`); the board's default `huge_app` has no OTA slot, so the
+  first flash with this firmware must be over USB. See `firmware/README.md`.
 
 ## Repository layout (planned)
 

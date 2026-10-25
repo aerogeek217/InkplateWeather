@@ -303,14 +303,14 @@ def _radar_layers(frame: dict, d: _Data, now: datetime, cfg: AppConfig | None) -
     home = (cfg.location.name.split(",")[0] if cfg else "") or "Home"
     xy = ext.project(cfg.location.lon, cfg.location.lat) if cfg else (0.0, 0.0)
     marks = radarmap.bolts(d.records("lightning.flashes"), now, ext)
-    return radarmap.layers(frame, home.upper(), xy, marks), bool(marks)
+    return radarmap.layers(frame, home.upper(), xy, marks, now=now), bool(marks)
 
 
 def _radar(d: _Data, tz: ZoneInfo, inp: summary.Inputs, now: datetime, cfg: AppConfig | None = None) -> Radar:
     frame = d.get("radar.frame")
     callout = d.get("radar.callout")  # fixture text wins over generated text
     if not (isinstance(callout, dict) and callout.get("headline")):
-        callout = summary.callout(inp)
+        callout = summary.callout(inp, frame.get("arrival") if isinstance(frame, dict) else None)
     hazard = d.get("summary.next_hazard") or summary.next_hazard(inp, summary.callout_event(inp))
     co = None
     if isinstance(callout, dict) and callout.get("headline"):

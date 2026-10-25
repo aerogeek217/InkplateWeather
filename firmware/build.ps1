@@ -11,10 +11,14 @@
   .\firmware\build.ps1                        # compile for Soldered Inkplate 10
   .\firmware\build.ps1 -Board eradionica      # compile for the older e-radionica Inkplate 10
   .\firmware\build.ps1 -Upload -Port COM5     # compile and flash (only when you mean to!)
+  .\firmware\build.ps1 -Export                # compile, then write firmware\dist\inkplate_weather-<ver>.bin + manifest.json
 #>
 param(
     [switch]$Setup,
     [switch]$Upload,
+    # After compiling, copy the app image to firmware\dist\inkplate_weather-<FW_VERSION>.bin and write manifest.json
+    # next to it (publish both to the server's cache\firmware\ folder for over-the-air updates).
+    [switch]$Export,
     [string]$Port = "",
     [ValidateSet("soldered", "eradionica")]
     [string]$Board = "soldered",
@@ -33,7 +37,12 @@ $CoreVersion = "4.0.0"
 $LibVersion = "11.2.1"
 $BoardIndexUrl = "https://github.com/SolderedElectronics/Inkplate-Board-Definitions-for-Arduino-IDE/raw/refs/heads/main/package_Inkplate_Boards_index.json"
 
-$Fqbn = if ($Board -eq "soldered") { "soldered-inkplate-boards:esp32:Inkplate10V2" } else { "soldered-inkplate-boards:esp32:Inkplate10" }
+# PartitionScheme=no_fs: two 2 MB app slots, which over-the-air updates need. The board's own default, huge_app,
+# has ONE app slot and no OTA. The first flash over USB must use this scheme (it rewrites the partition
+# table); later builds can then be pushed over the air.
+$Partitions = "PartitionScheme=no_fs"
+$BoardId = if ($Board -eq "soldered") { "soldered-inkplate-boards:esp32:Inkplate10V2" } else { "soldered-inkplate-boards:esp32:Inkplate10" }
+$Fqbn = "${BoardId}:$Partitions"
 
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 if (-not $ToolsDir) { $ToolsDir = Join-Path $RepoRoot ".tools" }
@@ -88,8 +97,40 @@ if (-not (Test-Path (Join-Path $Sketch "config.h"))) {
     throw "Missing $Sketch\config.h. Copy config.example.h to config.h and fill in Wi-Fi and server settings."
 }
 
-& $Cli --config-file $CliConfig compile --fqbn $Fqbn --warnings default $Sketch
+$compileArgs = @("--config-file", $CliConfig, "compile", "--fqbn", $Fqbn, "--warnings", "default")
+$DistDir = Join-Path $PSScriptRoot "dist"
+$BuildOut = Join-Path $DistDir "build"
+if ($Export) { $compileArgs += @("--output-dir", $BuildOut) }
+& $Cli @compileArgs $Sketch
 if ($LASTEXITCODE -ne 0) { throw "Compile failed" }
+
+if ($Export) {
+    $ver = [regex]::Match((Get-Content (Join-Path $Sketch "version.h") -Raw), '#define\s+FW_VERSION\s+(\d+)').Groups[1].Value
+    if (-not $ver) { throw "Couldn't read FW_VERSION from version.h" }
+    $built = Join-Path $BuildOut "inkplate_weather.ino.bin"
+    if (-not (Test-Path $built)) { throw "Expected build output $built not found" }
+    $name = "inkplate_weather-$ver.bin"
+    $dest = Join-Path $DistDir $name
+    Copy-Item $built $dest -Force
+    $md5 = (Get-FileHash $dest -Algorithm MD5).Hash.ToLower()
+    $sha = (Get-FileHash $dest -Algorithm SHA256).Hash.ToLower()
+    $size = (Get-Item $dest).Length
+    $builtAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    $manifest = @(
+        "{",
+        "  `"version`": $ver,",
+        "  `"file`": `"$name`",",
+        "  `"md5`": `"$md5`",",
+        "  `"sha256`": `"$sha`",",
+        "  `"size`": $size,",
+        "  `"fqbn`": `"$Fqbn`",",
+        "  `"built_at`": `"$builtAt`"",
+        "}"
+    ) -join "`n"
+    [System.IO.File]::WriteAllText((Join-Path $DistDir "manifest.json"), $manifest + "`n", (New-Object System.Text.UTF8Encoding($false)))
+    Write-Host "Exported $dest ($size bytes, md5 $md5) and manifest.json"
+    Write-Host "Publish: scp firmware/dist/$name firmware/dist/manifest.json pi@<server>:~/inkplate-weather/cache/firmware/"
+}
 
 if ($Upload) {
     if (-not $Port) { throw "Pass -Port COMx (see firmware/README.md, 'Find the COM port')." }

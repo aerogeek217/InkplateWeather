@@ -22,7 +22,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Res
 from fastapi.staticfiles import StaticFiles
 from pydantic import ValidationError
 
-from . import collector, config, history, messages, status, viewmodel
+from . import collector, config, firmware, history, messages, status, viewmodel
 from .cache import ProviderCache
 from .cache import cache_dir as cache_dir
 from .config import AppConfig
@@ -36,6 +36,31 @@ from .render.quantize import quantize, quantize_png
 from .resolver import Resolved
 
 log = logging.getLogger("inkplate")
+
+LOG_FORMAT = "%(asctime)s %(levelname)-7s %(name)s: %(message)s"
+
+
+def configure_logging() -> None:
+    """Timestamped log lines for `docker compose logs`, including our own INFO lines.
+
+    Uvicorn configures only its own loggers (no timestamps); ours would otherwise go to Python's last-resort
+    handler, which drops everything below WARNING. Idempotent, and it leaves handlers someone else set up alone
+    (a test runner, an embedding app).
+    """
+    fmt = logging.Formatter(LOG_FORMAT)
+    for name in ("uvicorn.error", "uvicorn.access"):
+        for h in logging.getLogger(name).handlers:
+            h.setFormatter(fmt)
+    root = logging.getLogger()
+    if not root.handlers:
+        h = logging.StreamHandler()  # stderr, unbuffered
+        h.setFormatter(fmt)
+        root.addHandler(h)
+    for name in ("inkplate", "app"):
+        lg = logging.getLogger(name)
+        if lg.level == logging.NOTSET:
+            lg.setLevel(logging.INFO)
+
 
 SLEEP_MARGIN_S = 20
 SLEEP_MIN_S, SLEEP_MAX_S = 60, 3600
@@ -186,6 +211,7 @@ def _stop_sampler(state) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    configure_logging()
     st = app.state
     path = config_path()
     _apply_config(st, config.load(path), path)
@@ -208,6 +234,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Inkplate weather", lifespan=lifespan)
 app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
+app.include_router(firmware.router)  # GET /firmware/inkplate_weather-<n>.bin (over-the-air updates)
 
 
 def _cfg(request: Request) -> AppConfig:
@@ -360,14 +387,16 @@ async def health() -> JSONResponse:
 
 @app.get("/display.png")
 async def display(request: Request, batt: str | None = Query(None), mv: str | None = Query(None),
-                  reason: str | None = Query(None)) -> Response:
+                  reason: str | None = Query(None), fw: str | None = Query(None)) -> Response:
     cfg = _cfg(request)
     device = DeviceInfo(battery_pct=_int(batt, 0, 100), voltage_mv=_int(mv, 0, 10000),
                         wake_reason=reason if reason in WAKE_REASONS else None)
     real_now = datetime.now(ZoneInfo(cfg.location.tz))
-    request.app.state.last_request = {"at": real_now, "device": device}
+    fw_version = firmware.parse_version(fw)
+    request.app.state.last_request = {"at": real_now, "device": device, "fw": fw_version}
     headers = {"X-Sleep-Seconds": str(sleep_seconds(real_now, cfg.server.refresh_minutes)),
-               "Cache-Control": "no-store"}
+               "Cache-Control": "no-store",
+               **firmware.update_headers(cache_dir(cfg), fw_version)}
     try:
         dctx = await build_context(cfg, cfg.server.fixture, device, request.app.state)
         png = await render_png(request.app.state.renderer, dctx)

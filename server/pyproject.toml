@@ -16,6 +16,7 @@ dependencies = [
     "tzdata>=2024.1",  # zoneinfo data on Windows and slim images
     "astral>=3.2",  # sun and moon rise/set (pure Python, no runtime downloads)
     "h5py>=3.10",  # GOES GLM lightning files are NetCDF4/HDF5 (wheels for arm64 and Windows)
+    "numpy>=1.26",  # storm motion (FFT cross-correlation); also an h5py dependency
 ]
 
 [project.optional-dependencies]

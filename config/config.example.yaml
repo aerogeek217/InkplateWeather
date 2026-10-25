@@ -30,6 +30,7 @@ providers:
   history:    {type: history, ttl: 0s}                  # recorded station readings (cache/history)
   device:     {type: device}                            # battery etc. from the Inkplate's request
   mrms:       {type: radar_mrms, ttl: 2m}               # NOAA MRMS reflectivity + precip type (2-min updates)
+  #           storm motion / arrival lines fetch two older frames while echoes are in view; `motion: false` skips it
   iem:        {type: radar_iem, ttl: 5m}                # fallback: Iowa Mesonet NEXRAD mosaic (intensity only)
   glm:        {type: lightning_glm}                     # GOES-East lightning; polls only while radar shows echoes
   # Home Assistant, e.g. for the PMS5003 later:
