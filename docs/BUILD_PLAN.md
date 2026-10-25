@@ -224,7 +224,9 @@ to the Inkplate on COM3 with the user's approval at 09:23 CDT; its first request
   Partition scheme now `no_fs` (2 × 2 MB app slots), so the **next flash must be over USB**. Untested on hardware.
 - Tests: 641 pass on Windows; in the container 636 pass, 5 skip (the backup-script tests: `scripts/` isn't in the image).
 
-Layout v3 (2026-10-25, on `layout-v3`; approved by the user, not yet deployed): margins 51/53/66/68 (15 px off the top
+Layout v3 (2026-10-25, on `layout-v3`; approved by the user and deployed to the OMV Pi as 6200615 at 10:25 CDT,
+config backed up, `:previous` = the 7a90f2b image; on the Pi all six fixture boards match the goldens, ≤ 0.055 %;
+the first live render showed Mattoon's label running into Charleston, fixed in 6200615): margins 51/53/66/68 (15 px off the top
 and right), radar 551 × 585 with the view 20 % farther out and home 60 mi from the west edge / 38 mi from the east
 (`app/mapgeo.py` X_MIN/X_MAX/Y_MIN/Y_MAX replace the centered HALF_W/HALF_H); base map rebuilt with five more towns;
 MRMS and IEM test recordings re-recorded from the archives for the wider extent. Snow-line motion now compares the
