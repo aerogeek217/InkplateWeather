@@ -236,6 +236,14 @@ time tags must fit inside the panel, off the legend and callout. The fall/winter
 the generated radar of `radar-motion` / `radar-snowline` (`design/tools/layout_v3.py`). Tests: 642 pass on Windows
 and in the container.
 
+Radar fixes (2026-10-27, after light rain on the evening of 10-27 showed arrival lines and "Rain ~7 PM" over a nearly
+empty map and a 0 % chance of rain): MRMS `ReflectivityAtLowestAltitude` showed ~200 echo cells in view where the
+base-scan mosaic `MergedBaseReflectivityQC` showed ~1,600 (light rain aloft), so the provider's default product is now
+`MergedBaseReflectivityQC` (motion uses the same product). The motion arrival carries `substantial` (convective, or
+≥ 20 cells ≥ 30 dBZ in the 16 mi band within the 3 h reach), and `summary.radar_callout` drops a rain callout that is
+neither substantial nor backed by a forecast chance ≥ 20 % in the hour of arrival or the one either side; the
+arrival lines still draw. Renders checked live and on a replay of the 6:40 PM radar. Tests: 644 pass on Windows.
+
 ## Testing strategy
 
 - **Unit tests** for parsers, resolver, view-model rules (pytest, no network; recorded responses with respx).

@@ -2,8 +2,9 @@
 
 Fetches (concurrently) from `https://mrms.ncep.noaa.gov/2D/`:
 
-- `<product>/MRMS_<product>.latest.grib2.gz`: reflectivity in dBZ, default `ReflectivityAtLowestAltitude`
-  (alternatives: `MergedBaseReflectivityQC`, `SeamlessHSR`), ~0.7 MB, every 2 min
+- `<product>/MRMS_<product>.latest.grib2.gz`: reflectivity in dBZ, default `MergedBaseReflectivityQC` (the
+  base-scan mosaic, like most radar apps; alternatives: `ReflectivityAtLowestAltitude`, `SeamlessHSR`, which miss
+  light rain aloft: on 2026-10-27 they showed ~200 cells where the base scan showed ~1,600), ~0.7 MB, every 2 min
 - `PrecipFlag/…`: rain / snow / hail per cell (no ice class)
 - `Model_SurfaceTemp/…` (hourly, ~14 MB) only when there is liquid precipitation in view, at most hourly, and only
   every 6 h while the last grid was warm (> 4 °C everywhere in view). Liquid precipitation at ≤ 0 °C at the surface
@@ -43,6 +44,7 @@ from .base import RequestContext, register
 log = logging.getLogger(__name__)
 
 BASE_URL = "https://mrms.ncep.noaa.gov/2D"
+PRODUCT = "MergedBaseReflectivityQC"
 MARGIN = 8.0  # map units of grid kept around the panel, so bilinear edges have neighbours
 TEMP_REFRESH_S = 3600  # the surface temperature grid is hourly
 TEMP_WARM_REFRESH_S = 6 * 3600
@@ -168,7 +170,7 @@ class MrmsProvider:
         self.name = name
         self.ttl = cfg.ttl
         opts = cfg.options
-        self.product = str(opts.get("product", "ReflectivityAtLowestAltitude"))
+        self.product = str(opts.get("product", PRODUCT))
         self.ice = bool(opts.get("ice", True))
         self.timeout = float(opts.get("timeout", 10))
         self.base = str(opts.get("base_url", BASE_URL)).rstrip("/")

@@ -125,6 +125,7 @@ def test_storm_overlays_follow_the_motion():
     assert gaps[0] == pytest.approx(gaps[1], abs=1)  # one hour apart = the same distance
     arr = res["arrival"]
     assert arr["kind"] == "storm" and arr["from"] == "west" and arr["heading"] == "ENE" and arr["mph"] == 15
+    assert arr["substantial"]
     t = datetime.fromisoformat(arr["t"])
     assert latest.t < t < latest.t + timedelta(hours=1)
     assert arr["dist_mi"] == pytest.approx((t - latest.t).total_seconds() / 3600 * 14.7, abs=1.5)
@@ -206,7 +207,7 @@ def provider():
 
 def _mock_winter(router, listing_status=200):
     b = radar_mrms.BASE_URL
-    refl = "ReflectivityAtLowestAltitude"
+    refl = radar_mrms.PRODUCT
     router.get(radar_mrms.url(b, refl)).mock(return_value=_gz("SeamlessHSR_00.00_20220202-090000.grib2"))
     router.get(radar_mrms.url(b, "PrecipFlag")).mock(return_value=_gz("PrecipFlag_00.00_20220202-090000.grib2"))
     for product, prefix in ((refl, "SeamlessHSR"), ("PrecipFlag", "PrecipFlag")):
@@ -309,6 +310,37 @@ def test_radar_callout_for_the_snow_line():
     assert co["detail"] == summary.callout(inp)["detail"]  # the forecast's detail ("Sleet now · heaviest …")
     storm = {"t": "2027-01-19T16:00:00-06:00", "kind": "rain", "dist_mi": 5, "from": "west", "heading": "E", "mph": 20}
     assert summary.callout(inp, storm) == summary.callout(inp)  # a winter storm: echo motion doesn't time it
+
+
+def test_light_echo_is_not_substantial():
+    latest, older, lat = storm_set()
+    for f in (latest, *older):  # the same line as sprinkles: 15–25 dBZ, no moderate or convective core
+        f.dbz = np.where(f.dbz >= 15, np.minimum(f.dbz, 25.0), f.dbz)
+    arr = motion.analyze(latest, older, lat, HOME, "intensity", TZ)["arrival"]
+    assert arr["kind"] == "rain" and not arr["substantial"]
+
+
+def test_radar_rain_callout_needs_substantial_echo_or_the_forecast():
+    inp = _inputs("fall", datetime(2026, 10, 24, 18, 0, tzinfo=TZ))
+    t = datetime(2026, 10, 24, 19, 10, tzinfo=TZ)
+    rain = {"t": t.isoformat(), "kind": "rain", "dist_mi": 22, "from": "southwest", "heading": "NE", "mph": 38,
+            "substantial": False}
+
+    def pops(*around):  # hourly chances for 6, 7 and 8 PM, nothing else
+        for h in inp.hours:
+            h.pop = 0.0
+        for h in inp.hours:
+            for hour, pop in zip((18, 19, 20), around, strict=True):
+                if h.t == t.replace(hour=hour, minute=0):
+                    h.pop = pop
+
+    pops(5, 5, 5)  # light echo, the forecast says no: lines only
+    assert summary.callout(inp, rain) == summary.callout(inp)
+    pops(5, 5, 20)  # the forecast agrees in the hour after arrival
+    assert summary.callout(inp, rain)["headline"] == "Rain ~7 PM"
+    pops(5, 5, 5)
+    assert summary.callout(inp, {**rain, "substantial": True})["headline"] == "Rain ~7 PM"  # moderate echo heading in
+    assert summary.callout(inp, {**rain, "kind": "storm"})["headline"] == "Storms ~7 PM"
 
 
 def test_fixture_boards_get_the_radar_callout():

@@ -19,7 +19,7 @@ Coordinates are map units (`app.mapgeo`: x east, y south, home near 0, 0); times
 JSON so it travels inside the radar frame (and the cache's last-good copy):
 
     {"motion": {"vx", "vy", "mph", "heading"},
-     "arrival": {"t", "kind": "storm"|"rain"|"snow", "dist_mi", "from", "heading", "mph"} | None,
+     "arrival": {"t", "kind": "storm"|"rain"|"snow", "dist_mi", "from", "heading", "mph", "substantial"} | None,
      "arrivals": [{"t", "x1", "y1", "x2", "y2", "tag": [x, y]}], "arrow": {...} | None,
      "snow_line": [[x, y], ...] | None, "snow_label": [x, y] | None,
      "snow_lines": [{"t", "points": [[x, y], ...], "tag": [x, y]}]}
@@ -47,6 +47,7 @@ AGREE_DEG = 35.0
 
 STRONG_DBZ, RAIN_DBZ, STORM_DBZ = 30.0, 20.0, 45.0
 MIN_STRONG_CELLS = 40
+SUBSTANTIAL_CELLS = 20  # moderate echo (≥ 30 dBZ, ≈ 7 mi²) heading for home within the horizon
 BAND_MI = 8.0  # storms within this distance across the track are "heading for home"
 AT_HOME_MI = 2.0
 STORM_HORIZON_H = 3.0
@@ -279,10 +280,12 @@ def storm_overlays(latest: Frame, lat: Lattice, m: Motion, home: tuple[float, fl
         hours = -s_edge / m.speed
         if hours <= STORM_HORIZON_H:
             convective = bool((z[band & (s < 0)] >= STORM_DBZ).any())
+            reach = band & (s < 0) & (s >= -m.speed * STORM_HORIZON_H)
+            substantial = convective or int((z[reach] >= STRONG_DBZ).sum()) >= SUBSTANTIAL_CELLS
             bearing = math.degrees(math.atan2(-ux, uy))  # from home toward the oncoming storms
             out["arrival"] = {"t": _iso(t0 + timedelta(hours=hours)), "kind": "storm" if convective else "rain",
                               "dist_mi": round(-s_edge / UNITS_PER_MILE), "from": compass8_word(bearing),
-                              "heading": m.heading, "mph": round(m.mph)}
+                              "heading": m.heading, "mph": round(m.mph), "substantial": substantial}
     else:
         s_edge = None
     if s_edge is None:

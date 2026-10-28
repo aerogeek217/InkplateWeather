@@ -20,7 +20,7 @@ from app.readings import Status
 
 MRMS = TESTS_DIR / "data" / "recorded" / "mrms"
 NOW = datetime(2026, 10, 24, 19, 0, tzinfo=UTC)
-REFL = radar_mrms.url(radar_mrms.BASE_URL, "ReflectivityAtLowestAltitude")
+REFL = radar_mrms.url(radar_mrms.BASE_URL, radar_mrms.PRODUCT)
 FLAG = radar_mrms.url(radar_mrms.BASE_URL, "PrecipFlag")
 TEMP = radar_mrms.url(radar_mrms.BASE_URL, "Model_SurfaceTemp")
 

@@ -809,7 +809,8 @@
      "dist_mi": 7,
      "from": "west",
      "heading": "ENE",
-     "mph": 15
+     "mph": 15,
+     "substantial": true
     }
    },
    "observed_at": "2026-10-24T14:25:00-05:00"
