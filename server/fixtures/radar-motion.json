@@ -578,7 +578,8 @@
      "dist_mi": 7,
      "from": "west",
      "heading": "ENE",
-     "mph": 15
+     "mph": 15,
+     "substantial": true
     },
     "overlays": {
      "arrivals": [

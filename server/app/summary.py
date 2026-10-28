@@ -31,6 +31,7 @@ CALLOUT_ICE_POP = 50
 CALLOUT_DETAIL_PARTS = 3  # "Sleet now · heaviest 7–11 PM · 3–5 in": at most three pieces
 RADAR_STORM_HOURS = 3  # radar-timed arrivals (app.motion) trusted this far ahead
 RADAR_SNOW_HOURS = 12
+RADAR_RAIN_POP = 20  # light echo alone gets a radar callout only when the forecast agrees around its arrival
 TREND_DEG = 8  # tomorrow's high this much above/below today's → "warmer" / "colder"
 WINDY_MPH = 20  # sustained
 WINDY_GUST_MPH = 30
@@ -534,7 +535,9 @@ def _round_up_to(t: datetime, minutes: int, now: datetime, nearest: bool) -> dat
 
 def radar_callout(inp: Inputs, arrival: dict | None, ev: Event | None) -> dict | None:
     """The callout timed by radar (app.motion): storms reaching home ("Storms ~4 PM", "22 mi west · ENE 15 mph ·
-    ~0.5 in", like the fall board) or the snow line reaching it ("Snow by 6 PM" + the forecast's detail)."""
+    ~0.5 in", like the fall board) or the snow line reaching it ("Snow by 6 PM" + the forecast's detail). Rain needs
+    substantial echo heading for home (moderate or convective) or a forecast chance of at least RADAR_RAIN_POP in the
+    hours around its arrival: light echo alone (sprinkles, rain aloft) only draws the arrival lines."""
     if not isinstance(arrival, dict):
         return None
     t = _dt(arrival.get("t"), inp.now.tzinfo)  # type: ignore[arg-type]
@@ -553,12 +556,19 @@ def radar_callout(inp: Inputs, arrival: dict | None, ev: Event | None) -> dict |
         return {"kind": "snow", "headline": headline, "detail": detail}
     if ev is not None and ev.kind in ("snow", "ice"):
         return None  # a winter storm: the snow line and the forecast tell it better than echo motion
+    if not (kind == "storm" or arrival.get("substantial")) and _pop_near(inp, t) < RADAR_RAIN_POP:
+        return None
     storm = kind == "storm" or (ev is not None and ev.kind == "storm")
     headline = f"{'Storms' if storm else 'Rain'} ~{clock_time(_round_up_to(t, 30, inp.now, nearest=True))}"
     parts = [x for x in (where, motion) if x]
     if ev is not None and ev.rain >= 0.1:
         parts.append(rain_amount(ev.rain))
     return {"kind": "storm" if storm else "rain", "headline": headline, "detail": " · ".join(parts)}
+
+
+def _pop_near(inp: Inputs, t: datetime) -> float:
+    """The highest hourly chance of precipitation in the hour containing `t` and the one either side."""
+    return max((h.pop for h in inp.hours if t - timedelta(hours=2) < h.t <= t + timedelta(hours=1)), default=0.0)
 
 
 def callout(inp: Inputs, arrival: dict | None = None) -> dict | None:

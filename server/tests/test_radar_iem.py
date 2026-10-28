@@ -58,7 +58,7 @@ async def test_recorded_mosaic(provider):
     app = AppConfig(location=LocationCfg(name="Savoy, IL", lat=40.0617, lon=-88.2517, tz="America/Chicago"))
     mrms = base.build("mrms", ProviderCfg(type="radar_mrms", ttl="2m"), app)
     with respx.mock(assert_all_called=False) as router:
-        for product, name in (("ReflectivityAtLowestAltitude", "SeamlessHSR_00.00_20230401-010000.grib2"),
+        for product, name in ((radar_mrms.PRODUCT, "SeamlessHSR_00.00_20230401-010000.grib2"),
                               ("PrecipFlag", "PrecipFlag_00.00_20230401-010000.grib2"),
                               ("Model_SurfaceTemp", "MRMS_Model_SurfaceTemp_00.50_20261024-170000.grib2")):
             router.get(radar_mrms.url(radar_mrms.BASE_URL, product)).mock(

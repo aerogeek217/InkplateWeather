@@ -127,7 +127,7 @@ frames (cross-correlation of the echo field); built in phase 4, see *Storm motio
 motion the panel shows the current frame and the callout uses forecast wording (e.g. "Storms ~4 PM · 3–8 PM · 80%").
 
 As built (Phase 3, 2026-10-24):
-- `radar_mrms` fetches `ReflectivityAtLowestAltitude` + `PrecipFlag` (`mrms.ncep.noaa.gov/2D/…latest.grib2.gz`),
+- `radar_mrms` fetches `MergedBaseReflectivityQC` (since 2026-10-27; was `ReflectivityAtLowestAltitude`) + `PrecipFlag` (`mrms.ncep.noaa.gov/2D/…latest.grib2.gz`),
   decodes them with `app/grib2.py` (template 3.0 + 5.41 PNG packing only) and crops to the extent.
   `app/radar.py` reprojects onto the 551 × 585 px panel (one affine transform: the map is equirectangular around
   home), dBZ bilinearly and type by nearest cell, then classifies into 1-bit masks the partial fills with the

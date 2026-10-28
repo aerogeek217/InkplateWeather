@@ -209,7 +209,9 @@ Storm motion (phase 4.1, renders approved 2026-10-25): the arrival lines, time t
 bold snow line with its "snow line" label and the "SNOW 6 PM" lines are drawn from radar with the boards' styles
 (`server/app/radarmap.py`), only when the motion estimate is trustworthy. The callout's headline is then timed by
 radar ("Storms ~3 PM", nearest half hour; "Snow by 5 PM") with the fall board's detail ("7 mi west · ENE 15 mph ·
-~0.5 in"). Test boards: `radar-motion` and `radar-snowline` fixtures (`server/tests/build_radar_fixtures.py`; since v3
+~0.5 in"). Rain gets a radar-timed callout only when the echo heading for home is substantial (convective, or
+≥ 20 cells of ≥ 30 dBZ within reach) or the forecast gives ≥ 20 % in the hours around the arrival; light echo alone
+(sprinkles, rain aloft) only draws the lines (2026-10-27). Test boards: `radar-motion` and `radar-snowline` fixtures (`server/tests/build_radar_fixtures.py`; since v3
 both use synthetic motion on real echoes: measured over one window, the recorded snow line was nearly stationary);
 their goldens `reference/radar-motion-eink.png`, `radar-snowline-eink.png` (+ `windows/`).
 
